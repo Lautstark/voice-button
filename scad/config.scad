@@ -136,44 +136,45 @@ plate_corner_cut = 13.5; // 45° corner chamfer clearing the bezel posts
 stop_z         = plate_under_z - travel_stop;  // 11.6 — mid-wall rib stop height
 
 // Card frame on the plate front (moves with the plate)
-// INSERTION: the card slides in edgewise through a slot in the WEST wall and
-// is never bent. Once inside, the full-length north and south lips hold its
-// top and bottom edges across the whole width, so the only way out is back
-// through the slot — and a sawtooth detent on the bed blocks that until the
-// card is deliberately pushed west through the notch in the east lip.
+// LOADING: only the front is reachable — the frame is a moving part inside
+// the bezel opening, so nothing can be slid in from an edge. The card hooks
+// into a deep pocket at the TOP, is pushed up until its bottom edge clears
+// the bottom lip, laid flat (there are no side lips in the way) and released.
+// Gravity then drops it onto the bottom lip and into a seat groove. The card
+// is never bent; the escape direction is upward, which gravity opposes and
+// the seat groove blocks.
 card_w         = 40.0;  // laminated card, square
 card_t         = 0.6;   // laminate thickness (parameterised)
-card_clear     = 0.2;   // channel clearance per side (across the slide axis)
-rail_overlap   = 1.3;   // lip overlap onto the card: north, south, east
+card_clear     = 0.2;   // channel clearance per side
+card_lift      = 1.5;   // how far the card rides up to free its bottom edge
+lip_bottom     = 1.0;   // bottom lip overlap, full width
+lip_top        = card_lift + 1.2;  // 2.7 — depth of the top pocket; 1.2 mm of
+                        // it is still engaged when the card sits down. Keep
+                        // this modest: its underside is an unsupported
+                        // overhang over the channel when the plate prints.
+seat_groove_d  = 0.4;   // the bed drops this much under the bottom lip, so
+seat_groove_w  = 3.0;   // the card's edge seats into it and has to climb the
+seat_ramp      = 1.5;   // ramp again before it can ride up and out
 rail_wall      = 2.2;   // rail outer wall thickness
-card_ch_h      = card_t + 0.3;           // 0.9 — channel height under the
-                        // lips; snug on purpose. The slack left over after
-                        // detent_h is what the card rides in on.
-rail_lip_t     = 1.7;   // lip thickness over the card; the same material is
-                        // the roof beam over the insertion slot
+card_ch_h      = card_t + 0.4;           // 1.0 — channel height under the lips;
+                        // the 0.1 over the old value is headroom for the sag
+                        // of the top pocket's overhang
+rail_lip_t     = 1.6;   // lip thickness: also sets how deep the block sits in
+                        // the bezel collar when the button is fully pressed
 rail_h         = card_ch_h + rail_lip_t; // 2.6 — rail rise above the card bed
-slot_h         = card_ch_h + 0.5;        // 1.55 — insertion slot height. The
-                        // extra over the channel absorbs the sag of the
-                        // 40 mm bridge that forms the slot roof.
-// The detent lives INSIDE the insertion slot, in the west wall, so it needs
-// no spare channel width and never sits under the seated card. Keep its
-// height a whole number of layers (0.4 = 2 x 0.2 mm) or it will not print.
-detent_h       = 0.4;   // ramp going in, steep face behind the card's west
-detent_l       = 1.2;   // edge once it is seated: the only escape route
-detent_w       = 16.0;
-finger_w       = 16.0;  // notch in the EAST lip: push the card west to eject
+finger_w       = 16.0;  // notch in the BOTTOM lip: push the card up to free it
 plate_front_z  = plate_under_z + plate_t;        // 15.4 — card bed surface
 rail_top_z     = plate_front_z + rail_h;         // 18.0
 // Channel and guided block (the block slides in the bezel collar)
-card_ch_w      = card_w + 2*card_clear;               // 40.4 (x, slide axis)
-card_ch_l      = card_w + 2*card_clear;               // 40.4 (y)
+card_ch_w      = card_w + 2*card_clear;               // 40.4 (x)
+card_ch_l      = card_w + 2*card_clear + card_lift;   // 41.9 (y, incl. lift)
 guide_w        = card_ch_w + 2*rail_wall;  // 44.8
-guide_h        = card_ch_l + 2*rail_wall;  // 44.8
-// Where the card comes to rest: pushed east against the east lip.
+guide_h        = card_ch_l + 2*rail_wall;  // 46.3
+// Where the card rests, and where it has to be pushed to load it.
 // (These live here, not in assembly.scad: `use <>` imports modules but not
 //  variables, so a check in main.scad would silently get undef.)
-card_seat_x    = cavity_w/2 + card_ch_w/2 - card_w;
-card_seat_y    = cavity_h/2 - card_w/2;
+card_seat_x    = cavity_w/2 - card_ch_w/2 + card_clear;
+card_seat_y    = cavity_h/2 - card_ch_l/2 + card_clear;
 
 // ---------------------------------------------------------------------
 // Bezel (fixed front frame, screwed from the back)
@@ -184,7 +185,7 @@ card_seat_y    = cavity_h/2 - card_w/2;
 // plate's card-frame block. Outside the collar the face is thinner.
 bezel_gap      = 0.3;   // guide clearance: collar bore to guide block, per side
 bezel_open_w   = guide_w + 2*bezel_gap; // 45.4 — guides the moving block
-bezel_open_h   = guide_h + 2*bezel_gap; // 45.4 (square again)
+bezel_open_h   = guide_h + 2*bezel_gap; // 46.9
 bezel_face_t   = 1.8;   // thin outer face region
 collar_w       = 2.0;   // collar ring radial width beyond the opening
 wall_top_z     = plate_front_z;                  // 15.4 — shell walls end here
@@ -228,11 +229,15 @@ assert(travel_stop * (cavity_h/2 - sw_y_shift)/cavity_h > act_gap + sw_travel + 
 assert(plate_under_z - bridge_top > foam_t - 0.5, "foam pad preload sane");
 assert(stop_z > bridge_top + bo_t + 2.0, "stops must sit above the breakout plane");
 
-assert(slot_h >= detent_h + card_t + 0.2,
-       "the card must clear the slot roof while riding over the detent");
 assert(card_ch_h > card_t + 0.2, "card needs room in the channel");
-assert(rail_overlap > (card_ch_l - card_w) + 0.5,
-       "lip overlap must exceed the channel play, or the card can slip out");
+assert(card_lift > lip_bottom + 0.3,
+       "the lift must free the card's bottom edge from the bottom lip");
+assert(lip_top - card_lift >= 1.0,
+       "the top pocket must still hold the card once it sits down");
+// Front loading is the only access the moving frame has, so the card must
+// pass through the bezel opening in both directions.
+assert(bezel_open_w > card_w + 1 && bezel_open_h > card_w + 1,
+       "card must pass through the bezel opening");
 
 echo(str("housing: ", housing_w, " x ", housing_h, " x ", housing_d,
          " mm external (+", foot_h, " feet, + loop)"));

@@ -51,18 +51,16 @@ module mock_foam_pads() {
         translate([fx, 27, bridge_top]) cube([foam_w, foam_w, foam_t]);
 }
 
-// The card seats EAST, against the east lip; the slide slack is west of it.
-card_seat_x = cavity_w/2 + card_ch_w/2 - card_w;
-card_seat_y = cavity_h/2 - card_w/2;
 module mock_card() {
     color([0.95, 0.6, 0.15])
         translate([card_seat_x, card_seat_y, plate_front_z])
             cube([card_w, card_w, card_t]);
 }
-// The card held at the slot mouth, just entering — used by the fit checks.
-module mock_card_entering() {
+// The card pushed up to the loading position, where its bottom edge has
+// just cleared the bottom lip and it can be laid flat / lifted out.
+module mock_card_lifted() {
     color([0.95, 0.6, 0.15])
-        translate([cavity_w/2 - guide_w/2 + 0.1, card_seat_y, plate_front_z + detent_h])
+        translate([card_seat_x, card_seat_y + card_lift, plate_front_z])
             cube([card_w, card_w, card_t]);
 }
 

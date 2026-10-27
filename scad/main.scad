@@ -51,22 +51,23 @@ else if (part == "check_plate_pressed")  intersection() {
     translate([0, 0, -travel_stop]) front_plate();
     union() { rear_shell(); bridge(); mock_battery(); mock_pcb(); }
 }
-// Card retention: a seated card lifted past its channel clearance MUST hit
-// the north, south and east lips (the west side is the insertion slot).
+// A seated card lifted past its channel clearance MUST hit the top and the
+// bottom lip (the sides are deliberately open so it can be laid in flat).
 else if (part == "check_card_retained") intersection() {
     test_card();
     translate([0, 0, card_ch_h - card_t + 0.1]) mock_card();
 }
-// The seated card must sit free in its channel: expect EMPTY.
+// Seated and in the loading position the card must lie free: expect EMPTY.
+// The loading one is the real proof that nothing blocks it being laid flat.
 else if (part == "check_card_seated") intersection() { test_card(); mock_card(); }
-// The card swept flat along the whole channel, from the slot's inner face to
-// the seat. Expect EMPTY: nothing may reach into the card's path there. (The
-// detent deliberately does stand in the path, but it sits in the slot, west
-// of this sweep; the slot headroom for riding over it is an assert instead.)
-else if (part == "check_card_sweep") intersection() {
-    test_card();
-    translate([cx - card_ch_w/2, card_seat_y, plate_front_z])
-        cube([card_ch_w, card_w, card_t]);
+else if (part == "check_card_lifted") intersection() {
+    test_card(); mock_card_lifted();
+}
+// Both card positions, checked against the WHOLE assembled device. This is
+// the check whose absence let a holder ship that could not be loaded at all.
+else if (part == "check_card_insert_assembled") intersection() {
+    union() { rear_shell(); bezel(); front_plate(); }
+    union() { mock_card(); mock_card_lifted(); }
 }
 else if (part == "section_card") difference() {
     union() { test_card(); mock_card(); }

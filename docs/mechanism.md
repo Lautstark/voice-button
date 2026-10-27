@@ -48,58 +48,49 @@ heraus. Die Ecken der Platte sind 45° gekappt und haben eine Aussparung
 Ost, damit die drei Schraubsäulen frei durchlaufen (0,3+ mm Spiel über den
 ganzen Hub, per `check_fit.sh` nachgewiesen).
 
-## Kartenhalter (Einschub)
+## Kartenhalter (oben einhängen)
 
 Auf der beweglichen Frontplatte, bewegt sich mit. Die Karte wird **nie
-gebogen** — sie wird flach durch einen Schlitz eingeschoben.
+gebogen**.
 
-Warum nicht mehr klemmen und knicken: Ein ringsum berandeter Rahmen hat
-keinen flachen Einlass. Die Karte muss sich dann wölben, und weil die
-Sehnenverkürzung quadratisch mit dem Bogen geht, braucht ein Übergreifen
-von 1,2 mm rund 3 mm Bogen. Das knickt 0,6-mm-Laminat sichtbar.
+**Warum nur von vorn:** Der Kartenrahmen ist ein bewegliches Teil *innerhalb*
+der Blendenöffnung, mit 0,3 mm Luft ringsum. Von keiner Kante kommt man an
+ihn heran — ein Einschubschlitz in einer Rahmenwand wäre von Gehäusewand und
+Blendenkragen zugebaut. Das ist in `check_card_insert_assembled` festgenagelt
+(ein früherer Entwurf scheiterte dort mit 115 mm³ Hindernis).
 
-Geometrie (Kanal 40,4 × 40,4 mm für eine 40 × 40-Karte):
+Geometrie (Kanal 40,4 × 41,9 mm für eine 40 × 40-Karte):
 
-- **Nord- und Südlippe:** über die volle Kanalbreite, 1,3 mm Überdeckung.
-  Sie stehen quer zur Einschubrichtung und halten die Karte an Ober- und
-  Unterkante durchgehend fest — das ist die eigentliche Sicherung.
-- **Ostlippe:** 1,3 mm, über die volle Höhe; sie ist der Endanschlag.
-- **Westwand:** durchgehender Einschubschlitz, 1,4 mm hoch.
-- **Rastnase:** 0,4 mm hoher Sägezahn, 16 mm breit, **im Schlitz** in der
-  Westwand. Rampe beim Einschieben, steile Flanke beim Herausziehen. Sie
-  sitzt bewusst in der Wand und nicht im Kanal: so liegt die Karte innen
-  plan auf, und der Rahmen braucht keine Extrabreite. 0,4 mm sind genau
-  zwei Schichten à 0,2 mm — eine flachere Nase druckt sich weg.
-- **Fingermulde:** 16 mm Ausschnitt in der Ostlippe zum Herausdrücken.
+- **Obere Tasche:** 2,7 mm tiefe Lippe über die volle Breite. Davon bleiben
+  1,2 mm im Eingriff, wenn die Karte unten sitzt; über den ganzen Hub lässt
+  sie die Karte nie los.
+- **Untere Lippe:** 1,0 mm, volle Breite, mit 16 mm Fingermulde.
+- **Keine Seitenlippen** — sie würden genau das verhindern, worum es geht:
+  die Karte flach ablegen zu können. Dafür ist sie seitlich voll sichtbar.
+- **Sitzmulde:** Das Bett fällt unter der unteren Lippe um 0,4 mm ab, auf
+  3 mm Breite, mit 1,5 mm Rampe (≈15°, zu flach zum Knicken). Die Karte
+  fällt dort hinein und muss die Rampe wieder hochklettern, um auszusteigen.
 
-Einsetzen: Karte flach in den Westschlitz schieben, bis sie am Ostanschlag
-sitzt; dabei fährt sie über die Rastnase. Entnehmen: durch die Fingermulde
-nach Westen drücken, bis sie aus dem Schlitz schaut, dann herausziehen.
+Einsetzen: Karte schräg halten, Oberkante in die obere Tasche schieben,
+1,5 mm hochdrücken, flach ablegen, loslassen. Sie rutscht nach unten unter
+die untere Lippe und in die Sitzmulde. Entnehmen: durch die Fingermulde
+hochdrücken, Unterkante herausheben.
 
-### Warum 1,3 mm Überlappung reichen
+**Warum sie hält:** Der einzige Fluchtweg führt nach oben. Der Anhänger
+richtet sich an seinem Ring immer mit der Öse nach oben aus, die Schwerkraft
+arbeitet also dauerhaft gegen den Ausstieg; die Sitzmulde übernimmt den Rest,
+wenn das Gerät kopfüber geschüttelt wird. Kippen scheidet aus: Kanal 1,0 mm
+minus Karte 0,6 mm = 0,3 mm Hub, dann stößt sie an die Lippen (geprüft mit
+`check_card_retained`, muss an oberer **und** unterer Lippe anstoßen).
 
-Naheliegender Gedanke: mehr Überlappung hält besser. Hier nicht — es ist
-nicht die Lippe, die begrenzt, sondern das Kanalspiel:
+Mehr Lippenüberdeckung bringt hier nichts: Was die Karte halten kann, ist
+nicht die Breite der Lippe, sondern wie weit sie sich überhaupt bewegen darf.
+Wer mehr Halt will, vertieft `seat_groove_d` (in 0,2-mm-Schritten).
 
-- Kanal 40,4 mm, Karte 40,0 mm → die Karte kann quer **0,4 mm** wandern.
-- Um unter einer Lippe hervorzukommen, bräuchte sie **1,3 mm** Querweg.
-- Selbst ganz an eine Seite geschoben, greift die Gegenlippe noch 0,9 mm.
-
-Die Lippe hat also 3,3-fache Reserve gegenüber allem, was die Karte
-überhaupt an Weg hat. Sie zu verbreitern verdeckt nur mehr vom Symbol.
-Abheben geht ebensowenig: Kanal 0,9 mm minus Karte 0,6 mm = 0,3 mm Hub,
-dann stößt sie an. Kippen scheidet damit aus.
-
-Der einzige reale Fluchtweg ist seitlich aus dem Schlitz — und dafür ist
-die Rastnase zuständig, nicht die Lippe. Wer mehr Halt will, erhöht
-`detent_h` (in Schritten von 0,2 mm), nicht `rail_overlap`.
-
-Geprüft in `check_fit.sh`: `check_card_sweep` fährt die Karte rechnerisch
-flach durch den ganzen Kanal (muss leer sein), `check_card_retained` hebt
-sie über das Kanalspiel an (muss an Nord-, Süd- und Ostlippe anstoßen),
-`check_card_seated` prüft, dass sie im Sitz frei liegt. Dass sie über die
-Rastnase passt, sichert ein Assert in `config.scad`
-(`slot_h >= detent_h + card_t + 0.2`).
+**Beim ersten Druck prüfen:** Die Unterseite der oberen Tasche ist ein
+2,7 mm weit frei stehender Überhang über dem Kanal. Hängt er zu weit durch,
+klemmt die Karte dort — dann `card_ch_h` erhöhen oder `lip_top` verkleinern
+(Untergrenze: `card_lift + 1,0`).
 
 ## Was Software-Checks NICHT beweisen
 

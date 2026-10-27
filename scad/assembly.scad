@@ -62,7 +62,7 @@ module mock_card() {
 // The card held at the slot mouth, just entering — used by the fit checks.
 module mock_card_entering() {
     color([0.95, 0.6, 0.15])
-        translate([cavity_w/2 - card_ch_w/2 + 0.1, card_seat_y, plate_front_z + detent_h])
+        translate([cavity_w/2 - guide_w/2 + 0.1, card_seat_y, plate_front_z + detent_h])
             cube([card_w, card_w, card_t]);
 }
 

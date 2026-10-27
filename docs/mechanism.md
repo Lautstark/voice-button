@@ -58,33 +58,48 @@ keinen flachen Einlass. Die Karte muss sich dann wölben, und weil die
 Sehnenverkürzung quadratisch mit dem Bogen geht, braucht ein Übergreifen
 von 1,2 mm rund 3 mm Bogen. Das knickt 0,6-mm-Laminat sichtbar.
 
-Geometrie (Kanal 41,9 × 40,4 mm für eine 40 × 40-Karte):
+Geometrie (Kanal 40,4 × 40,4 mm für eine 40 × 40-Karte):
 
 - **Nord- und Südlippe:** über die volle Kanalbreite, 1,3 mm Überdeckung.
   Sie stehen quer zur Einschubrichtung und halten die Karte an Ober- und
   Unterkante durchgehend fest — das ist die eigentliche Sicherung.
 - **Ostlippe:** 1,3 mm, über die volle Höhe; sie ist der Endanschlag.
 - **Westwand:** durchgehender Einschubschlitz, 1,4 mm hoch.
-- **Rastnase:** 0,15 mm hoher Sägezahn auf dem Bett, 16 mm breit, hinter
-  der Westkante der sitzenden Karte. Rampe beim Einschieben, steile Flanke
-  beim Herausziehen.
+- **Rastnase:** 0,4 mm hoher Sägezahn, 16 mm breit, **im Schlitz** in der
+  Westwand. Rampe beim Einschieben, steile Flanke beim Herausziehen. Sie
+  sitzt bewusst in der Wand und nicht im Kanal: so liegt die Karte innen
+  plan auf, und der Rahmen braucht keine Extrabreite. 0,4 mm sind genau
+  zwei Schichten à 0,2 mm — eine flachere Nase druckt sich weg.
 - **Fingermulde:** 16 mm Ausschnitt in der Ostlippe zum Herausdrücken.
 
 Einsetzen: Karte flach in den Westschlitz schieben, bis sie am Ostanschlag
 sitzt; dabei fährt sie über die Rastnase. Entnehmen: durch die Fingermulde
 nach Westen drücken, bis sie aus dem Schlitz schaut, dann herausziehen.
 
-Warum sie nicht herausfällt: Nord- und Südlippe greifen in **jeder**
-Schiebeposition über die volle Kartenbreite. Die Karte kann sich also
-weder kippen noch auswölben — der einzige Weg hinaus ist der Schlitz, und
-den sperrt die Rastnase. Geprüft in `check_fit.sh`:
-`check_card_sweep` fährt die Karte rechnerisch von außerhalb des Schlitzes
-bis an den Anschlag (muss leer sein), `check_card_retained` hebt sie über
-das Kanalspiel an (muss an Nord-, Süd- und Ostlippe anstoßen).
+### Warum 1,3 mm Überlappung reichen
 
-Preis dafür: Der Rahmen wird 1,5 mm breiter (Fenster 46,9 × 45,4 statt
-45,4 × 45,4), und die mittlere Ostschraube rückt entsprechend nach außen.
-Das Gehäuse außen bleibt 61 × 61 mm.
+Naheliegender Gedanke: mehr Überlappung hält besser. Hier nicht — es ist
+nicht die Lippe, die begrenzt, sondern das Kanalspiel:
+
+- Kanal 40,4 mm, Karte 40,0 mm → die Karte kann quer **0,4 mm** wandern.
+- Um unter einer Lippe hervorzukommen, bräuchte sie **1,3 mm** Querweg.
+- Selbst ganz an eine Seite geschoben, greift die Gegenlippe noch 0,9 mm.
+
+Die Lippe hat also 3,3-fache Reserve gegenüber allem, was die Karte
+überhaupt an Weg hat. Sie zu verbreitern verdeckt nur mehr vom Symbol.
+Abheben geht ebensowenig: Kanal 0,9 mm minus Karte 0,6 mm = 0,3 mm Hub,
+dann stößt sie an. Kippen scheidet damit aus.
+
+Der einzige reale Fluchtweg ist seitlich aus dem Schlitz — und dafür ist
+die Rastnase zuständig, nicht die Lippe. Wer mehr Halt will, erhöht
+`detent_h` (in Schritten von 0,2 mm), nicht `rail_overlap`.
+
+Geprüft in `check_fit.sh`: `check_card_sweep` fährt die Karte rechnerisch
+flach durch den ganzen Kanal (muss leer sein), `check_card_retained` hebt
+sie über das Kanalspiel an (muss an Nord-, Süd- und Ostlippe anstoßen),
+`check_card_seated` prüft, dass sie im Sitz frei liegt. Dass sie über die
+Rastnase passt, sichert ein Assert in `config.scad`
+(`slot_h >= detent_h + card_t + 0.2`).
 
 ## Was Software-Checks NICHT beweisen
 

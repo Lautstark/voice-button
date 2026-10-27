@@ -144,8 +144,6 @@ stop_z         = plate_under_z - travel_stop;  // 11.6 — mid-wall rib stop hei
 card_w         = 40.0;  // laminated card, square
 card_t         = 0.6;   // laminate thickness (parameterised)
 card_clear     = 0.2;   // channel clearance per side (across the slide axis)
-card_slide     = 1.5;   // spare channel width west of the seated card: the
-                        // room the detent needs behind the card's west edge
 rail_overlap   = 1.3;   // lip overlap onto the card: north, south, east
 rail_wall      = 2.2;   // rail outer wall thickness
 card_ch_h      = card_t + 0.3;           // 0.9 — channel height under the
@@ -157,17 +155,25 @@ rail_h         = card_ch_h + rail_lip_t; // 2.6 — rail rise above the card bed
 slot_h         = card_ch_h + 0.5;        // 1.55 — insertion slot height. The
                         // extra over the channel absorbs the sag of the
                         // 40 mm bridge that forms the slot roof.
-detent_h       = 0.15;  // sawtooth bump on the bed behind the card's west
-detent_l       = 1.2;   // edge: ramp on the way in, steep face on the way out
+// The detent lives INSIDE the insertion slot, in the west wall, so it needs
+// no spare channel width and never sits under the seated card. Keep its
+// height a whole number of layers (0.4 = 2 x 0.2 mm) or it will not print.
+detent_h       = 0.4;   // ramp going in, steep face behind the card's west
+detent_l       = 1.2;   // edge once it is seated: the only escape route
 detent_w       = 16.0;
 finger_w       = 16.0;  // notch in the EAST lip: push the card west to eject
 plate_front_z  = plate_under_z + plate_t;        // 15.4 — card bed surface
 rail_top_z     = plate_front_z + rail_h;         // 18.0
 // Channel and guided block (the block slides in the bezel collar)
-card_ch_w      = card_w + 2*card_clear + card_slide;  // 41.9 (x, slide axis)
+card_ch_w      = card_w + 2*card_clear;               // 40.4 (x, slide axis)
 card_ch_l      = card_w + 2*card_clear;               // 40.4 (y)
-guide_w        = card_ch_w + 2*rail_wall;  // 46.3
+guide_w        = card_ch_w + 2*rail_wall;  // 44.8
 guide_h        = card_ch_l + 2*rail_wall;  // 44.8
+// Where the card comes to rest: pushed east against the east lip.
+// (These live here, not in assembly.scad: `use <>` imports modules but not
+//  variables, so a check in main.scad would silently get undef.)
+card_seat_x    = cavity_w/2 + card_ch_w/2 - card_w;
+card_seat_y    = cavity_h/2 - card_w/2;
 
 // ---------------------------------------------------------------------
 // Bezel (fixed front frame, screwed from the back)
@@ -177,8 +183,8 @@ guide_h        = card_ch_l + 2*rail_wall;  // 44.8
 // plate slab against, and the collar bore is the ONLY sliding guide for the
 // plate's card-frame block. Outside the collar the face is thinner.
 bezel_gap      = 0.3;   // guide clearance: collar bore to guide block, per side
-bezel_open_w   = guide_w + 2*bezel_gap; // 46.9 — guides the moving block
-bezel_open_h   = guide_h + 2*bezel_gap; // 45.4
+bezel_open_w   = guide_w + 2*bezel_gap; // 45.4 — guides the moving block
+bezel_open_h   = guide_h + 2*bezel_gap; // 45.4 (square again)
 bezel_face_t   = 1.8;   // thin outer face region
 collar_w       = 2.0;   // collar ring radial width beyond the opening
 wall_top_z     = plate_front_z;                  // 15.4 — shell walls end here
@@ -221,6 +227,12 @@ assert(travel_stop * (cavity_h/2 - sw_y_shift)/cavity_h > act_gap + sw_travel + 
        "corner-tilt must still actuate the (near-)central switch with margin");
 assert(plate_under_z - bridge_top > foam_t - 0.5, "foam pad preload sane");
 assert(stop_z > bridge_top + bo_t + 2.0, "stops must sit above the breakout plane");
+
+assert(slot_h >= detent_h + card_t + 0.2,
+       "the card must clear the slot roof while riding over the detent");
+assert(card_ch_h > card_t + 0.2, "card needs room in the channel");
+assert(rail_overlap > (card_ch_l - card_w) + 0.5,
+       "lip overlap must exceed the channel play, or the card can slip out");
 
 echo(str("housing: ", housing_w, " x ", housing_h, " x ", housing_d,
          " mm external (+", foot_h, " feet, + loop)"));

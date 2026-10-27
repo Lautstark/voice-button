@@ -12,7 +12,7 @@ use <lib.scad>
 // ---------------------------------------------------------------------
 // Bezel screw columns: 3 columns in plan-space free of components.
 // SW corner, NW corner, mid-east (between battery fence and PCB pocket).
-post_positions = [[3.4, 2.6], [3.4, cavity_h - 2.6], [53.8, 24.6]];
+post_positions = [[3.4, 2.6], [3.4, cavity_h - 2.6], [53.2, 24.3]];
 
 // Bridge strip and supports
 bridge_y0   = 23.0;                       // south edge clears the battery fence
@@ -51,7 +51,7 @@ rib_w2 = wall_rib_w/2;
 
 // East-post notch in the moving plate (the mid-east screw column passes
 // through the plate's footprint; the notch clears it over the full travel)
-notch_x0 = 51.4;   notch_y = [20.6, 28.6];
+notch_x0 = 50.3;   notch_y = [20.4, 29.6];
 
 // ---------------------------------------------------------------------
 // REAR SHELL
@@ -304,9 +304,10 @@ module card_frame(ccx, ccy, bed_z) {
                 cube([card_ch_w, rail_overlap, rail_lip_t]);
             translate([x1 - rail_overlap, y0, lip_z])
                 cube([rail_overlap, card_ch_l, rail_lip_t]);
-            // detent: gentle ramp going in, steep face behind the card's
-            // west edge once it is seated against the east lip
-            translate([x0 + 0.1, ccy + detent_w/2, bed_z])
+            // detent, sitting INSIDE the slot in the west wall: gentle ramp
+            // going in, steep face that the card's west edge has to climb
+            // again to come back out
+            translate([x0 - 0.1 - detent_l, ccy + detent_w/2, bed_z])
                 rotate([-90, 0, 0]) linear_extrude(detent_w)
                     polygon([[0, 0], [detent_l, 0], [detent_l, detent_h]]);
         }

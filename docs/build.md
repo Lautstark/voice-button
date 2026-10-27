@@ -35,7 +35,9 @@ Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
    sie am Ostanschlag einrastet. Schütteln, kopfüber halten, durch die
    Fingermulde wieder herausdrücken.
    Zu stramm → `card_ch_h` hoch; rutscht von allein heraus → `detent_h`
-   hoch (0,15 → 0,25); Schlitzdach hängt zu weit durch → `slot_h` hoch.
+   hoch (0,4 → 0,6; immer in 0,2-Schritten, sonst druckt es sich weg);
+   geht zu schwer rein → `detent_h` runter auf 0,2; Schlitzdach hängt zu
+   weit durch → `slot_h` hoch.
 2. **`test_pcb_coupon` / `test_speaker_coupon`**: Modul, Akku und
    Lautsprecher probeliegen; USB-Kabel durch die Öffnung stecken,
    Schalter mit dem Fingernagel schalten.

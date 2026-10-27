@@ -59,17 +59,14 @@ else if (part == "check_card_retained") intersection() {
 }
 // The seated card must sit free in its channel: expect EMPTY.
 else if (part == "check_card_seated") intersection() { test_card(); mock_card(); }
-// Riding over the detent, the card must still clear the lips: expect EMPTY.
-else if (part == "check_card_entering") intersection() {
-    test_card();
-    mock_card_entering();
-}
-// The WHOLE insertion path, swept from outside the slot to the seat, riding
-// on top of the detent. Expect EMPTY — this is the proof it slides in.
+// The card swept flat along the whole channel, from the slot's inner face to
+// the seat. Expect EMPTY: nothing may reach into the card's path there. (The
+// detent deliberately does stand in the path, but it sits in the slot, west
+// of this sweep; the slot headroom for riding over it is an assert instead.)
 else if (part == "check_card_sweep") intersection() {
     test_card();
-    translate([cx - guide_w/2 - 5, card_seat_y, plate_front_z + detent_h])
-        cube([card_seat_x + card_w - (cx - guide_w/2 - 5), card_w, card_t]);
+    translate([cx - card_ch_w/2, card_seat_y, plate_front_z])
+        cube([card_ch_w, card_w, card_t]);
 }
 else if (part == "section_card") difference() {
     union() { test_card(); mock_card(); }

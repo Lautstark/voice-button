@@ -77,6 +77,58 @@ else if (part == "check_card_retained") intersection() {
 else if (part == "check_card_lifted") intersection() {
     test_card(); mock_card_lifted();
 }
+// Das Sichtfenster ueber der Karte muss bis vor die Blendenstirn frei
+// sein. Faengt eine verschlossene Mulde, einen zu tiefen Lippenueberhang
+// und jede Blende, die ueber die Karte greift. Erwartet: LEER.
+// Selbsttests der Messwerkzeuge: eine Sonde, die aus undef-Koordinaten
+// entsteht, rendert nichts und wuerde jeden Einschluss-Check gruen melden.
+else if (part == "selftest_wall_probes") wall_probes();
+else if (part == "selftest_bore_probes")
+    union() for (p = post_positions)
+        translate([p[0], p[1], -wall_back - foot_h - 0.5])
+            cylinder(d = boss_hole_d - 0.3, h = stop_z + wall_back + foot_h + 0.5);
+
+// Schaumsitze muessen frei von den Schraubenkopfsitzen bleiben, sonst
+// steht das Pad schief auf einem Schraubenkopf. Erwartet: LEER.
+// Einschubweg der Platine: von ausserhalb der Tasche bis an den
+// Suedanschlag, auf Platinenhoehe. Erwartet: LEER. Genau dieser Check
+// fehlte, als der Querriegel die Platine eingesperrt hat.
+else if (part == "check_breakout_path") intersection() {
+    bridge();
+    translate([cavity_w/2 - bo_w/2, cavity_h/2 + sw_y_shift - sw_off_y - bo_l/2,
+               bridge_top + 0.05])
+        cube([bo_w, bo_l + 14, bo_t]);
+}
+else if (part == "check_bridge_seats") intersection() {
+    union() for (fs = foam_seats)
+        translate([fs[0], fs[1], bridge_top]) cube([foam_w + 1, foam_w + 1, 0.4]);
+    union() for (p = [bridge_scr_w, bridge_scr_e])
+        translate([p[0], p[1], bridge_top - 0.8]) cylinder(d = 4.4, h = 2);
+}
+else if (part == "check_card_front_open") intersection() {
+    translate([card_seat_x + 1, card_seat_y + lip_bottom + 0.5, card_bed_z + card_t])
+        cube([card_w - 2,
+              card_w - lip_bottom - card_top_engage - 1.0,
+              bezel_front_z + 2 - (card_bed_z + card_t)]);
+    union() { front_plate(); bezel(); rear_shell(); }
+}
+// Jede Wandsonde muss vollstaendig im Material liegen. Erwartet: LEER.
+else if (part == "check_wall_solid") difference() {
+    wall_probes();
+    rear_shell();
+}
+// Die drei Schraubenkanaele muessen bis zur Domoberkante frei sein.
+else if (part == "check_screw_bores_open") intersection() {
+    rear_shell();
+    union() for (p = post_positions)
+        translate([p[0], p[1], -wall_back - foot_h - 0.5])
+            cylinder(d = boss_hole_d - 0.3, h = stop_z + wall_back + foot_h + 0.5);
+}
+// Schraubenkoepfe gegen die ruhende Frontplatte.
+else if (part == "check_screw_heads") intersection() {
+    mock_screw_heads();
+    front_plate();
+}
 else if (part == "section_card") difference() {
     union() { test_card(); mock_card(); }
     translate([-10, -10, 0]) cube([cavity_w/2 + 10, 100, 60]);
@@ -93,3 +145,4 @@ else if (part == "check_mocks") intersection() {
     union() { mock_speaker(); mock_battery(); mock_pcb(); mock_breakout(); }
     union() { rear_shell(); bridge(); front_plate(); bezel(); }
 }
+else assert(false, str("unbekannter Teilname: ", part));

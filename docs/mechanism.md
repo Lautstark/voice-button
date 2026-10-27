@@ -5,18 +5,33 @@ Kavitätenboden, +z zeigt zum Kind.
 
 ## Stapel (hinten → vorn)
 
+Außen 61,2 × 61,2 × 21,0 mm. z = 0 ist der Kavitätenboden.
+
 | z (mm) | Was |
 |---|---|
-| −2,4 … −1,6 | Füße (0,8) + Rückwand (1,6) mit Lautsprechergitter |
+| −2,0 … 0 | Rückwand, plan. Gitter in einer 0,8 mm flachen Mulde; die Öse liegt bündig in dieser Ebene |
 | 0 … 5,5 | Lautsprecher (unten links, Membran nach hinten), PCB (oben rechts auf 0,8-mm-Pads), Akkusockel massiv bis 4,3 |
-| 4,3 … 9,1 | Akku, westlich auf dem Lautsprecherrand, östlich auf dem Sockel |
+| 4,3 … 5,3 | EVA-Unterlage unter dem Akku (`bat_pad_t`, Teil des Stapels) |
+| 5,3 … 10,1 | Akku; Schwellreserve bis 11,1 |
 | 6,0 … 7,6 | Brücke (2 × M2 auf Plattform West und Säule Südost) |
 | 7,6 … 13,1 | Breakout in der Brückentasche, Tasteroberkante 13,1 |
 | **12,7** | **Oberkante der Taschenwände = Mittenanschlag** |
 | 13,4 | Frontplatten-Unterseite in Ruhe (0,3 mm Spalt zum Taster) |
 | 13,4 … 18,0 | Frontplatte: Platte 2,0 + Rahmen 2,6 |
-| 15,4 | Wandoberkante = Auflage der Blende = Ruheanschlag der Platte |
+| 15,4 | Wandoberkante = Auflage der Blende |
 | 19,0 | Blenden-Vorderkante |
+
+### Warum die Rückseite plan ist
+
+Ursprünglich standen dort drei 0,8-mm-Abstandsfüße. In Drucklage hätte die
+erste Schicht damit aus drei Zapfen von zusammen 69 mm² bestanden, und
+darüber hätten **3462 mm² Boden in der Luft** begonnen — ohne Stützen ein
+sicherer Fehldruck. Dieselbe Wirkung gegen anliegenden Stoff erreicht jetzt
+eine flache Mulde um das Gitter: Die Rückwand bleibt plan und druckbar.
+
+Aus demselben Grund liegt die **Öse bündig in der Rückebene**. Vorher begann
+sie 6,2 mm über dem Bett und ragte 12,5 mm frei hinaus. Nebeneffekt: Die
+Schichten liegen jetzt parallel zur Zugrichtung am Ring statt quer dazu.
 
 ## Warum die ganze Fläche schaltet
 
@@ -33,7 +48,7 @@ Breakout-Tasche am Akku vorbeikommt).
 - **Verkanten:** Die Umfangsrippen (Oberkante 11,6, also 1,8 mm Hub) sind
   **nicht** der Arbeitsanschlag, sondern der Backstop gegen Schrägstellen.
 
-### Der Anschlag, auf den es ankommt
+### Die Anschläge, auf die es ankommt
 
 Ein 12 × 12-Taktiltaster ist nach 0,55 mm ein Festkörper. Lägen die
 Anschläge nur am Umfang (1,8 mm), würde die Platte bei jedem mittigen
@@ -41,17 +56,54 @@ Druck **1,25 mm über den blockierten Taster hinausfahren** — die gesamte
 Handkraft eines Kindes liefe dann über die Tasterkappe in das Breakout und
 in eine 1,6 mm dünne Brücke.
 
-Deshalb sind die Wände der Breakout-Tasche auf **12,7 mm** hochgezogen.
-Sie fangen die Platte direkt neben dem Taster ab; der Überhub beträgt nur
-noch **0,15 mm**. Geprüft mit `check_centre_stop` (muss greifen) und
-`check_plate_pressed` (bis zum Mittenanschlag muss alles frei sein).
+Es genügt aber nicht, *irgendeinen* Anschlag nahe die Mitte zu setzen.
+Beim Druck auf eine Kantenmitte kippt die starre Platte, und der vom
+Drehpunkt am weitesten entfernte Anschlag setzt zuerst auf. Lag der nur
+am Rand der Breakout-Tasche — 14,3 mm nördlich des Tasters — kamen am
+Taster nur **0,48 mm** an, zu wenig zum Auslösen.
 
-**Rückstellung:** zwei Pads aus **weichem offenzelligem PU-Schaum**,
-10 × 10 × 6,5 mm, auf der Brücke links und rechts der Tasche — zwischen
-den Versteifungsrippen, nicht darauf. Ruheraum 5,8 mm ergibt 0,7 mm
-Vorspannung, am Anschlag sind sie 22 % gestaucht. **Kein Moosgummi:**
-zwei EVA-Pads dieser Größe geben rund 20 N statt 1 N, der Taster selbst
-braucht 1,6–2,6 N — die Taste wäre für ein Kind unbedienbar.
+Deshalb zwei Anschläge:
+
+- Die **Wände der Breakout-Tasche**, hochgezogen auf 12,45 mm.
+- Ein **Querriegel** bei y = 40, dicht nördlich des Tasters, der zwischen
+  den Taschenwänden über die Platine hinwegspannt (3,15 mm über ihr).
+
+Damit kommt bei Druck auf eine Kantenmitte an:
+
+| Druck auf | am Taster | nötig |
+|---|---:|---:|
+| Mitte | 0,95 mm | 0,55 mm |
+| Nordkante | 0,75 mm | 0,55 mm |
+| Südkante | 0,67 mm | 0,55 mm |
+| Ostkante | 0,70 mm | 0,55 mm |
+
+Der Überhub des Tasters bei mittigem Druck beträgt **0,40 mm** statt
+1,25 mm. Der endgültige Wert für `center_stop_over` braucht den echten
+Taster: 0,25 mm Vorlauf ist eine Annahme, kein Datenblattwert.
+
+Die Rechnung steht als `assert` in `config.scad` — sie ersetzt eine
+frühere Hebelformel, die Drehpunkt und Druckpunkt an die Kavitätswände
+legte, dadurch die falsche Richtung prüfte und nur mit 0,01 mm hielt.
+
+**Rückstellung:** zwei Pads aus **weichem offenzelligem Schaum** (die
+weiche Seite eines Spülschwamms trifft es am besten), 8 × 8 × 6 mm, auf
+den zwei markierten Feldern der Brücke. Die Felder liegen zwischen den
+Versteifungsrippen und frei von den Schraubenkopfsitzen — `check_bridge_seats`
+hält das fest. Vorspannung 0,7 mm. **Kein Moosgummi:** zwei EVA-Pads dieser
+Größe geben rund 20 N statt 1 N, der Taster selbst braucht 1,6–2,6 N.
+
+**Die Platine schiebt sich von Norden ein**, flach unter Querriegel und
+Wandbalken hindurch, bis sie am Südanschlag sitzt. Beide halten sie
+danach nieder — Haltelippen braucht es nicht, und sie wären hier sogar
+schädlich: zwei gegenüberliegende Lippen hätten dasselbe Problem wie der
+alte Kartenhalter, die Platine käme nur durch Biegen hinein.
+`check_breakout_path` fährt den Einschubweg rechnerisch ab.
+
+**Keine Klemmschraube für das Breakout mehr.** Für einen Sockel auf
+Platinenhöhe ist in der 1,6-mm-Taschenwand kein Platz, und auf Anschlaghöhe
+klemmte sie nicht, sondern stieß mit dem Kopf 0,7 mm in die Frontplatte.
+Gebraucht wird sie auch nicht: Beim Betätigen drückt der Taster die Platine
+nach **unten** in ihre Tasche. Gehalten wird sie von Tasche und Lippen.
 
 **Führung:** Der Rahmenblock greift in Ruhe 2,6 mm in den Kragen, am
 Mittenanschlag noch 1,9 mm. (Vor dem Mittenanschlag waren es am Hubende
@@ -95,6 +147,20 @@ Nicht erreichbar. Der Rahmen ist ein *bewegliches* Teil innerhalb der
 Blendenöffnung; Gehäusewand und Blendenkragen stehen mit 115 mm³ im Weg
 jeder seitlichen Zufuhr, egal an welcher Kante. Festgenagelt in
 `check_card_insert_assembled`.
+
+## Innenecken
+
+Akku und Platine sind Rechtecke in einem Gehäuse mit 7 mm Eckradius; ihre
+Ecken fassen in die Rundung. Zwei der vier Ecken sind deshalb innen
+freigestellt (Südost für den Akku, Nordost für den Schiebeschalter), und
+zwar mit einer Linie in festem Abstand von der **Außenhaut**: Es bleiben
+immer `corner_wall_min` = 1,5 mm Wand stehen.
+
+Die erste Fassung schnitt in die falsche Richtung und entfernte die
+Außenhaut statt des Innenecks — ein 0,7 mm breiter Durchbruch an beiden
+Ostecken, den kein Check bemerkte. Dafür gibt es jetzt `check_wall_solid`:
+vier Würfel direkt hinter der Außenhaut auf den Eckdiagonalen, die
+vollständig im Material liegen müssen.
 
 ## Geprüft wird mit
 

@@ -23,7 +23,8 @@ $fn            = 48;
 cavity_w       = 56.4;  // internal cavity, x
 cavity_h       = 56.4;  // internal cavity, y
 wall           = 2.4;   // side wall thickness
-wall_back      = 1.6;   // back wall thickness
+wall_back      = 2.0;   // back wall thickness (0,4 mehr als noetig,
+                        // damit die Gittermulde unten 1,2 mm stehen laesst)
 corner_r       = 7.0;   // outer corner radius
 housing_w      = cavity_w + 2*wall;   // 61.2
 housing_h      = cavity_h + 2*wall;   // 61.2
@@ -42,8 +43,15 @@ spk_cx         = 16.0;  // speaker center (lower-left quadrant)
 spk_cy         = 15.6;
 spk_seat_h     = 2.0;   // seat ring height holding the rim laterally
 grille_hole_d  = 2.4;   // rear grille holes
-foot_h         = 0.8;   // standoff feet on the back so fabric can't seal the grille
-foot_d         = 7.0;
+// KEINE Fuesse. Gedruckte Abstandsfuesse haetten die Rueckwand 0,8 mm ueber
+// dem Bett beginnen lassen: die erste Schicht waeren drei Zapfen von
+// zusammen 69 mm2 gewesen, darueber 3462 mm2 Boden in der Luft. Stattdessen
+// ist die Rueckseite plan und das Gitter liegt in einer flachen Mulde —
+// gleiche Wirkung gegen anliegenden Stoff, aber druckbar.
+foot_h         = 0;     // bleibt als Parameter, damit der Stapel stimmt
+foot_d         = 0;
+grille_dish_d  = 0.8;   // Tiefe der Gittermulde
+grille_dish_m  = 4.0;   // Rand der Mulde um den Lautsprecher herum
 
 // ---------------------------------------------------------------------
 // Battery 402030 LiPo  [MEASURE]
@@ -59,8 +67,12 @@ bat_swell      = 1.0;   // free space above the battery face
 // whole pocket would be a 31 x 21 mm plate hanging 4.3 mm in mid-air — it
 // would need supports or fail outright.
 bat_shelf_x0   = 33.0;  // derived from the seat ring: see docs/mechanism.md
-bat_z          = spk_rim_depth + 0.3;            // 4.3 — just over the rim
-bat_x0         = 26.1;  // battery SW corner (pocket interior = this - bat_clear;
+bat_pad_t      = 1.0;   // EVA-Unterlage; sie hebt den Akku und gehoert
+                        // deshalb in den Stapel, nicht nur in die Stueckliste
+bat_z          = spk_rim_depth + 0.3;            // 4.3 — Oberkante Sockel
+bat_top        = bat_z + bat_pad_t + bat_t;      // Oberkante Akku
+bat_envelope   = bat_top + bat_swell;            // inkl. Schwellreserve
+bat_x0         = 25.1;  // battery SW corner (pocket interior = this - bat_clear;
 bat_y0         = 1.1;   //  the east side of the pocket is the cavity wall itself)
 
 // ---------------------------------------------------------------------
@@ -80,11 +92,17 @@ pcb_z          = pcb_standoff;          // pcb underside
 pcb_top        = pcb_z + pcb_t;         // 2.0
 pcb_comp_h     = 3.3;   // tallest component on top  [MEASURE]
 pcb_clear      = 0.3;   // pocket clearance per side
-pcb_x0         = cavity_w - 0.6 - pcb_w;   // 26.8 — east edge near wall
-pcb_y0         = cavity_h - 0.6 - pcb_h;   // 26.8
+pcb_x0         = cavity_w - 1.5 - pcb_w;   // 1,5 statt 0,6: damit die
+pcb_y0         = cavity_h - 1.5 - pcb_h;   // Platinenecke innerhalb der
+                        // Kavitaetsrundung bleibt und gar keine Eckfase braucht   // 26.8 — east edge near wall
 
 // USB-C opening in the east wall  [MEASURE positions!]
-usb_y_c        = pcb_y0 + 11.0; // ~0.38 along the edge, from the photo
+// Die Platine wird um 180 Grad gedreht eingebaut. Herum sitzt der Schalter
+// 2,4 mm vom Nordende und damit in der Eckrundung — dort kann kein
+// brauchbarer Durchbruch liegen, ohne die Aussenhaut aufzuschneiden
+// (check_wall_solid). Gedreht liegen beide Durchbrueche in der geraden
+// Wand. Die Lage entlang der Kante stammt aus dem Produktfoto.  [MEASURE]
+usb_y_c        = pcb_y0 + (pcb_h - 11.0);   // 43.9
 usb_z_c        = pcb_top + 1.7; // port center height (3.2 mm tall connector)
 usb_cut_w      = 10.2;  // opening width (connector 8.9 + clearance)
 usb_cut_h      = 4.6;   // opening height
@@ -93,9 +111,10 @@ usb_funnel_h   = 8.0;
 usb_funnel_d   = 1.2;   // recess depth into the wall
 
 // Power slide switch through the east wall  [MEASURE positions!]
-psw_y_c        = pcb_y0 + 24.6; // ~0.85 along the edge, from the photo
+psw_y_c        = pcb_y0 + (pcb_h - 24.6);   // 30.3
 psw_z_c        = pcb_top + 1.4;
-psw_cut_w      = 9.0;   // slot width (finger/nail access, recessed)
+psw_cut_w      = 9.0;   // Schlitzbreite (Nagelzugang, vertieft)
+psw_recess_off = 0;     // keine Verschiebung noetig, seit die Platine gedreht ist
 psw_cut_h      = 4.2;
 psw_recess_d   = 1.2;   // outside recess so it can't be toggled by bumping
 
@@ -132,8 +151,12 @@ pocket_wall    = 1.6;   // walls of the breakout pocket
 // breakout and a 1.6 mm bridge. The breakout pocket walls are therefore
 // raised to catch the plate right beside the switch. The perimeter ribs
 // stay as the anti-cocking backstop.
-center_stop_over = 0.15;  // how far the switch may be driven past its own
-                          // bottom before the plate lands on the pocket
+center_stop_over = 0.4;   // Ueberhub des Tasters, bis die Platte aufsitzt.
+                          // 0,15 war zu wenig: bei Druck auf eine Kanten-
+                          // mitte kippt die Platte, der weit entfernte
+                          // Taschenrand setzt zuerst auf und am Taster kamen
+                          // nur 0,48 statt 0,55 mm an. Endgueltig erst mit
+                          // dem echten Taster festzulegen.  [MEASURE]
 // Bridge supports: west leg to the floor, east tab onto a wall ledge
 bridge_leg_x   = 3.0;   // west leg west face (near west wall)
 bridge_ledge_d = 3.0;   // east wall ledge protrusion
@@ -203,6 +226,19 @@ card_ch_w      = card_w + 2*card_clear;                        // 40.8
 card_ch_l      = card_w + (card_spare_min + card_spare_max)/2; // 41.68
 card_h_min     = card_ch_l - card_spare_max;
 card_h_max     = card_ch_l - card_spare_min;
+// Wie weit die obere Lippe die sitzende Karte ueberdeckt. Gebraucht vom
+// Sichtfenster-Check, der beweist, dass die Mulde nach vorn offen ist.
+card_top_engage = card_clear + card_w - card_ch_l + lip_top;
+// ACHTUNG: Alles, was auch main.scad oder assembly.scad braucht, MUSS hier
+// stehen. `use <parts.scad>` importiert Module, aber KEINE Variablen — ein
+// Check mit undef-Koordinaten rendert lautlos nichts und meldet "leer".
+// Genau so hat der Bohrungs-Check eine echte 0,6-mm-Membran uebersehen.
+post_positions = [[3.4, 2.6], [3.4, cavity_h - 2.6], [53.2, 24.7]];
+bridge_scr_w   = [5.8, 32.25];   // 0,55 weiter oestlich: der Kopfsitz liess
+bridge_scr_e   = [47.3, 26.0];   // vorher 0,05 mm Steg stehen, der oestliche
+                                 // 0,6 mm genau im verschraubten Lastpfad
+screw_head_d   = 3.8;   // M2 Linsenkopf  [MEASURE am gekauften Satz]
+screw_head_h   = 1.4;
 card_lift_max  = card_ch_l - card_clear - card_w;  // 1.48 — how far a nominal
                         // card can be pushed up before it hits the recess top
 guide_w        = card_ch_w + 2*rail_wall; // 45.2
@@ -235,6 +271,13 @@ boss_hole_d    = 2.2;   // through-hole in the shell boss (M2 shank)
 boss_cb_d      = 4.3;   // counterbore for the M2 head
 post_d         = 5.6;
 post_pilot_d   = 1.7;   // self-tap pilot in the bezel post
+// Mindestrestwand unter den Innenfasen an den Ecken. Zu grosse Fasen haben
+// die Aussenhaut auf den Diagonalen komplett aufgeschnitten; check_wall_solid
+// misst das jetzt.
+corner_wall_min = 1.5;  // verbleibende Aussenwand auf der Eckdiagonale.
+                        // Bemessen am ungünstigsten Bauteil: der Schalter
+                        // sitzt laut Foto 2,4 mm vom Nordende der Platine
+                        // und reicht damit 0,56 mm in die Eckrundung.
 wall_rib_w     = 6.0;   // mid-wall stop ribs (N and S walls)
 wall_rib_d     = 1.6;   // protrusion into the cavity
 
@@ -247,6 +290,36 @@ loop_t         = 5.0;   // thickness along z
 loop_rise      = 5.0;   // ring center above the outer top wall
 
 center_stop_z  = plate_under_z - (act_gap + sw_travel + center_stop_over);
+// Querriegel ueber dem Breakout, dicht noerdlich des Tasters. Ohne ihn ist
+// der naechste Anschlag in Nordrichtung der Taschenrand 14,3 mm entfernt;
+// die Platte kippt dann so weit, dass der Taster zu kurz kommt.
+xbar_y0        = cavity_h/2 + sw_y_shift + 6.9;   // 39.5, 0,9 mm noerdlich
+                        // der Tasterkappe
+xbar_y1        = xbar_y0 + 2.0;
+xbar_z0        = bo_z + bo_t + 0.5;               // ueber der Platine durch
+bo_slot_h      = bo_t + 0.8;   // Einschubschlitz in der Nordwand der Tasche:
+                        // die Platine wird von Norden eingeschoben, nicht
+                        // von oben eingelegt — von oben versperrt sie der
+                        // Querriegel. Darueber bleibt die Wand als Anschlag.
+
+// Kippbetrachtung fuer Druck auf eine Kantenmitte. Die Platte dreht um die
+// gegenueberliegende Plattenkante, der am weitesten vom Drehpunkt entfernte
+// Anschlag begrenzt. Ersetzt die alte Hebelformel, die Drehpunkt und
+// Druckpunkt an die Kavitaetswaende legte und nur mit 0,01 mm hielt.
+function tilt_travel(d_press, d_stop, d_sw) =
+    (plate_under_z - center_stop_z) * d_stop > 0
+    ? (plate_under_z - center_stop_z) / d_stop * d_sw : 0;
+sw_y           = cavity_h/2 + sw_y_shift;
+plate_s        = cavity_h/2 - plate_w/2;          // Plattenkante Sued
+plate_n        = cavity_h/2 + plate_w/2;
+po_n           = cavity_h/2 + sw_y_shift - sw_off_y + bo_l/2 + pocket_wall;
+po_s           = cavity_h/2 + sw_y_shift - sw_off_y - bo_l/2 - pocket_wall;
+travel_press_n = tilt_travel(plate_n - plate_s, xbar_y1 - plate_s, sw_y - plate_s);
+travel_press_s = tilt_travel(plate_n - plate_s, plate_n - po_s, plate_n - sw_y);
+travel_press_e = tilt_travel(plate_w, plate_w/2 + (bo_w/2 + pocket_wall), plate_w/2);
+assert(min(travel_press_n, travel_press_s, travel_press_e)
+         > act_gap + sw_travel + 0.1,
+       "Druck auf eine Kantenmitte muss den Taster noch erreichen");
 
 // ---------------------------------------------------------------------
 // Foam return pads (not printed)
@@ -266,7 +339,9 @@ center_stop_z  = plate_under_z - (act_gap + sw_travel + center_stop_over);
 // is ~20 N and would make the button unusable for a child; memory foam
 // recovers too slowly and the button would feel dead.
 // Thickness is hand-cut, so the preload window below is deliberately wide.
-foam_w         = 10.0;
+foam_w         = 8.0;   // kleiner als frueher: zwischen Bruecken-
+                        // schraube, Rippen und Tasche ist nicht mehr Platz,
+                        // und weniger Flaeche heisst weniger Gegenkraft
 foam_t         = 6.0;   // on the bridge top, beside the breakout pocket:
                         // space at rest = plate_under_z - bridge_top = 5.8
                         // -> 0.2 preload; at full stop = 4.0 -> 33% compression
@@ -286,7 +361,9 @@ assert(travel_stop * (cavity_h/2 - sw_y_shift)/cavity_h > act_gap + sw_travel + 
 // Printed seats lift the pads so that off-the-shelf 6 mm tape lands in the
 // right preload window instead of needing an odd thickness.
 foam_seat_h    = 0.5;
-foam_seats     = [[8.0, 26.0], [38.5, 26.0]];   // SW corners, 11 x 11 each
+foam_seats     = [[8.5, 26.0], [38.5, 29.0]];   // SW-Ecken, je foam_w+1
+                        // Beide liegen zwischen den Rippen und frei von den
+                        // Schraubenkopfsitzen — per check_bridge_seats belegt.
 foam_preload   = foam_t - (plate_under_z - (bridge_top + foam_seat_h));
 // Wide on purpose: hand-cut foam is +/-0.5 mm at best, and with SOFT foam
 // even 2.5 mm of preload is well under 1 N. With stiff foam the upper end
@@ -309,6 +386,11 @@ assert(card_h_max - card_h_min > 1.0,
 // pass through the bezel opening in both directions.
 assert(bezel_open_w > card_w + 1 && bezel_open_h > card_w + 1,
        "card must pass through the bezel opening");
+
+assert(corner_wall_min >= 1.2,
+       "Eckfase darf nicht mehr als corner_r - 1.2 Restwand wegnehmen");
+assert(foot_h == 0,
+       "gedruckte Fuesse lassen die Rueckwand in der Luft beginnen");
 
 echo(str("Karte: ", card_w, " mm breit (max ", card_ch_w,
          "), Hoehe ", card_h_min, " .. ", card_h_max, " mm"));

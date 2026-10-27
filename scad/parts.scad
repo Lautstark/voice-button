@@ -12,7 +12,7 @@ use <lib.scad>
 // ---------------------------------------------------------------------
 // Bezel screw columns: 3 columns in plan-space free of components.
 // SW corner, NW corner, mid-east (between battery fence and PCB pocket).
-post_positions = [[3.4, 2.6], [3.4, cavity_h - 2.6], [53.2, 25.1]];
+// post_positions steht in config.scad (siehe dort: use<> importiert keine Variablen)
 
 // Bridge strip and supports
 bridge_y0   = 23.0;                       // south edge clears the battery fence
@@ -23,8 +23,7 @@ plat_x      = [3.0, 7.5];                 // west leg platform (floor-standing,
 plat_y      = [28.5, 36.0];               //  beside the speaker's narrow zone)
 col_x       = [44.0, 49.6];               // SE support column, floor-standing
 col_y       = [22.0, 27.5];
-bridge_scr_w = [5.25, 32.25];             // bridge screw, west (in the platform)
-bridge_scr_e = [47.3, 24.75];             // bridge screw, east (in the column)
+// bridge_scr_w / bridge_scr_e stehen ebenfalls in config.scad
 
 // Breakout pocket (switch lands sw_y_shift north of the cavity center;
 // breakout center compensates sw_off_y, connector end faces +y / the PCB)
@@ -66,16 +65,19 @@ module rear_shell(lite = false) {
                 rbox(cavity_w, cavity_h, wall_top_z + 1, corner_r - wall);
             }
             if (!lite) loop_solid();
-            if (!lite) back_feet();
             shell_internals(lite);
         }
         shell_cuts(lite);
     }
 }
 
+// Die Oese liegt buendig in der Rueckebene und druckt damit flach auf dem
+// Bett mit. Frueher begann sie 6,2 mm darueber und ragte 12,5 mm frei
+// hinaus — das haette schon beim Druck abreissen koennen. Nebeneffekt: die
+// Schichten liegen jetzt parallel zur Zugrichtung am Ring, nicht quer.
 module loop_solid() {
     ring_cy = cavity_h + wall + loop_rise;
-    zl0 = 4.2;
+    zl0 = -wall_back;
     hull() {
         translate([cx, ring_cy, zl0]) cylinder(d = loop_od, h = loop_t);
         translate([cx - loop_od/2 - 3, cavity_h + wall - 3, zl0])
@@ -83,12 +85,11 @@ module loop_solid() {
     }
 }
 
-module back_feet() {
-    // three feet define the standoff plane; SW is left free for the
-    // grille + screw boss (the 0.8 mm gap still spans it)
-    for (p = [[cavity_w - 5, 5], [cavity_w - 5, cavity_h - 5], [8, cavity_h - 8.4]])
-        translate([p[0], p[1], -wall_back - foot_h])
-            cylinder(d1 = foot_d - 2*foot_h, d2 = foot_d, h = foot_h + 0.05);
+// Flache Mulde um das Gitter: haelt anliegenden Stoff vom Gitter weg,
+// ohne dass die Rueckwand auf Zapfen beginnt. Wird in shell_cuts abgezogen.
+module grille_dish() {
+    translate([spk_cx, spk_cy, -wall_back - 0.01])
+        cylinder(d = spk_d + 2*grille_dish_m, h = grille_dish_d + 0.01);
 }
 
 module shell_internals(lite = false) {
@@ -116,7 +117,9 @@ module shell_internals(lite = false) {
         difference() {
             translate([bat_shelf_x0, bp_y1, bat_z])
                 cube([cavity_w - bat_shelf_x0, fence_t, fence_top_n - bat_z]);
-            translate([40, bp_y1 - 0.5, bat_z]) cube([8, fence_t + 1, 20]);
+            // Kabeldurchlass nach Westen versetzt: ab x=44 steht die
+            // Bruecken-Stuetzsaeule dahinter, sonst bleiben nur 4 mm Gasse.
+            translate([37, bp_y1 - 0.5, bat_z]) cube([8, fence_t + 1, 20]);
         }
     }
 
@@ -158,8 +161,8 @@ module shell_internals(lite = false) {
     // west wall: full height
     translate([0, cy - rib_w2, 0]) cube([wall_rib_d, wall_rib_w, stop_z]);
     // south wall: a short stop pad above the battery's swell headroom
-    translate([cx - rib_w2, 0, bat_z + bat_t + bat_swell - 0.4])
-        cube([wall_rib_w, wall_rib_d, stop_z - (bat_z + bat_t + bat_swell - 0.4)]);
+    translate([cx - rib_w2, 0, bat_envelope])
+        cube([wall_rib_w, wall_rib_d, stop_z - bat_envelope]);
     // north wall: above PCB component space (the small underside overhang
     // prints fine; only the rib's TOP face is a functional stop surface)
     translate([cx - rib_w2, cavity_h - wall_rib_d, bridge_z + 0.5])
@@ -176,7 +179,8 @@ module shell_internals(lite = false) {
 }
 
 module shell_cuts(lite = false) {
-    // --- rear speaker grille: center + two rings of holes ---------------
+    // --- Gittermulde + Loecher ------------------------------------------
+    if (!lite) grille_dish();
     if (!lite) translate([spk_cx, spk_cy, 0]) {
         for (ang = [0:60:300]) translate([5*cos(ang), 5*sin(ang), 0])
             translate([0, 0, -wall_back - foot_h - 1]) cylinder(d = grille_hole_d, h = 10);
@@ -195,14 +199,17 @@ module shell_cuts(lite = false) {
     // --- power switch slot + recess (east wall)  [MEASURE] --------------
     translate([cavity_w - 0.5, psw_y_c - psw_cut_w/2, psw_z_c - psw_cut_h/2])
         cube([wall + 1, psw_cut_w, psw_cut_h]);
-    translate([cavity_w + wall - psw_recess_d, psw_y_c - psw_cut_w/2 - 1.5,
+    translate([cavity_w + wall - psw_recess_d,
+               psw_y_c - psw_recess_off - psw_cut_w/2 - 1.5,
                psw_z_c - psw_cut_h/2 - 1.5])
         cube([psw_recess_d + 1, psw_cut_w + 3, psw_cut_h + 3]);
 
     // --- bezel screw bores: M2 through-hole + deep head counterbore -----
     for (p = post_positions) translate([p[0], p[1], 0]) {
+        // Laenge aus stop_z ableiten; die feste Zahl liess oben 0,6 mm
+        // Membran stehen, die jede Schraube erst durchstossen musste.
         translate([0, 0, -wall_back - foot_h - 1])
-            cylinder(d = boss_hole_d, h = stop_z + foot_h + 2);
+            cylinder(d = boss_hole_d, h = stop_z + wall_back + foot_h + 1.5);
         translate([0, 0, -wall_back - foot_h - 1])
             cylinder(d = boss_cb_d, h = 6.0 + wall_back + foot_h + 1);
     }
@@ -211,18 +218,20 @@ module shell_cuts(lite = false) {
     for (p = [bridge_scr_w, bridge_scr_e])
         translate([p[0], p[1], bridge_z - 5.2]) cylinder(d = bridge_screw_d, h = 6);
 
-    // --- inner corner chamfers where rectangular components meet the
-    //     cavity's rounded corners (outer radius is larger, so the wall
-    //     stays >= 2.6 mm thick behind these flats) ----------------------
-    // SE: battery corner, over the tray height band. The leg length has to
-    // out-reach the cavity's corner radius, or the rectangular component
-    // still catches the round — check_mocks is what measures this.
-    translate([0, 0, bat_z - 0.1]) linear_extrude(bat_t + bat_swell + 0.2)
-        polygon([[cavity_w - 9, -0.6], [cavity_w + 0.6, -0.6], [cavity_w + 0.6, 9]]);
-    // NE: PCB corner, over the PCB + component band
-    translate([0, 0, 0.3]) linear_extrude(pcb_top + pcb_comp_h + 0.2)
-        polygon([[cavity_w + 0.6, cavity_h - 9], [cavity_w + 0.6, cavity_h + 0.6],
-                 [cavity_w - 9, cavity_h + 0.6]]);
+    // --- Innenfasen an den Ecken ----------------------------------------
+    // Halbebene senkrecht zur Eckdiagonale, in festem Abstand von der
+    // AUSSENhaut. Die fruehere Dreiecksform war in Kavitaetskoordinaten
+    // bemasst und hat die Aussenwand auf den Diagonalen aufgeschnitten.
+    if (!lite) {
+        corner_relief(cavity_w - (corner_r - wall), corner_r - wall, 1, -1,
+                      bat_z - 0.1, bat_envelope - bat_z + 0.2,
+                      corner_r - corner_wall_min);
+        // NE: die Platine selbst bliebe jetzt innerhalb der Rundung, aber
+        // der Schiebeschalter ragt hinaus — deshalb hier doch eine Fase.
+        corner_relief(cavity_w - (corner_r - wall), cavity_h - (corner_r - wall), 1, 1,
+                      0.3, pcb_top + pcb_comp_h + 0.2,
+                      corner_r - corner_wall_min);
+    }
 
     // --- hanging loop hole ------------------------------------------------
     if (!lite) translate([cx, cavity_h + wall + loop_rise, -1])
@@ -252,35 +261,42 @@ module bridge() {
                 for (yy = [bridge_y0, bridge_y1 - 1.6])
                     translate([bridge_x0, yy, bridge_top])
                         cube([bridge_x1 - bridge_x0, 1.6, bridge_rib_h]);
+                // Querriegel ueber dem Breakout: zweiter Anschlag dicht am
+                // Taster, damit auch ein Druck auf die Kantenmitte reicht.
+                // Spannt zwischen den Taschenwaenden ueber die Platine hinweg.
+                translate([po_x0, xbar_y0, xbar_z0])
+                    cube([po_x1 - po_x0, xbar_y1 - xbar_y0, center_stop_z - xbar_z0]);
                 // breakout pocket walls, raised to centre_stop_z so they,
                 // and not the tactile switch, take a hard press
                 translate([po_x0, po_y0, bridge_top])
                     cube([po_x1 - po_x0, po_y1 - po_y0, center_stop_z - bridge_top]);
-                // clamp screw boss at the pocket's NW corner (M2 x 5; the pan
-                // head overlaps the breakout edge and holds it down)
-                translate([po_x0 + 0.6, po_y1 - 3.4, bridge_z])
-                    cylinder(d = 5.0, h = center_stop_z - bridge_z);
+                // Keine Klemmschraube mehr: fuer einen Sockel auf Platinen-
+                // hoehe ist in der 1,6-mm-Taschenwand kein Platz, und auf
+                // Anschlaghoehe klemmte sie nicht, sondern stiess mit dem
+                // Kopf in die Frontplatte. Gebraucht wird sie auch nicht —
+                // der Taster drueckt die Platine beim Betaetigen nach UNTEN
+                // in ihre Tasche. Gehalten wird sie von Tasche und Lippen.
             }
             // pocket interior (0.25 clearance per side around the breakout)
             translate([bo_cx - bo_w/2 - 0.25, bo_cy - bo_l/2 - 0.25, bridge_top - 0.1])
                 cube([bo_w + 0.5, bo_l + 0.5, 10]);
-            // wire/connector gap at the north pocket wall
-            translate([bo_cx - 5, po_y1 - pocket_wall - 0.5, bridge_top - 0.1])
-                cube([10, pocket_wall + 1, 10]);
+            // Einschubschlitz ueber die volle Taschenbreite in der Nordwand.
+            // Die Platine schiebt sich von Norden unter Querriegel und
+            // Wandbalken; beide halten sie danach nieder. Die Wand oberhalb
+            // bleibt als Anschlagbalken stehen (spannt 19 mm, druckt als
+            // Bruecke). Hier laufen auch die Anschlusskabel heraus.
+            translate([po_x0 - 0.5, po_y1 - pocket_wall - 0.5, bridge_top - 0.01])
+                cube([po_x1 - po_x0 + 1, pocket_wall + 1, bo_slot_h]);
             // bridge screw holes + shallow head seats
             for (p = [bridge_scr_w, bridge_scr_e]) {
                 translate([p[0], p[1], bridge_z - 1]) cylinder(d = 2.3, h = bridge_t + 12);
                 translate([p[0], p[1], bridge_top - 0.6]) cylinder(d = 4.4, h = 12);
             }
-            // clamp screw pilot
-            translate([po_x0 + 0.6, po_y1 - 3.4, bridge_top + 0.2])
-                cylinder(d = 1.7, h = 10);
         }
-        // retaining lips over the breakout edges (E/W walls, south half;
-        // the breakout slides in from the south at a shallow angle)
-        for (xx = [bo_cx - bo_w/2 - 0.25, bo_cx + bo_w/2 + 0.25 - 0.85])
-            translate([xx, po_y0 + pocket_wall + 1, bridge_top + bo_t + 0.3])
-                cube([0.85, 6, 0.8]);
+        // Keine Haltelippen mehr: zwei gegenueberliegende Lippen haetten
+        // dasselbe Problem wie der alte Kartenhalter — die Platine kaeme
+        // nur durch Biegen hinein. Niedergehalten wird sie jetzt vom
+        // Querriegel und vom Balken ueber dem Einschubschlitz.
     }
 }
 
@@ -301,7 +317,9 @@ module card_frame(ccx, ccy, face_z) {
         translate([ccx - guide_w/2, ccy - guide_h/2, face_z])
             rbox(guide_w, guide_h, rail_h, 3);
         translate([x0, y0, bed])
-            rbox(card_ch_w, card_ch_l, card_ch_h + 1, card_corner_r);
+            // Hoehe aus dem Rahmen ableiten, nicht raten: card_ch_h + 1 war
+            // 0,1 mm zu kurz und liess eine Haut ueber der ganzen Mulde stehen.
+            rbox(card_ch_w, card_ch_l, rail_h - bed_rise + 1, card_corner_r);
         // floor relief under the top lip: room for that overhang to sag
         translate([x0, y1 - lip_top - 0.5, bed - lip_relief])
             cube([card_ch_w, lip_top + 0.5, lip_relief + 0.01]);
@@ -381,6 +399,25 @@ module bezel() {
         for (p = post_positions)
             translate([p[0], p[1], stop_z - 1]) cylinder(d = post_pilot_d, h = 6.2);
     }
+}
+
+// ---------------------------------------------------------------------
+// PRUEFSONDEN (keine Druckteile)
+// ---------------------------------------------------------------------
+// Je ein Wuerfel mitten in der Aussenwand auf den vier Eckdiagonalen,
+// ueber die ganze Wandhoehe. Was hier nicht vollstaendig im Material
+// liegt, ist ein Loch in der Aussenhaut. Genau diese Stellen hat eine
+// vergroesserte Innenfase aufgeschnitten, ohne dass ein Check anschlug.
+module wall_probes() {
+    r0 = corner_r - wall;            // Mittelpunkt der Eckrundungen
+    rm = corner_r - 0.8;             // direkt hinter der Aussenhaut:
+                                     // dort muss in jedem Fall Material sein
+    d  = rm / sqrt(2);
+    for (c = [[r0, r0, -1, -1], [cavity_w - r0, r0, 1, -1],
+              [cavity_w - r0, cavity_h - r0, 1, 1], [r0, cavity_h - r0, -1, 1]])
+        for (z = [0.6 : 2.0 : wall_top_z - 1.2])
+            translate([c[0] + c[2]*d - 0.4, c[1] + c[3]*d - 0.4, z])
+                cube([0.8, 0.8, 0.8]);
 }
 
 // ---------------------------------------------------------------------

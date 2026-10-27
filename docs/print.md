@@ -13,12 +13,12 @@ fertigen Gerät, wenn die Karte passt.
 
 | Teil | Maße | Material | Lage auf dem Bett | Stützen |
 |---|---|---|---|---|
-| `rear_shell.stl` | 61 × 74 × 18 mm | ~23 g | Rücken aufs Bett (Öse flach mit) | nein |
+| `rear_shell.stl` | 61 × 74 × 17,4 mm | ~21 g | Rücken aufs Bett — die Rückseite ist plan, die Öse liegt in derselben Ebene | nein |
 | `front_plate.stl` | 55 × 55 × 4,6 mm | ~9 g | Rücken aufs Bett, Rahmen oben | nein |
 | `bezel.stl` | 61 × 61 × 7,4 mm | ~6 g | **Gesicht aufs Bett** | nein |
-| `bridge.stl` | 47 × 25 × 9 mm | ~3 g | flach, Tasche nach oben | nein |
+| `bridge.stl` | 47 × 25 × 6,9 mm | ~3 g | flach, Tasche nach oben | nein |
 
-Zusammen ~41 g massiv gerechnet (mit 25 % Infill eher 32 g), fertiges
+Zusammen ~39 g massiv gerechnet (mit 25 % Infill eher 30 g), fertiges
 Gerät ~60 g.
 
 ## Alles auf einmal: ja
@@ -48,28 +48,35 @@ wiederholen, nicht der ganze Satz.
 - **Deckschicht-Muster: monoton**, nicht konzentrisch — die Rahmenstege
   sind nur 2,2 mm breit, konzentrisch zieht der Slicer dort Rillen
 - 3 Wände, 25 % Gyroid
-- Brücken aktiviert lassen (Akkuschale überbrückt den Lautsprecherrand)
+- Brücken aktiviert lassen. Die beiden einzigen echten Brücken sitzen in
+  der **Tasterbrücke**: der Querriegel über der Platine und der Balken über
+  dem Einschubschlitz, je ~19 mm Spannweite. Beide dürfen durchhängen —
+  funktional ist nur ihre Oberseite (der Anschlag). Darunter sind 0,5 bzw.
+  0,8 mm Luft über der Platine eingeplant.
 
 ## Worauf beim ersten Satz achten
 
-1. **Karte:** oben unter die Lippe schieben, loslassen. **39,3–40,7 mm in
+1. **Rückseite:** Die erste Schicht muss die **volle** Grundfläche samt Öse
+   abdecken. Sieht der Slicer dort nur Inseln, stimmt die Orientierung
+   nicht — gedruckte Abstandsfüße gibt es bewusst nicht mehr.
+2. **Karte:** oben unter die Lippe schieben, loslassen. **39,3–40,7 mm in
    beiden Richtungen.** Klemmt sie oben, hängt die 3-mm-Lippe durch →
    `card_ch_h` erhöhen.
-2. **Platte im Blendenkragen:** muss mit 0,3 mm Spiel laufen, ohne zu
+3. **Platte im Blendenkragen:** muss mit 0,3 mm Spiel laufen, ohne zu
    klemmen und ohne zu klappern. Das ist die kritischste Passung.
-3. **Modul in der Rückschale:** PCB ins Fach, USB-Kabel durch die
+4. **Modul in der Rückschale:** PCB ins Fach, USB-Kabel durch die
    Trichteröffnung, Schalter mit dem Fingernagel erreichbar? Lautsprecher
    in den Sitzring, Akku auf die Schale. Was nicht passt: messen und in
    `scad/config.scad` eintragen.
-4. **Schaumpads:** zwei Stücke von ~10 × 10 × 6 mm aus der weichen Seite
+5. **Schaumpads:** zwei Stücke von ~8 × 8 × 6 mm aus der weichen Seite
    eines Spülschwamms auf die beiden markierten Felder der Brücke kleben.
    Kein Moosgummi (~20 N statt ~1 N), kein Memory-Schaum (federt zu
    langsam). Dicke 5,7–7,8 mm ist in Ordnung.
-5. **Druckpunkt:** Platte einlegen, Brücke mit Taster darunter — die Platte
+6. **Druckpunkt:** Platte einlegen, Brücke mit Taster darunter — die Platte
    muss nach 0,7 mm auf den Taschenwänden aufsitzen, *nicht* weiter. Wenn
    sie spürbar tiefer geht, ist der Mittenanschlag zu niedrig und der
    Taster nimmt die Last.
-6. **Öse:** kräftig am Ring ziehen.
+7. **Öse:** kräftig am Ring ziehen.
 
 Nach dem Messen `scad/render_all.sh` und `scad/check_fit.sh` laufen lassen —
 die Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.

@@ -31,3 +31,29 @@ module stop_rib(w, depth, h) {
     // runs along x, protrudes +y by `depth`, height h, origin at SW bottom
     cube([w, depth, h]);
 }
+
+// Eckfreistellung: entfernt alles jenseits einer Linie, die senkrecht auf
+// der Eckdiagonale steht und corner_wall_min von der Aussenhaut entfernt
+// liegt. (ax,ay) ist der Mittelpunkt der Eckrundung, (dx,dy) zeigt nach
+// aussen. So bleibt die Restwand per Konstruktion erhalten, statt von der
+// Groesse eines Dreiecks abzuhaengen.
+// R wird UEBERGEBEN, nicht aus config gelesen: lib.scad wird per use<>
+// eingebunden und sieht dessen Variablen nicht. Lautlos undef war hier
+// schon dreimal die Ursache fuer still durchgerutschte Fehler, deshalb
+// der assert.
+module corner_relief(ax, ay, dx, dy, z0, h, R) {
+    assert(is_num(R) && is_num(ax) && is_num(z0),
+           "corner_relief: undefinierte Parameter — kommt config.scad an?");
+    ux = dx/sqrt(2);  uy = dy/sqrt(2);
+    px = ax + ux*R;   py = ay + uy*R;
+    vx = -uy;         vy = ux;
+    L = 25;
+    // NACH INNEN abtragen (-u), nicht nach aussen. Die erste Fassung hat
+    // genau andersherum geschnitten und damit die Aussenhaut auf den
+    // Diagonalen entfernt statt das Inneneck freizustellen.
+    translate([0, 0, z0]) linear_extrude(h)
+        polygon([[px + vx*L,        py + vy*L],
+                 [px - vx*L,        py - vy*L],
+                 [px - vx*L - ux*L, py - vy*L - uy*L],
+                 [px + vx*L - ux*L, py + vy*L - uy*L]]);
+}

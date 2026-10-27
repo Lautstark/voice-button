@@ -99,3 +99,43 @@ Breakout-Tasche auf 12,7 mm hochgezogen. Überhub jetzt 0,15 mm, die
 Umfangsrippen bleiben als Backstop gegen Verkanten. Nebeneffekt: Der
 Eingriff des Rahmens im Blendenkragen fällt am Hubende nicht mehr auf
 0,8 mm, sondern bleibt bei 1,9 mm.
+
+## Nachtrag: Externes Review und was es gekostet hat (2026-10-27)
+
+Ein unabhängiger Reviewer bekam den Stand `df3c1f2` mit der Auflage, weder
+der Doku noch den Code-Kommentaren noch den vorhandenen Checks zu glauben.
+Sein Urteil war „nicht drucken", und er hatte recht. Drei Befunde habe ich
+selbst nachgemessen, bevor ich sie akzeptiert habe:
+
+1. **Die Kartenmulde war durch eine 0,1-mm-Haut verschlossen.** Der
+   Ausschnitt war aus `card_ch_h + 1` abgeleitet und damit exakt 0,1 mm zu
+   kurz für den 2,6 mm hohen Rahmen. Eine Schnittprobe mitten in der
+   vermeintlich offenen Fläche ergab 25,6 mm³ Material.
+2. **Der Gehäuseboden begann 0,8 mm über dem Bett.** Die drei gedruckten
+   Abstandsfüße ließen die erste Schicht aus 69 mm² Zapfen bestehen,
+   darüber 3462 mm² Boden in der Luft. Eine Schichtprobe fand dort 40 mm³
+   — nur die Füße.
+3. **Die Innenfasen schnitten die Außenhaut auf.** Sie trugen in die
+   falsche Richtung ab. Eine Sonde mitten in der Wand auf der
+   Südost-Diagonale fand nichts, 4,5 mm tiefer massives Material.
+
+Alle zwölf damaligen Checks waren dabei grün.
+
+### Die eigentliche Lehre: zwei stille Durchlasspfade
+
+- **`use <datei.scad>` importiert Module, aber keine Variablen.** Eine
+  Variable aus einer so eingebundenen Datei ist `undef`, und
+  undef-Koordinaten rendern lautlos *nichts*. Ein Einschluss-Check meldet
+  daraufhin „leer" — also bestanden. Genau so hat der Bohrungs-Check eine
+  echte 0,6-mm-Membran übersehen. Gegenmittel: alle geteilten Konstanten
+  stehen in `config.scad`, Hilfsmodule bekommen ihre Werte als Parameter,
+  und `scad/check_scope.py` sucht diesen Fehler jetzt automatisch.
+- **OpenSCAD 2021.01 gibt für ein leeres Ergebnis denselben Exitcode 1 wie
+  für einen echten Fehler.** Das alte Skript hat deshalb abgestürzte
+  Renderings als PASS gezählt. Jetzt wird zuerst auf die Fehlermeldung
+  geprüft, dann auf leer, und ein unbekannter Teilname löst ein `assert`
+  aus statt stillschweigend nichts zu rendern.
+
+Jeder neue Check prüft außerdem sein eigenes Messwerkzeug
+(`selftest_wall_probes`, `selftest_bore_probes`): Eine Sonde, die aus
+undef entsteht, würde sonst jeden Einschluss-Check grün melden.

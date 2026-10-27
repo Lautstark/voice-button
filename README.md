@@ -41,10 +41,10 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
   Karte wird oben unter eine Lippe geschoben und fällt in ihre Mulde —
   werkzeugfrei, ohne Kleben, ohne Biegen ([docs/mechanism.md](docs/mechanism.md)).
 - USB-C-Laden und Ein/Aus ohne Öffnen des Gehäuses (rechte Seite, vertieft).
-- Lautsprechergitter hinten mit 0,8-mm-Abstandsfüßen, damit Stoff es nicht
-  abdichtet.
+- Lautsprechergitter hinten in einer 0,8 mm flachen Mulde, damit anliegender
+  Stoff es nicht abdichtet — die Rückseite bleibt dabei plan und druckbar.
 - Verschraubt mit 3 × M2 von hinten (versenkt), plus 2 × M2 für die
-  Tasterbrücke, 1 × M2×5 als Breakout-Klemmschraube.
+  Tasterbrücke.
 - Gedrucktes Gewicht ≈ 40 g massiv gerechnet (mit 25 % Infill eher 30 g),
   Gerät komplett ≈ 60 g.
 
@@ -56,7 +56,12 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
 - `scad/assembly.scad` — Baugruppe, Explosion, Schnitte, Komponenten-Mockups.
 - `scad/main.scad` — Teil wählen: `openscad -D 'part="rear_shell"' …`
 - `scad/render_all.sh` — alle Ansichten (`renders/`) und STLs (`stl/`).
-- `scad/check_fit.sh` — paarweise Kollisionsprüfung (muss grün sein).
+- `scad/check_fit.sh` — Kollisions-, Eingriffs- und Einschlussprüfungen
+  (muss grün sein). Prüft zuerst seine eigenen Messwerkzeuge, scheitert bei
+  Renderfehlern und bei vertippten Checknamen.
+- `scad/check_scope.py` — sucht `use <>`-Lecks: Variablen aus per `use`
+  eingebundenen Dateien sind `undef`, rendern lautlos nichts und lassen
+  Checks grün aussehen. Dieser Fehler hat hier dreimal zugeschlagen.
 - `docs/` — [Mechanik](docs/mechanism.md), [Bauanleitung](docs/build.md),
   [Architektur-Entscheidung](docs/adr-001-architecture.md).
 

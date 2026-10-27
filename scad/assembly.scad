@@ -21,7 +21,7 @@ module mock_speaker() {
 
 module mock_battery() {
     color("lightsteelblue")
-        translate([bat_x0, bat_y0, bat_z]) cube([bat_l, bat_w, bat_t]);
+        translate([bat_x0, bat_y0, bat_z + bat_pad_t]) cube([bat_l, bat_w, bat_t]);
 }
 
 module mock_pcb() {
@@ -64,6 +64,18 @@ module mock_card_lifted() {
     color([0.95, 0.6, 0.15])
         translate([card_seat_x, card_seat_y + card_lift_max, card_bed_z + 0.02])
             cube([card_w, card_w, card_t]);
+}
+
+// Schraubenkoepfe als Huellkoerper. Sie fehlten in allen Kollisions-
+// modellen, deshalb blieb unbemerkt, dass der Klemmschraubenkopf in die
+// Frontplatte ragt.
+module mock_screw_heads() {
+    color("silver") {
+        // Brueckenschrauben
+        for (p = [bridge_scr_w, bridge_scr_e])
+            translate([p[0], p[1], bridge_z + bridge_t + 1.6 - 0.6])
+                cylinder(d = screw_head_d + 0.6, h = screw_head_h);
+    }
 }
 
 // e = explode distance multiplier (0 = assembled)

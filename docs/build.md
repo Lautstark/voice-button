@@ -31,12 +31,26 @@ Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
 
 ## Stufen B–D — Testdrucke
 
-1. **`test_card`** (~20 min): Karte oben unter die Lippe schieben,
-   loslassen. Schütteln, kopfüber halten, mit dem Daumen wieder
-   hochschieben und herauskippen.
-   Klemmt oben → `card_ch_h` hoch (Lippe hängt durch); rutscht zu leicht
-   heraus → `lip_bottom` hoch (und `card_lift` mit); Ecken stehen hoch →
-   `card_corner_r` runter.
+1. **`front_plate`** (~9 g, ca. 45 min) — **kein Testteil, das Echtteil.**
+   Seine Geometrie hängt an keiner der noch offenen `[MEASURE]`-Größen:
+   mit auf Anschlag verstellten Werten für Taster, Lautsprecher, Akku und
+   Breakout kommt dieselbe Bounding Box und dasselbe Volumen heraus. Passt
+   die Karte, bleibt das Teil im fertigen Gerät.
+   Rücken aufs Bett, Rahmen nach oben, keine Stützen.
+
+   Karte oben unter die Lippe schieben, loslassen. Schütteln, kopfüber
+   halten, mit dem Daumen wieder hochschieben und herauskippen.
+   Klemmt oben → `card_ch_h` hoch (die 1,8-mm-Lippe hängt durch);
+   rutscht zu leicht heraus → `lip_bottom` und `card_lift` zusammen hoch;
+   Ecken stehen hoch → `card_corner_r` runter.
+
+   Gleich mitdrucken lohnt sich: **`bezel`** (~6 g) ist aus demselben Grund
+   ein Echtteil. Zusammen zeigen die beiden, ob die Platte mit 0,3 mm Spiel
+   im Blendenkragen läuft, ohne zu klemmen — die eine Passung, die sonst
+   erst ganz am Schluss auffällt. Blende mit dem Gesicht aufs Bett.
+
+   `test_card` gibt es weiterhin, falls nur der Kartensitz interessiert;
+   es spart aber nur ~1 g gegenüber der echten Platte.
 
 2. **`test_pcb_coupon` / `test_speaker_coupon`**: Modul, Akku und
    Lautsprecher probeliegen; USB-Kabel durch die Öffnung stecken,

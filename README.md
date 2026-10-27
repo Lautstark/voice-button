@@ -79,7 +79,9 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
 
 ## Reihenfolge
 
-1. `test_card` drucken → echte laminierte Karte einschieben/entnehmen.
+1. `front_plate` **und** `bezel` drucken — beides Echtteile, unabhängig von
+   den noch offenen Messwerten. Karte einschieben, Lauf der Platte im
+   Blendenkragen prüfen. Passt es, bleiben die Teile im fertigen Gerät.
 2. Hardware ankommt → messen, `config.scad` aktualisieren,
    `test_pcb_coupon` + `test_speaker_coupon` drucken → Modul einlegen.
 3. `press_rig` + `front_plate` + `bezel` + `bridge` drucken → Taster

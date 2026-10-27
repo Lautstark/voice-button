@@ -53,10 +53,13 @@ bat_w          = 20.0;  // along y
 bat_t          = 4.8;   // thickness incl. wrap; allow for swelling below
 bat_clear      = 0.3;   // per side in plan
 bat_swell      = 1.0;   // free space above the battery face
-bat_tray_t     = 1.2;   // printed tray plate thickness
-// Tray plate must clear the speaker rim it spans over:
-bat_tray_z     = spk_rim_depth + 0.3;            // tray underside: 4.3
-bat_z          = bat_tray_z + bat_tray_t;        // battery rests at 5.7
+// The battery shelf is a SOLID pedestal from the floor, but only where the
+// floor is actually free of the speaker (x >= bat_shelf_x0). West of that
+// the speaker's own rim carries the battery. A flat shelf spanning the
+// whole pocket would be a 31 x 21 mm plate hanging 4.3 mm in mid-air — it
+// would need supports or fail outright.
+bat_shelf_x0   = 33.0;  // derived from the seat ring: see docs/mechanism.md
+bat_z          = spk_rim_depth + 0.3;            // 4.3 — just over the rim
 bat_x0         = 26.1;  // battery SW corner (pocket interior = this - bat_clear;
 bat_y0         = 1.1;   //  the east side of the pocket is the cavity wall itself)
 
@@ -122,6 +125,15 @@ bridge_rib_h   = 2.2;   // stiffening ribs on both long edges (downward)
 bo_z           = bridge_top;            // breakout sits on the bridge
 sw_top         = bo_z + bo_t + sw_h;    // 13.1 — switch cap front face
 pocket_wall    = 1.6;   // walls of the breakout pocket
+// THE TRAVEL STOP THAT MATTERS. The perimeter ribs sit at travel_stop = 1.8,
+// but the tactile switch goes solid after act_gap + sw_travel = 0.55 mm —
+// so on a centre press the plate would drive 1.25 mm PAST a bottomed-out
+// switch and put a child's whole hand force through a 12 x 12 cap, the
+// breakout and a 1.6 mm bridge. The breakout pocket walls are therefore
+// raised to catch the plate right beside the switch. The perimeter ribs
+// stay as the anti-cocking backstop.
+center_stop_over = 0.15;  // how far the switch may be driven past its own
+                          // bottom before the plate lands on the pocket
 // Bridge supports: west leg to the floor, east tab onto a wall ledge
 bridge_leg_x   = 3.0;   // west leg west face (near west wall)
 bridge_ledge_d = 3.0;   // east wall ledge protrusion
@@ -142,7 +154,7 @@ plate_corner_cut = 13.5; // 45° corner chamfer clearing the bezel posts
 stop_z         = plate_under_z - travel_stop;  // 11.6 — mid-wall rib stop height
 
 // Card frame on the plate front (moves with the plate)
-// The recess is 1 mm taller than the card, with a narrow lip top and bottom.
+// The recess is ~1.7 mm taller than the card, with a narrow lip top and bottom.
 // Slide the card up under the top lip, let go — it drops onto the bottom lip
 // and stays there. Nothing bends, nothing latches, no tape, no tool.
 //
@@ -154,7 +166,10 @@ stop_z         = plate_under_z - travel_stop;  // 11.6 — mid-wall rib stop hei
 // hence the spare height that lets it duck under one lip at a time.
 card_w         = 40.0;  // laminated card, square
 card_t         = 0.6;   // laminate thickness (parameterised)
-card_clear     = 0.2;   // recess clearance per side
+card_clear     = 0.4;   // recess clearance per side. Not cosmetic: it sets
+                        // the WIDTH tolerance of the card, and the same
+                        // scissors cut both edges, so it has to be in the
+                        // same league as the height window below.
 card_corner_r  = 0.5;   // recess corner radius. Must stay small: a square
                         // card corner reaches sqrt(2)*r into a rounded one.
                         // Caught by check_card_seated.
@@ -184,14 +199,14 @@ card_spare_min = lip_bottom + 0.15;         // less than this and the card's
                                             // bottom edge will not clear
 card_spare_max = lip_top - 0.6;             // more than this and the top lip
                                             // no longer holds it
-card_ch_w      = card_w + 2*card_clear;                        // 40.4
+card_ch_w      = card_w + 2*card_clear;                        // 40.8
 card_ch_l      = card_w + (card_spare_min + card_spare_max)/2; // 41.68
 card_h_min     = card_ch_l - card_spare_max;
 card_h_max     = card_ch_l - card_spare_min;
 card_lift_max  = card_ch_l - card_clear - card_w;  // 1.48 — how far a nominal
                         // card can be pushed up before it hits the recess top
-guide_w        = card_ch_w + 2*rail_wall; // 44.8
-guide_h        = card_ch_l + 2*rail_wall; // 45.8
+guide_w        = card_ch_w + 2*rail_wall; // 45.2
+guide_h        = card_ch_l + 2*rail_wall; // 46.08
 // Where the card rests, and where it has to be pushed to get it in or out.
 // (These live here, not in assembly.scad: `use <>` imports modules but not
 //  variables, so a check in main.scad would silently get undef.)
@@ -206,8 +221,8 @@ card_seat_y    = cavity_h/2 - card_ch_l/2 + card_clear;
 // plate slab against, and the collar bore is the ONLY sliding guide for the
 // plate's card-frame block. Outside the collar the face is thinner.
 bezel_gap      = 0.3;   // guide clearance: collar bore to guide block, per side
-bezel_open_w   = guide_w + 2*bezel_gap; // 45.4 — guides the moving block
-bezel_open_h   = guide_h + 2*bezel_gap; // 46.4
+bezel_open_w   = guide_w + 2*bezel_gap; // 45.8 — guides the moving block
+bezel_open_h   = guide_h + 2*bezel_gap; // 46.68
 bezel_face_t   = 1.8;   // thin outer face region
 collar_w       = 2.0;   // collar ring radial width beyond the opening
 wall_top_z     = plate_front_z;                  // 15.4 — shell walls end here
@@ -231,11 +246,21 @@ loop_id        = 5.5;   // takes a standard split ring
 loop_t         = 5.0;   // thickness along z
 loop_rise      = 5.0;   // ring center above the outer top wall
 
+center_stop_z  = plate_under_z - (act_gap + sw_travel + center_stop_over);
+
 // ---------------------------------------------------------------------
-// Foam return pads (adhesive EVA, not printed)
+// Foam return pads (not printed)
+// MATERIAL MATTERS MORE THAN SIZE HERE. Two 10 x 10 pads are 200 mm^2; at
+// 33 % compression that gives roughly:
+//    soft open-cell PU upholstery foam (25-35 kg/m3)  ~5 kPa ->  1 N
+//    soft EPDM weather-strip foam                    ~20 kPa ->  4 N
+//    closed-cell EVA / Moosgummi                    ~100 kPa -> 20 N
+// The tactile switch itself needs 1.6-2.6 N, and the pads only have to
+// return a 9 g plate. So: SOFT OPEN-CELL PU. EVA would make the button
+// unusable for a three-year-old. Smaller pads if it still feels stiff.
 // ---------------------------------------------------------------------
 foam_w         = 10.0;
-foam_t         = 6.0;   // on the bridge top, beside the breakout pocket:
+foam_t         = 6.5;   // on the bridge top, beside the breakout pocket:
                         // space at rest = plate_under_z - bridge_top = 5.8
                         // -> 0.2 preload; at full stop = 4.0 -> 33% compression
 
@@ -248,7 +273,16 @@ assert(bat_z + bat_t + bat_swell < plate_under_z - travel_stop,
        "battery face must clear the fully pressed plate");
 assert(travel_stop * (cavity_h/2 - sw_y_shift)/cavity_h > act_gap + sw_travel + 0.2,
        "corner-tilt must still actuate the (near-)central switch with margin");
-assert(plate_under_z - bridge_top > foam_t - 0.5, "foam pad preload sane");
+// Two-sided: too thin and there is no return at all, too thick and the pads
+// fight the switch. (The old one-sided form let foam_t = 5.0 pass with
+// 0.8 mm of AIR under the plate and still called it "sane".)
+foam_preload   = foam_t - (plate_under_z - bridge_top);
+assert(foam_preload >= 0.4 && foam_preload <= 1.5,
+       "foam preload must be between 0.4 and 1.5 mm");
+assert(rail_h - travel_stop >= 0.7,
+       "the block must stay in the bezel collar over the whole travel");
+assert(center_stop_z > bridge_top + bo_t + 0.5,
+       "centre stop must clear the breakout it stands around");
 assert(stop_z > bridge_top + bo_t + 2.0, "stops must sit above the breakout plane");
 
 assert(card_ch_h > card_t + 0.2, "card needs room in the recess");

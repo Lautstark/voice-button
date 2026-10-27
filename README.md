@@ -8,7 +8,7 @@ Werkzeug wechseln lässt. Mehrere identische Geräte lassen sich aus denselben
 Teilen bauen.
 
 **Status: Prototyp.** Die Geometrie ist parametrisch aufgebaut, in Software
-geprüft (Rendering, Watertightness, paarweise Kollisionschecks) und auf die
+geprüft (Rendering, paarweise Kollisions- und Eingriffschecks) und auf die
 Angaben des Amazon-Listings ausgelegt — aber noch nicht gegen die echte
 Hardware gemessen. Erst Koffer auf, messen, Testteile drucken (siehe
 [docs/build.md](docs/build.md)), dann das Gehäuse.
@@ -45,7 +45,8 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
   abdichtet.
 - Verschraubt mit 3 × M2 von hinten (versenkt), plus 2 × M2 für die
   Tasterbrücke, 1 × M2×5 als Breakout-Klemmschraube.
-- Gedrucktes Gewicht ≈ 30 g, Gerät komplett ≈ 55 g.
+- Gedrucktes Gewicht ≈ 40 g massiv gerechnet (mit 25 % Infill eher 30 g),
+  Gerät komplett ≈ 60 g.
 
 ## Dateien
 
@@ -68,8 +69,9 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
   Deckschicht zieht der Slicer dort Rillen statt einer geschlossenen Fläche.
 - Fluss 102–105 % und trockenes Filament. Matte-PLA wirkt von Natur aus
   körnig, sichtbare **Lücken** zwischen den Bahnen sind aber Unterextrusion.
-- Brücken aktiviert lassen: das Schlitzdach des Kartenhalters überspannt
-  40 mm. Ein wenig Durchhang ist eingeplant (Schlitz 1,4 statt 0,9 mm).
+- Der einzige nennenswerte Überhang ist die obere Kartenlippe: 3,0 mm tief
+  über 40,8 mm Breite. Darunter sind 1,3 mm frei (Mulde 0,9 + Entlastung
+  0,4), die Lippe darf also durchhängen, ohne die Karte zu klemmen.
 - 3 Wände, 25 % Gyroid, **keine Stützen** — alle Teile liegen flach:
   Rückschale auf dem Rücken, Frontplatte auf dem Rücken (Schienen oben),
   Blende auf dem Gesicht, Brücke flach (Tasche oben).

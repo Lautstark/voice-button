@@ -38,5 +38,6 @@ for c in check_shell_bridge check_shell_plate check_shell_bezel \
          check_plate_bezel check_plate_bridge check_plate_pressed check_mocks \
          check_card_seated check_card_lifted check_card_insert_assembled; do must_be_clear "$c"; done
 must_engage check_card_retained
+must_engage check_centre_stop
 
 exit $fail

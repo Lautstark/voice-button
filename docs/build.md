@@ -9,11 +9,18 @@
 | 3 | M2 × 10 Senk-/Linsenkopf, selbstschneidend | Blende |
 | 2 | M2 × 6 selbstschneidend | Brücke |
 | 1 | M2 × 5 Linsenkopf (Pan-Head) | Breakout-Klemme |
-| 2 | EVA-Schaumpad selbstklebend 10 × 10 × 6 mm, weich | Rückstellfedern |
-| 1 | EVA-Pad 20 × 30 × 1–2 mm | unter den Akku |
-| 1 | Schaumring ~Ø 29 außen, 2 mm | zwischen Lautsprecherrand und Brückenfinger (optional) |
+| 2 | **Weicher offenzelliger PU-Schaum** 10 × 10 × 6 mm | Rückstellfedern — siehe Warnung unten |
+| 1 | EVA/Moosgummi 20 × 30 × 1–2 mm | unter den Akku (hier darf es steif sein) |
+| 1 | Schaumring ~Ø 29 außen, 2 mm | unter den Akku, wo er auf dem Lautsprecherrand aufliegt (optional) |
 | 1 | laminierte METACOM-Karte 40 × 40 mm, ~0,6 mm | selbst laminieren |
 | 1 | Schlüsselring oder kleiner Karabiner | Öse Ø 5,5 |
+
+> **Zum Schaum:** Nimm *keinen* Moosgummi und kein EVA. Zwei Pads von
+> 10 × 10 mm ergeben bei 33 % Stauchung rund 1 N mit weichem PU-Polster-
+> schaum, aber etwa 20 N mit Moosgummi. Der Taster selbst braucht 1,6–2,6 N
+> — mit EVA wäre die Taste für ein dreijähriges Kind unbedienbar. Wenn sie
+> sich trotzdem schwer anfühlt: Pads auf 6 × 6 mm verkleinern. Wenn die
+> Platte nicht zurückkommt: vergrössern.
 
 ## Stufe A — Messen (Hardware da, Koffer auf)
 
@@ -40,9 +47,10 @@ Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
 
    Karte oben unter die Lippe schieben, loslassen. Schütteln, kopfüber
    halten, mit dem Daumen wieder hochschieben und herauskippen.
-   Klemmt oben → `card_ch_h` hoch (die 1,8-mm-Lippe hängt durch);
-   rutscht zu leicht heraus → `lip_bottom` und `card_lift` zusammen hoch;
-   Ecken stehen hoch → `card_corner_r` runter.
+   Karte 39,3–40,7 mm in **beiden** Richtungen schneiden.
+   Klemmt oben → `card_ch_h` hoch (die 3-mm-Lippe hängt durch);
+   rutscht zu leicht heraus → `lip_bottom` hoch (`lip_top` mitziehen, sonst
+   schrumpft das Toleranzfenster); Ecken stehen hoch → `card_corner_r` runter.
 
    Gleich mitdrucken lohnt sich: **`bezel`** (~6 g) ist aus demselben Grund
    ein Echtteil. Zusammen zeigen die beiden, ob die Platte mit 0,3 mm Spiel
@@ -72,15 +80,17 @@ Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
    die Aussparung Richtung Nordost).
 3. PCB mit Bauteilen nach **oben** in die Tasche (USB-C zur Ostwand);
    prüfen: Stecker findet durch die Trichteröffnung in die Buchse.
-4. Dünnes EVA-Pad in die Akkuschale, Akku darauf, Kabel durch den Schlitz
-   der Nordwand zum PCB.
+4. Dünnes EVA-Pad auf Sockel und Lautsprecherrand, Akku darauf. Er liegt
+   westlich auf dem Lautsprecherrand und östlich auf dem massiven Sockel —
+   das Pad gleicht den 0,3-mm-Absatz aus. Kabel durch den Schlitz der
+   Nordwand zum PCB.
 5. Brücke inkl. Breakout (wie oben) über Lautsprecher/PCB schrauben;
    Kabel unter der Brücke führen, nichts klemmt, nichts liegt auf dem
    Magneten auf.
-6. Schaumpads auf die Brücke, Platte einlegen (Aussparung zur Ostwand),
-   Blende auflegen, 3 × M2×10 von hinten.
-7. Blende auflegen, 3 × M2×10 von hinten anziehen.
-8. Funktionstest (Stufe-D-Protokoll), dann Karte einsetzen — die geht ohne
+6. Schaumpads auf die Brücke kleben — **zwischen** die Versteifungsrippen,
+   nicht darauf, sonst sitzen sie 2,2 mm zu hoch. Platte einlegen
+   (Aussparung zur Ostwand), Blende auflegen, 3 × M2×10 von hinten.
+7. Funktionstest (Stufe-D-Protokoll), dann Karte einsetzen — die geht ohne
    Werkzeug rein und raus.
 
 ## Bespielen

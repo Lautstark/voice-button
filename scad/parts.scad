@@ -51,7 +51,7 @@ rib_w2 = wall_rib_w/2;
 
 // East-post notch in the moving plate (the mid-east screw column passes
 // through the plate's footprint; the notch clears it over the full travel)
-notch_x0 = 50.3;   notch_y = [20.5, 29.7];
+notch_x0 = 50.1;   notch_y = [20.5, 29.7];
 
 // ---------------------------------------------------------------------
 // REAR SHELL
@@ -101,27 +101,23 @@ module shell_internals(lite = false) {
             cube([9, 7, spk_seat_h + 1]);
     }
 
-    // --- battery tray: plate over the speaker rim + fence walls -------
+    // --- battery shelf: solid pedestal, no bridging ------------------
     if (!lite) {
-        // tray plate (west edge clears the magnet; the part over the rim
-        // prints as a short internal bridge)
-        translate([bp_x0 - fence_t, 0, bat_tray_z])
-            cube([bp_x1 - (bp_x0 - fence_t), bp_y1 + fence_t, bat_tray_t]);
-        // south fence: full height from the floor, webbed into the S wall
+        // pedestal, only where the floor is clear of the speaker seat
+        translate([bat_shelf_x0, -1, 0])
+            cube([cavity_w - bat_shelf_x0, bp_y1 + fence_t + 1, bat_z]);
+        // south wall of the pocket: west part stands on free floor, east
+        // part sits on the pedestal
         translate([bp_x0 - fence_t, -1, 0])
-            cube([bp_x1 - (bp_x0 - fence_t), 1 + bp_y0, fence_top]);
-        // west fence: sits on the tray plate (magnet lies below/west)
-        translate([bp_x0 - fence_t, bp_y0, bat_z])
-            cube([fence_t, bp_y1 - bp_y0, fence_top - bat_z]);
-        // north fence (reduced height, stays under the bridge) + wire gap
+            cube([bat_shelf_x0 - (bp_x0 - fence_t), 1 + bp_y0, fence_top]);
+        translate([bat_shelf_x0, -1, bat_z])
+            cube([cavity_w - bat_shelf_x0, 1 + bp_y0, fence_top - bat_z]);
+        // north fence on the pedestal, with the wire gap to the PCB
         difference() {
-            translate([bp_x0 - fence_t, bp_y1, bat_tray_z])
-                cube([bp_x1 - (bp_x0 - fence_t), fence_t, fence_top_n - bat_tray_z]);
+            translate([bat_shelf_x0, bp_y1, bat_z])
+                cube([cavity_w - bat_shelf_x0, fence_t, fence_top_n - bat_z]);
             translate([40, bp_y1 - 0.5, bat_z]) cube([8, fence_t + 1, 20]);
         }
-        // two skirts carrying the north fence down to the floor
-        for (sx = [33, 50]) translate([sx, bp_y1, 0])
-            cube([3, fence_t, bat_tray_z + 0.1]);
     }
 
     // --- PCB pocket: standoff pads + low perimeter walls ---------------
@@ -221,7 +217,7 @@ module shell_cuts(lite = false) {
     // SE: battery corner, over the tray height band. The leg length has to
     // out-reach the cavity's corner radius, or the rectangular component
     // still catches the round — check_mocks is what measures this.
-    translate([0, 0, bat_tray_z - 0.1]) linear_extrude(bat_z + bat_t + bat_swell - bat_tray_z + 0.2)
+    translate([0, 0, bat_z - 0.1]) linear_extrude(bat_t + bat_swell + 0.2)
         polygon([[cavity_w - 9, -0.6], [cavity_w + 0.6, -0.6], [cavity_w + 0.6, 9]]);
     // NE: PCB corner, over the PCB + component band
     translate([0, 0, 0.3]) linear_extrude(pcb_top + pcb_comp_h + 0.2)
@@ -250,13 +246,14 @@ module bridge() {
                 for (yy = [bridge_y0, bridge_y1 - 1.6])
                     translate([bridge_x0, yy, bridge_top])
                         cube([bridge_x1 - bridge_x0, 1.6, bridge_rib_h]);
-                // breakout pocket walls
+                // breakout pocket walls, raised to centre_stop_z so they,
+                // and not the tactile switch, take a hard press
                 translate([po_x0, po_y0, bridge_top])
-                    cube([po_x1 - po_x0, po_y1 - po_y0, bo_t + 1.6]);
+                    cube([po_x1 - po_x0, po_y1 - po_y0, center_stop_z - bridge_top]);
                 // clamp screw boss at the pocket's NW corner (M2 x 5; the pan
                 // head overlaps the breakout edge and holds it down)
                 translate([po_x0 + 0.6, po_y1 - 3.4, bridge_z])
-                    cylinder(d = 5.0, h = bridge_t + bo_t + 1.6);
+                    cylinder(d = 5.0, h = center_stop_z - bridge_z);
             }
             // pocket interior (0.25 clearance per side around the breakout)
             translate([bo_cx - bo_w/2 - 0.25, bo_cy - bo_l/2 - 0.25, bridge_top - 0.1])

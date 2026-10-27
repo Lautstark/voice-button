@@ -57,19 +57,45 @@ aber bewegte Kabel an der Taste und Montage-Gefummel. Verworfen.
 
 ## Nachtrag: Kartenhalterung (2026-10-27)
 
-Drei Eigenschaften, von denen nur zwei gleichzeitig zu haben sind:
-kein Klebeband, kein Mechanismus, Wechsel ohne Werkzeug.
+Vier Entwürfe sind gescheitert, bevor der fünfte stehen blieb. Der Weg ist
+die Begründung wert, weil jeder Schritt eine Variante ausschliesst:
 
-Zwei Mechanismen sind unterwegs gescheitert — Lippen ringsum knicken die
-Karte (quadratische Sehnenverkürzung), ein Einschubschlitz ist nicht
-erreichbar (der Rahmen ist ein bewegliches Teil in der Blendenöffnung).
-Damit fiel „kein Mechanismus" nicht mehr weg, sondern war erzwungen.
+1. **Lippen ringsum + Nase:** Ein vierseitig berandeter Rahmen hat keinen
+   flachen Einlass. Die Karte muss sich wölben, und die Sehnenverkürzung
+   wächst quadratisch mit dem Bogen — 1,2 mm Übergreifen brauchen ~3 mm
+   Bogen. Der erste Testdruck knickte das Laminat sichtbar.
+2. **Einschubschlitz seitlich:** nicht erreichbar. Der Rahmen sitzt als
+   bewegliches Teil in der Blendenöffnung; 115 mm³ Gehäusewand und
+   Blendenkragen stehen im Weg. Gilt für jede Kante.
+3. **Blanke Mulde + Klebeband:** funktioniert, hinterlässt aber Rückstände
+   auf dem Laminat und macht jeden Wechsel zur Bastelei.
+4. **Blende übergreift die Karte:** hält bombenfest, kostet aber den
+   werkzeugfreien Wechsel **und** verkleinert die Drückfläche von 46 auf
+   38 mm — eine Verschlechterung bei genau der Eigenschaft, die der Spec
+   am wichtigsten ist.
 
-Entschieden gegen **Wechsel ohne Werkzeug**: Die Blende übergreift die
-Karte um 1 mm. Begründung: Karten wechseln selten; es ist die einfachste
-Geometrie von allen (ein Absatz in der Blendenöffnung, sonst nichts); und
-was eine Dreijährige nicht herausbekommt, kann sie auch nicht in den Mund
-nehmen. Die Blende muss für den Akkuservice ohnehin abnehmbar sein.
+**Entschieden: Mulde mit je einer Lippe oben und unten**, Mulde ~1,7 mm
+höher als die Karte. Oben einhängen, loslassen. Werkzeugfrei, ohne
+Klebeband, ohne Biegen, volle Drückfläche. Die Karte ist allseitig
+gehalten — oben und unten von den Lippen, seitlich von den Muldenwänden.
 
-Verworfen: **Klebeband.** Funktioniert, hinterlässt aber Rückstände auf
-der laminierten Karte und macht aus einem Wechsel eine Bastelei.
+Der Preis: Die Karte lässt sich mit dem Daumen hochschieben, also auch von
+einem Kind. Das ist vertretbar, weil 40 × 40 mm nicht durch den
+Kleinteile-Prüfzylinder (Ø 31,7 mm) passt — eine herausgeholte Karte ist
+ein Verlust, kein Sicherheitsproblem.
+
+## Nachtrag: Anschlag des Druckmechanismus (2026-10-27)
+
+Ursprünglich lagen die Anschläge nur am Umfang (Wandrippen, 1,8 mm Hub).
+Eine unabhängige Nachrechnung zeigte: Der 12 × 12-Taktiltaster geht nach
+0,55 mm auf Block, die Platte wäre also bei jedem mittigen Druck 1,25 mm
+**über** den blockierten Taster hinausgefahren — mit der vollen Handkraft
+eines Kindes über Tasterkappe, Breakout und eine 1,6 mm dünne Brücke.
+
+Das Dilemma ist prinzipiell: Umfangsanschläge brauchen viel Weg, damit der
+Eckendruck auslöst, und wenig Weg, um den Taster zu schützen. Auflösung:
+ein **zweiter Anschlag direkt neben dem Taster** — die Wände der
+Breakout-Tasche auf 12,7 mm hochgezogen. Überhub jetzt 0,15 mm, die
+Umfangsrippen bleiben als Backstop gegen Verkanten. Nebeneffekt: Der
+Eingriff des Rahmens im Blendenkragen fällt am Hubende nicht mehr auf
+0,8 mm, sondern bleibt bei 1,9 mm.

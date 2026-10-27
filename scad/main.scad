@@ -45,11 +45,18 @@ else if (part == "check_shell_plate")    intersection() { rear_shell(); front_pl
 else if (part == "check_shell_bezel")    intersection() { rear_shell(); bezel(); }
 else if (part == "check_plate_bezel")    intersection() { front_plate(); bezel(); }
 else if (part == "check_plate_bridge")   intersection() { front_plate(); bridge(); }
-// (the switch mock is excluded here: at full perimeter-stop travel the
-//  plate legitimately bottoms the tactile switch, which is its own stop)
+// Pressed to the CENTRE stop (the pocket walls), everything must still be
+// clear — that is the deepest the plate may go on a straight press.
 else if (part == "check_plate_pressed")  intersection() {
-    translate([0, 0, -travel_stop]) front_plate();
+    translate([0, 0, -(plate_under_z - center_stop_z)]) front_plate();
     union() { rear_shell(); bridge(); mock_battery(); mock_pcb(); }
+}
+// ...and pressed further it MUST run into the bridge, not into the switch.
+// Without this the plate drives a bottomed-out tactile switch into the
+// breakout under a child's full hand force.
+else if (part == "check_centre_stop") intersection() {
+    translate([0, 0, -(plate_under_z - center_stop_z) - 0.2]) front_plate();
+    bridge();
 }
 // The card must lie free in its recess: expect EMPTY.
 else if (part == "check_card_seated") intersection() { test_card(); mock_card(); }

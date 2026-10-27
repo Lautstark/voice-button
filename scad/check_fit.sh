@@ -42,6 +42,13 @@ render() {
   fi
   IS_EMPTY=0
   echo "$OUT" | grep -q "top level object is empty" && IS_EMPTY=1
+  # RC war bisher nur gespeichert, nicht ausgewertet: ein Lauf mit
+  # Exitcode != 0, der weder "ERROR" schrieb noch sich leer meldete, kam
+  # als PASS durch. Der Leerfall ist der einzige erlaubte Nicht-Null-Fall.
+  if [ $IS_EMPTY -eq 0 ] && [ $RC -ne 0 ]; then
+    echo "$1: FAIL (openscad Exitcode $RC ohne Fehlermeldung)"
+    fail=1; return 1
+  fi
   if [ $IS_EMPTY -eq 0 ] && [ ! -s "$STL" ]; then
     echo "$1: FAIL (kein STL geschrieben, aber auch nicht als leer gemeldet)"
     fail=1; return 1

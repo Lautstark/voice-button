@@ -20,6 +20,26 @@ fertigen Gerät, wenn die Karte passt.
 
 Zusammen ~39 g gedruckt, fertiges Gerät ~60 g.
 
+## Alles auf einmal: ja
+
+Mit 8 mm Abstand und 10 mm Rand belegen die vier Teile **150 × 156 mm** von
+den 220 × 220 mm des Ender 3 V2 — 70 bzw. 64 mm Reserve.
+
+    Reihe 1   Rückschale (61 × 74) │ Blende (61 × 61)
+    Reihe 2   Frontplatte (55 × 55) │ Brücke (47 × 25)
+
+Rechne mit 4–6 Stunden. Drei Dinge dabei:
+
+- Nur die Rückschale ist höher als 7,4 mm; darüber druckt der Kopf allein
+  an ihr weiter. Unproblematisch, macht den Druck aber nicht schneller.
+- Vier Teile heißt viele Leerfahrten. Retraction und Combing an, sonst
+  zieht Matte-PLA Fäden quer über das Bett.
+- Die Brücke hat die kleinste Aufstandsfläche — ein Brim darum ist billige
+  Versicherung gegen Ablösen.
+
+Falls die Karte am Ende nicht passt, ist nur die Frontplatte (9 g) zu
+wiederholen, nicht der ganze Satz.
+
 ## Einstellungen (eSUN ePLA-Matte, Ender 3 V2)
 
 - Düse 0,4 mm · Schicht 0,2 mm · Düse 215–225 °C · Bett 50 °C

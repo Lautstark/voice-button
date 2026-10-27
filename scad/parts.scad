@@ -12,7 +12,7 @@ use <lib.scad>
 // ---------------------------------------------------------------------
 // Bezel screw columns: 3 columns in plan-space free of components.
 // SW corner, NW corner, mid-east (between battery fence and PCB pocket).
-post_positions = [[3.4, 2.6], [3.4, cavity_h - 2.6], [53.2, 24.3]];
+post_positions = [[3.4, 2.6], [3.4, cavity_h - 2.6], [53.2, 25.1]];
 
 // Bridge strip and supports
 bridge_y0   = 23.0;                       // south edge clears the battery fence
@@ -51,7 +51,7 @@ rib_w2 = wall_rib_w/2;
 
 // East-post notch in the moving plate (the mid-east screw column passes
 // through the plate's footprint; the notch clears it over the full travel)
-notch_x0 = 50.3;   notch_y = [20.4, 29.6];
+notch_x0 = 50.3;   notch_y = [20.5, 29.7];
 
 // ---------------------------------------------------------------------
 // REAR SHELL
@@ -141,8 +141,10 @@ module shell_internals(lite = false) {
                 translate([pp_x0 - 1.6, pp_y1, 0])
                     cube([pp_x1 - pp_x0 + 1.6, cavity_h - pp_y1 + 0.5, pp_wall_h]);
             }
-            // wire gap in the west pocket wall (speaker + battery leads)  [MEASURE]
-            translate([pp_x0 - 2.6, pcb_y0 + 6, -0.5]) cube([3.6, 10, pp_wall_h + 1]);
+            // wire gaps  [MEASURE]: speaker lead enters from the west, the
+            // battery lead comes up from the south
+            translate([pp_x0 - 2.6, pcb_y0 + 7, -0.5]) cube([3.6, 12, pp_wall_h + 1]);
+            translate([40, pp_y0 - 2.6, -0.5]) cube([10, 3.6, pp_wall_h + 1]);
             // relieve the pocket walls around the speaker
             translate([spk_cx, spk_cy, -0.5])
                 cylinder(d = spk_d + 2*spk_clear + 0.8, h = pp_wall_h + 1);
@@ -216,13 +218,15 @@ module shell_cuts(lite = false) {
     // --- inner corner chamfers where rectangular components meet the
     //     cavity's rounded corners (outer radius is larger, so the wall
     //     stays >= 2.6 mm thick behind these flats) ----------------------
-    // SE: battery corner, over the tray height band
+    // SE: battery corner, over the tray height band. The leg length has to
+    // out-reach the cavity's corner radius, or the rectangular component
+    // still catches the round — check_mocks is what measures this.
     translate([0, 0, bat_tray_z - 0.1]) linear_extrude(bat_z + bat_t + bat_swell - bat_tray_z + 0.2)
-        polygon([[cavity_w - 3.6, -0.6], [cavity_w + 0.6, -0.6], [cavity_w + 0.6, 3.6]]);
+        polygon([[cavity_w - 9, -0.6], [cavity_w + 0.6, -0.6], [cavity_w + 0.6, 9]]);
     // NE: PCB corner, over the PCB + component band
-    translate([0, 0, 0.3]) linear_extrude(5.7)
-        polygon([[cavity_w + 0.6, cavity_h - 3.6], [cavity_w + 0.6, cavity_h + 0.6],
-                 [cavity_w - 3.6, cavity_h + 0.6]]);
+    translate([0, 0, 0.3]) linear_extrude(pcb_top + pcb_comp_h + 0.2)
+        polygon([[cavity_w + 0.6, cavity_h - 9], [cavity_w + 0.6, cavity_h + 0.6],
+                 [cavity_w - 9, cavity_h + 0.6]]);
 
     // --- hanging loop hole ------------------------------------------------
     if (!lite) translate([cx, cavity_h + wall + loop_rise, -1])
@@ -295,6 +299,9 @@ module card_frame(ccx, ccy, face_z) {
             rbox(guide_w, guide_h, rail_h, 3);
         translate([x0, y0, bed])
             rbox(card_ch_w, card_ch_l, card_ch_h + 1, card_corner_r);
+        // floor relief under the top lip: room for that overhang to sag
+        translate([x0, y1 - lip_top - 0.5, bed - lip_relief])
+            cube([card_ch_w, lip_top + 0.5, lip_relief + 0.01]);
     }
     translate([x0, y0, lip_z]) cube([card_ch_w, lip_bottom, rail_lip_t]);
     translate([x0, y1 - lip_top, lip_z]) cube([card_ch_w, lip_top, rail_lip_t]);

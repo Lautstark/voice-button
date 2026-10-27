@@ -63,8 +63,14 @@ bat_y0         = 1.1;   //  the east side of the pocket is the cavity wall itsel
 // ---------------------------------------------------------------------
 // Main PCB  [MEASURE]  (27 x 29, USB-C + slide switch on one edge)
 // ---------------------------------------------------------------------
-pcb_w          = 29.0;  // along x (connector edge faces the east wall)
-pcb_h          = 27.0;  // along y
+// Read off the listing's own close-up: USB-C and the ON-OFF slider sit on
+// the SAME edge, with three 1.25 mm JST blocks on the others (speaker left,
+// one right, battery B-/B+ top right). Positions along that edge are scaled
+// off the photo and still want a caliper.  [MEASURE]
+pcb_w          = 29.0;  // along x
+pcb_h          = 27.0;  // along y — the east edge, carrying USB-C and the
+                        // slider. Which of the two board edges is 27 and
+                        // which is 29 is not readable from the photo.  [MEASURE]
 pcb_t          = 1.2;
 pcb_standoff   = 0.8;   // keeps solder side off the floor
 pcb_z          = pcb_standoff;          // pcb underside
@@ -72,10 +78,10 @@ pcb_top        = pcb_z + pcb_t;         // 2.0
 pcb_comp_h     = 3.3;   // tallest component on top  [MEASURE]
 pcb_clear      = 0.3;   // pocket clearance per side
 pcb_x0         = cavity_w - 0.6 - pcb_w;   // 26.8 — east edge near wall
-pcb_y0         = 28.0;
+pcb_y0         = cavity_h - 0.6 - pcb_h;   // 26.8
 
 // USB-C opening in the east wall  [MEASURE positions!]
-usb_y_c        = pcb_y0 + 10.5; // port center along y — placeholder
+usb_y_c        = pcb_y0 + 11.0; // ~0.38 along the edge, from the photo
 usb_z_c        = pcb_top + 1.7; // port center height (3.2 mm tall connector)
 usb_cut_w      = 10.2;  // opening width (connector 8.9 + clearance)
 usb_cut_h      = 4.6;   // opening height
@@ -84,7 +90,7 @@ usb_funnel_h   = 8.0;
 usb_funnel_d   = 1.2;   // recess depth into the wall
 
 // Power slide switch through the east wall  [MEASURE positions!]
-psw_y_c        = pcb_y0 + 21.0; // placeholder (north end of the edge)
+psw_y_c        = pcb_y0 + 24.6; // ~0.85 along the edge, from the photo
 psw_z_c        = pcb_top + 1.4;
 psw_cut_w      = 9.0;   // slot width (finger/nail access, recessed)
 psw_cut_h      = 4.2;
@@ -152,12 +158,16 @@ card_clear     = 0.2;   // recess clearance per side
 card_corner_r  = 0.5;   // recess corner radius. Must stay small: a square
                         // card corner reaches sqrt(2)*r into a rounded one.
                         // Caught by check_card_seated.
-card_lift      = 1.0;   // spare height above the seated card — the room it
-                        // needs to clear the bottom lip on the way in
-lip_bottom     = 0.8;   // must stay under card_lift
-lip_top        = card_lift + 0.8;  // 1.8 — still 0.8 mm over the card when
-                        // it sits down. Keep it modest: this is an
-                        // unsupported overhang over the recess when printed.
+lip_bottom     = 0.8;   // bottom lip; must exceed the card's lift in the
+                        // recess (card_ch_h - card_t) by a clear margin
+lip_top        = 3.0;   // top pocket. This is what makes the holder tolerant
+                        // of the card's cut size: the usable range of card
+                        // heights is lip_top - lip_bottom - 0.75 mm wide, so
+                        // 1.8 mm here would demand a card cut to +/-0.12 mm.
+                        // 3.0 gives +/-0.7 mm, which scissors can hit.
+lip_relief     = 0.4;   // the recess floor steps down under the top lip, so
+                        // the 3 mm overhang may sag that far without ever
+                        // pinching the card
 rail_wall      = 2.2;   // rim thickness around the recess
 card_ch_h      = card_t + 0.3;           // 0.9 — recess depth
 bed_rise       = 0.6;   // the card bed sits this far above the plate face
@@ -168,8 +178,18 @@ plate_front_z  = plate_under_z + plate_t;        // 15.4 — plate front face
 card_bed_z     = plate_front_z + bed_rise;       // 16.0 — card rests here
 rail_top_z     = plate_front_z + rail_h;         // 18.0
 // Recess and guided block (the block slides in the bezel collar)
-card_ch_w      = card_w + 2*card_clear;              // 40.4
-card_ch_l      = card_w + 2*card_clear + card_lift;  // 41.4
+// Recess height is derived so the nominal card lands in the MIDDLE of the
+// usable range, and the range itself is echoed at render time.
+card_spare_min = lip_bottom + 0.15;         // less than this and the card's
+                                            // bottom edge will not clear
+card_spare_max = lip_top - 0.6;             // more than this and the top lip
+                                            // no longer holds it
+card_ch_w      = card_w + 2*card_clear;                        // 40.4
+card_ch_l      = card_w + (card_spare_min + card_spare_max)/2; // 41.68
+card_h_min     = card_ch_l - card_spare_max;
+card_h_max     = card_ch_l - card_spare_min;
+card_lift_max  = card_ch_l - card_clear - card_w;  // 1.48 — how far a nominal
+                        // card can be pushed up before it hits the recess top
 guide_w        = card_ch_w + 2*rail_wall; // 44.8
 guide_h        = card_ch_l + 2*rail_wall; // 45.8
 // Where the card rests, and where it has to be pushed to get it in or out.
@@ -232,15 +252,17 @@ assert(plate_under_z - bridge_top > foam_t - 0.5, "foam pad preload sane");
 assert(stop_z > bridge_top + bo_t + 2.0, "stops must sit above the breakout plane");
 
 assert(card_ch_h > card_t + 0.2, "card needs room in the recess");
-assert(card_lift > lip_bottom + 0.15,
-       "the spare height must free the card from the bottom lip");
-assert(lip_top > card_lift + 0.5,
-       "the top lip must still hold the card once it has dropped");
+assert(lip_bottom > (card_ch_h - card_t) + 0.4,
+       "bottom lip must out-reach the card's lift inside the recess");
+assert(card_h_max - card_h_min > 1.0,
+       "usable card-height range is too narrow to cut by hand");
 // Front loading is the only access the moving frame has, so the card must
 // pass through the bezel opening in both directions.
 assert(bezel_open_w > card_w + 1 && bezel_open_h > card_w + 1,
        "card must pass through the bezel opening");
 
+echo(str("Karte: ", card_w, " mm breit (max ", card_ch_w,
+         "), Hoehe ", card_h_min, " .. ", card_h_max, " mm"));
 echo(str("housing: ", housing_w, " x ", housing_h, " x ", housing_d,
          " mm external (+", foot_h, " feet, + loop)"));
 echo(str("switch top z=", sw_top, "  plate rest z=", plate_under_z,

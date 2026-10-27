@@ -12,7 +12,7 @@ use <lib.scad>
 // ---------------------------------------------------------------------
 // Bezel screw columns: 3 columns in plan-space free of components.
 // SW corner, NW corner, mid-east (between battery fence and PCB pocket).
-post_positions = [[3.4, 2.6], [3.4, cavity_h - 2.6], [53.2, 24.3]];
+post_positions = [[3.4, 2.6], [3.4, cavity_h - 2.6], [53.8, 24.6]];
 
 // Bridge strip and supports
 bridge_y0   = 23.0;                       // south edge clears the battery fence
@@ -51,7 +51,7 @@ rib_w2 = wall_rib_w/2;
 
 // East-post notch in the moving plate (the mid-east screw column passes
 // through the plate's footprint; the notch clears it over the full travel)
-notch_x0 = 49.4;   notch_y = [20.4, 29.6];
+notch_x0 = 51.4;   notch_y = [20.6, 28.6];
 
 // ---------------------------------------------------------------------
 // REAR SHELL
@@ -279,37 +279,43 @@ module bridge() {
 
 // ---------------------------------------------------------------------
 // CARD FRAME (shared by the front plate and the card test coupon)
+// Slide-in holder: the card enters edgewise through a slot in the WEST
+// wall and is never bent. Lips on north, south and east hold it; a 0.25 mm
+// sawtooth detent on the bed keeps it from sliding back out. The only
+// thing that ever flexes is the card, by 0.25 mm, riding over that detent.
 // ---------------------------------------------------------------------
 module card_frame(ccx, ccy, bed_z) {
-    chan = card_w/2 + card_clear;        // half-size of the card channel
-    difference() {
-        // frame block
-        translate([ccx - guide_w/2, ccy - guide_w/2, bed_z])
-            rbox(guide_w, guide_w, rail_h, 3);
-        // card channel (full depth)
-        translate([ccx - chan, ccy - chan, bed_z - 0.5])
-            cube([2*chan, 2*chan, rail_h + 1]);
-        // finger notch in the north wall, east of the nub
-        translate([ccx + 6, ccy + chan - 0.5, bed_z - 0.5])
-            cube([14, rail_wall + 1, rail_h + 1]);
-    }
-    // retaining lips: west, east (stopping short of the top so the card's
-    // upper third can bow past the nub during insertion), south (full width)
+    x0 = ccx - card_ch_w/2; x1 = ccx + card_ch_w/2;   // channel west / east
+    y0 = ccy - card_ch_l/2; y1 = ccy + card_ch_l/2;   // channel south / north
     lip_z = bed_z + card_ch_h;
-    translate([ccx - chan, ccy - chan, lip_z]) {
-        cube([rail_overlap, 2*chan - rail_free_top, rail_lip_t]);       // west
-        translate([2*chan - rail_overlap, 0, 0])
-            cube([rail_overlap, 2*chan - rail_free_top, rail_lip_t]);   // east
-        cube([2*chan, rail_overlap, rail_lip_t]);                       // south
-    }
-    // top-center retaining nub with insertion chamfer
     difference() {
-        translate([ccx - nub_w/2, ccy + chan - nub_overlap, lip_z])
-            cube([nub_w, nub_overlap, rail_lip_t]);
-        // 45° bevel on the nub's front inner edge so the flexed card slips past
-        translate([ccx, ccy + chan - nub_overlap, lip_z + rail_lip_t])
-            rotate([45, 0, 0]) translate([-nub_w/2 - 0.5, -1.5, 0])
-                cube([nub_w + 1, 3, 3]);
+        union() {
+            // outer walls
+            difference() {
+                translate([ccx - guide_w/2, ccy - guide_h/2, bed_z])
+                    rbox(guide_w, guide_h, rail_h, 3);
+                translate([x0, y0, bed_z - 0.5])
+                    cube([card_ch_w, card_ch_l, rail_h + 1]);
+            }
+            // lips: south and north run the full channel width and are what
+            // actually keeps the card captive; east is the end stop
+            translate([x0, y0, lip_z]) cube([card_ch_w, rail_overlap, rail_lip_t]);
+            translate([x0, y1 - rail_overlap, lip_z])
+                cube([card_ch_w, rail_overlap, rail_lip_t]);
+            translate([x1 - rail_overlap, y0, lip_z])
+                cube([rail_overlap, card_ch_l, rail_lip_t]);
+            // detent: gentle ramp going in, steep face behind the card's
+            // west edge once it is seated against the east lip
+            translate([x0 + 0.1, ccy + detent_w/2, bed_z])
+                rotate([-90, 0, 0]) linear_extrude(detent_w)
+                    polygon([[0, 0], [detent_l, 0], [detent_l, detent_h]]);
+        }
+        // insertion slot through the west wall
+        translate([ccx - guide_w/2 - 1, y0, bed_z - 0.01])
+            cube([guide_w/2 - card_ch_w/2 + 1.01, card_ch_l, slot_h]);
+        // notch in the east lip: push the card west to eject it
+        translate([x1 - rail_overlap - 0.01, ccy - finger_w/2, lip_z - 0.01])
+            cube([rail_overlap + 2, finger_w, rail_lip_t + 1]);
     }
 }
 
@@ -358,8 +364,8 @@ module bezel() {
                         difference() {
                             translate([-(cavity_w/2 - 0.4), -(cavity_h/2 - 0.4)])
                                 rrect(cavity_w - 0.8, cavity_h - 0.8, corner_r - wall);
-                            translate([-(bezel_open_w/2 + collar_w), -(bezel_open_w/2 + collar_w)])
-                                rrect(bezel_open_w + 2*collar_w, bezel_open_w + 2*collar_w, 4);
+                            translate([-(bezel_open_w/2 + collar_w), -(bezel_open_h/2 + collar_w)])
+                                rrect(bezel_open_w + 2*collar_w, bezel_open_h + 2*collar_w, 4);
                         }
             }
             // screw posts, trimmed to the cavity outline
@@ -370,13 +376,16 @@ module bezel() {
                 translate([0.3, 0.3, 0]) rbox(cavity_w - 0.6, cavity_h - 0.6, 50, corner_r - wall);
             }
         }
-        // the opening (= the sliding guide bore for the card-frame block)
-        translate([cx - bezel_open_w/2, cy - bezel_open_w/2, wall_top_z - 1])
-            rbox(bezel_open_w, bezel_open_w, bezel_front_z - wall_top_z + 2, 3 + bezel_gap);
+        // the opening (= the sliding guide bore for the card-frame block).
+        // It runs down past stop_z so the mid-east screw column is shaved
+        // flush with the collar over its whole height and never reaches into
+        // the travel envelope of the moving plate.
+        translate([cx - bezel_open_w/2, cy - bezel_open_h/2, stop_z - 1])
+            rbox(bezel_open_w, bezel_open_h, bezel_front_z - stop_z + 2, 3 + bezel_gap);
         // soft chamfer on the front inner edge
         translate([cx, cy, bezel_front_z - 0.5]) linear_extrude(1.0, scale = 1.06)
-            translate([-bezel_open_w/2 - 0.5, -bezel_open_w/2 - 0.5])
-                rrect(bezel_open_w + 1.0, bezel_open_w + 1.0, 3.5);
+            translate([-bezel_open_w/2 - 0.5, -bezel_open_h/2 - 0.5])
+                rrect(bezel_open_w + 1.0, bezel_open_h + 1.0, 3.5);
         // M2 self-tap pilots in the posts
         for (p = post_positions)
             translate([p[0], p[1], stop_z - 1]) cylinder(d = post_pilot_d, h = 6.2);
@@ -388,8 +397,8 @@ module bezel() {
 // ---------------------------------------------------------------------
 // Stage C: card holder coupon — prints in minutes, verifies the real card.
 module test_card() {
-    translate([cx - guide_w/2 - 2, cy - guide_w/2 - 2, plate_front_z - 1.8])
-        rbox(guide_w + 4, guide_w + 4, 1.8, 4);
+    translate([cx - guide_w/2 - 2, cy - guide_h/2 - 2, plate_front_z - 1.8])
+        rbox(guide_w + 4, guide_h + 4, 1.8, 4);
     card_frame(cx, cy, plate_front_z);
 }
 

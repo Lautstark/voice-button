@@ -48,29 +48,43 @@ heraus. Die Ecken der Platte sind 45° gekappt und haben eine Aussparung
 Ost, damit die drei Schraubsäulen frei durchlaufen (0,3+ mm Spiel über den
 ganzen Hub, per `check_fit.sh` nachgewiesen).
 
-## Kartenhalter (drei Schienen + Nase)
+## Kartenhalter (Einschub)
 
-Auf der beweglichen Frontplatte, bewegt sich mit. Kanal 40,4 × 40,4 mm,
-Kanalhöhe 0,9 mm für 0,6-mm-Laminat:
+Auf der beweglichen Frontplatte, bewegt sich mit. Die Karte wird **nie
+gebogen** — sie wird flach durch einen Schlitz eingeschoben.
 
-- Links/rechts: Lippen mit 1,3 mm Überdeckung, die **16 mm unterhalb der
-  Oberkante enden** (`rail_free_top`). Liefen sie bis oben durch, läge die
-  Karte auf ganzer Länge flach gepresst und könnte sich nicht mehr wölben —
-  nach unten sind nur 0,3 mm Luft, die Nase wäre unpassierbar.
-- Unten: Lippe über die volle Breite.
-- Oben Mitte: starre Nase, 7 mm breit, 1,2 mm Überdeckung, mit
-  45°-Einführfase. **Die Karte biegt sich, nie das PLA.**
-- Oben rechts: 14 mm Fingermulde bis auf Bettniveau zum Heraushebeln mit
-  dem Fingernagel.
+Warum nicht mehr klemmen und knicken: Ein ringsum berandeter Rahmen hat
+keinen flachen Einlass. Die Karte muss sich dann wölben, und weil die
+Sehnenverkürzung quadratisch mit dem Bogen geht, braucht ein Übergreifen
+von 1,2 mm rund 3 mm Bogen. Das knickt 0,6-mm-Laminat sichtbar.
 
-Einsetzen: Unterkante in die untere Schiene, Seiten unter die Lippen, dann
-das freie obere Drittel leicht zum Betrachter wölben (~3 mm Bogen verkürzt
-die Sehne um die nötigen ~1,4 mm) und die Oberkante über die Fase hinter
-die Nase schnappen lassen. Entnahme umgekehrt über die Fingermulde. Die
-oberen Ecken sind dafür bewusst frei; gehalten wird die Karte unten, an
-beiden Seiten unten/mittig und oben an der Nase. Der Retention-Check
-(`check_card_retained`) bestätigt: eine um 0,4 mm angehobene Karte
-kollidiert mit allen drei Lippen und der Nase.
+Geometrie (Kanal 41,9 × 40,4 mm für eine 40 × 40-Karte):
+
+- **Nord- und Südlippe:** über die volle Kanalbreite, 1,3 mm Überdeckung.
+  Sie stehen quer zur Einschubrichtung und halten die Karte an Ober- und
+  Unterkante durchgehend fest — das ist die eigentliche Sicherung.
+- **Ostlippe:** 1,3 mm, über die volle Höhe; sie ist der Endanschlag.
+- **Westwand:** durchgehender Einschubschlitz, 1,4 mm hoch.
+- **Rastnase:** 0,15 mm hoher Sägezahn auf dem Bett, 16 mm breit, hinter
+  der Westkante der sitzenden Karte. Rampe beim Einschieben, steile Flanke
+  beim Herausziehen.
+- **Fingermulde:** 16 mm Ausschnitt in der Ostlippe zum Herausdrücken.
+
+Einsetzen: Karte flach in den Westschlitz schieben, bis sie am Ostanschlag
+sitzt; dabei fährt sie über die Rastnase. Entnehmen: durch die Fingermulde
+nach Westen drücken, bis sie aus dem Schlitz schaut, dann herausziehen.
+
+Warum sie nicht herausfällt: Nord- und Südlippe greifen in **jeder**
+Schiebeposition über die volle Kartenbreite. Die Karte kann sich also
+weder kippen noch auswölben — der einzige Weg hinaus ist der Schlitz, und
+den sperrt die Rastnase. Geprüft in `check_fit.sh`:
+`check_card_sweep` fährt die Karte rechnerisch von außerhalb des Schlitzes
+bis an den Anschlag (muss leer sein), `check_card_retained` hebt sie über
+das Kanalspiel an (muss an Nord-, Süd- und Ostlippe anstoßen).
+
+Preis dafür: Der Rahmen wird 1,5 mm breiter (Fenster 46,9 × 45,4 statt
+45,4 × 45,4), und die mittlere Ostschraube rückt entsprechend nach außen.
+Das Gehäuse außen bleibt 61 × 61 mm.
 
 ## Was Software-Checks NICHT beweisen
 

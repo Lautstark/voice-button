@@ -136,26 +136,38 @@ plate_corner_cut = 13.5; // 45° corner chamfer clearing the bezel posts
 stop_z         = plate_under_z - travel_stop;  // 11.6 — mid-wall rib stop height
 
 // Card frame on the plate front (moves with the plate)
+// INSERTION: the card slides in edgewise through a slot in the WEST wall and
+// is never bent. Once inside, the full-length north and south lips hold its
+// top and bottom edges across the whole width, so the only way out is back
+// through the slot — and a sawtooth detent on the bed blocks that until the
+// card is deliberately pushed west through the notch in the east lip.
 card_w         = 40.0;  // laminated card, square
 card_t         = 0.6;   // laminate thickness (parameterised)
-card_clear     = 0.2;   // channel clearance per side
-rail_overlap   = 1.3;   // lip overlap onto the card, left/right/bottom
-nub_w          = 7.0;   // top-center retaining nub width
-nub_overlap    = 1.2;
-rail_free_top  = 16.0;  // the side lips STOP this far below the channel top,
-                        // so the card's upper third can bow toward the viewer
-                        // during insertion (chord shortening ~1.4 mm at ~3 mm
-                        // bow) and slip under the nub; full-length side lips
-                        // would pin the card flat and block insertion
+card_clear     = 0.2;   // channel clearance per side (across the slide axis)
+card_slide     = 1.5;   // spare channel width west of the seated card: the
+                        // room the detent needs behind the card's west edge
+rail_overlap   = 1.3;   // lip overlap onto the card: north, south, east
 rail_wall      = 2.2;   // rail outer wall thickness
-rail_lip_t     = 1.0;   // lip thickness over the card
-card_ch_h      = card_t + 0.3;          // channel height under the lip
-rail_h         = card_ch_h + rail_lip_t; // rail rise above the card bed: 1.9
-finger_w       = 14.0;  // finger recess in the top edge (beside the nub)
+card_ch_h      = card_t + 0.3;           // 0.9 — channel height under the
+                        // lips; snug on purpose. The slack left over after
+                        // detent_h is what the card rides in on.
+rail_lip_t     = 1.7;   // lip thickness over the card; the same material is
+                        // the roof beam over the insertion slot
+rail_h         = card_ch_h + rail_lip_t; // 2.6 — rail rise above the card bed
+slot_h         = card_ch_h + 0.5;        // 1.55 — insertion slot height. The
+                        // extra over the channel absorbs the sag of the
+                        // 40 mm bridge that forms the slot roof.
+detent_h       = 0.15;  // sawtooth bump on the bed behind the card's west
+detent_l       = 1.2;   // edge: ramp on the way in, steep face on the way out
+detent_w       = 16.0;
+finger_w       = 16.0;  // notch in the EAST lip: push the card west to eject
 plate_front_z  = plate_under_z + plate_t;        // 15.4 — card bed surface
-rail_top_z     = plate_front_z + rail_h;         // 17.3
-// Guided block = card frame outline sliding in the bezel opening
-guide_w        = card_w + 2*card_clear + 2*rail_wall;  // 44.8
+rail_top_z     = plate_front_z + rail_h;         // 18.0
+// Channel and guided block (the block slides in the bezel collar)
+card_ch_w      = card_w + 2*card_clear + card_slide;  // 41.9 (x, slide axis)
+card_ch_l      = card_w + 2*card_clear;               // 40.4 (y)
+guide_w        = card_ch_w + 2*rail_wall;  // 46.3
+guide_h        = card_ch_l + 2*rail_wall;  // 44.8
 
 // ---------------------------------------------------------------------
 // Bezel (fixed front frame, screwed from the back)
@@ -165,7 +177,8 @@ guide_w        = card_w + 2*card_clear + 2*rail_wall;  // 44.8
 // plate slab against, and the collar bore is the ONLY sliding guide for the
 // plate's card-frame block. Outside the collar the face is thinner.
 bezel_gap      = 0.3;   // guide clearance: collar bore to guide block, per side
-bezel_open_w   = guide_w + 2*bezel_gap; // 45.4 — guides the moving block
+bezel_open_w   = guide_w + 2*bezel_gap; // 46.9 — guides the moving block
+bezel_open_h   = guide_h + 2*bezel_gap; // 45.4
 bezel_face_t   = 1.8;   // thin outer face region
 collar_w       = 2.0;   // collar ring radial width beyond the opening
 wall_top_z     = plate_front_z;                  // 15.4 — shell walls end here

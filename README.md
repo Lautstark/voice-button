@@ -38,7 +38,7 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
 - Außen ca. **61 × 61 × 21 mm** (plus Öse), Kantenradius 7 mm, matt lila
   (eSUN ePLA-Matte Lilac).
 - Die ganze Vorderseite ist eine starre, schwimmend geführte Taste; die
-  Karte wird von drei Schienen und einer Nase gehalten
+  Karte wird flach durch einen Schlitz eingeschoben und nie gebogen
   ([docs/mechanism.md](docs/mechanism.md)).
 - USB-C-Laden und Ein/Aus ohne Öffnen des Gehäuses (rechte Seite, vertieft).
 - Lautsprechergitter hinten mit 0,8-mm-Abstandsfüßen, damit Stoff es nicht
@@ -62,7 +62,14 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
 ## Druck (eSUN ePLA-Matte, Ender 3 V2)
 
 - Düse 0,4 mm, Schicht 0,2 mm, Düse **215–225 °C**, Bett **50 °C** (Matte-PLA
-  will es eher kühl und langsam: ≤ 50 mm/s Perimeter).
+  will es eher kühl und langsam: ≤ 40 mm/s Perimeter).
+- **Oberflächenmuster auf „monoton"/„monotonic" stellen**, nicht
+  konzentrisch. Die Rahmenstege sind nur 2,2 mm breit; mit konzentrischer
+  Deckschicht zieht der Slicer dort Rillen statt einer geschlossenen Fläche.
+- Fluss 102–105 % und trockenes Filament. Matte-PLA wirkt von Natur aus
+  körnig, sichtbare **Lücken** zwischen den Bahnen sind aber Unterextrusion.
+- Brücken aktiviert lassen: das Schlitzdach des Kartenhalters überspannt
+  40 mm. Ein wenig Durchhang ist eingeplant (Schlitz 1,4 statt 0,9 mm).
 - 3 Wände, 25 % Gyroid, **keine Stützen** — alle Teile liegen flach:
   Rückschale auf dem Rücken, Frontplatte auf dem Rücken (Schienen oben),
   Blende auf dem Gesicht, Brücke flach (Tasche oben).
@@ -72,7 +79,7 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
 
 ## Reihenfolge
 
-1. `test_card` drucken → echte laminierte Karte einsetzen/entnehmen.
+1. `test_card` drucken → echte laminierte Karte einschieben/entnehmen.
 2. Hardware ankommt → messen, `config.scad` aktualisieren,
    `test_pcb_coupon` + `test_speaker_coupon` drucken → Modul einlegen.
 3. `press_rig` + `front_plate` + `bezel` + `bridge` drucken → Taster

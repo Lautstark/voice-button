@@ -31,11 +31,12 @@ Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
 
 ## Stufen B–D — Testdrucke
 
-1. **`test_card`** (~20 min): Karte flach in die Mulde legen. Prüfen, ob
-   sie plan liegt (Ecken!) und ob sie sich durch die beiden Löcher von
-   hinten herausdrücken lässt.
-   Karte wackelt → `card_ch_h` runter; Ecken stehen hoch → `card_corner_r`
-   runter oder `card_clear` hoch; zu stramm → `card_clear` hoch.
+1. **`test_card`** (~20 min): Karte oben unter die Lippe schieben,
+   loslassen. Schütteln, kopfüber halten, mit dem Daumen wieder
+   hochschieben und herauskippen.
+   Klemmt oben → `card_ch_h` hoch (Lippe hängt durch); rutscht zu leicht
+   heraus → `lip_bottom` hoch (und `card_lift` mit); Ecken stehen hoch →
+   `card_corner_r` runter.
 
 2. **`test_pcb_coupon` / `test_speaker_coupon`**: Modul, Akku und
    Lautsprecher probeliegen; USB-Kabel durch die Öffnung stecken,
@@ -64,9 +65,9 @@ Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
    Magneten auf.
 6. Schaumpads auf die Brücke, Platte einlegen (Aussparung zur Ostwand),
    Blende auflegen, 3 × M2×10 von hinten.
-7. Karte in die Mulde der Frontplatte legen, **dann** Blende auflegen und
-   3 × M2×10 von hinten anziehen — die Blende hält die Karte.
-8. Funktionstest (Stufe-D-Protokoll).
+7. Blende auflegen, 3 × M2×10 von hinten anziehen.
+8. Funktionstest (Stufe-D-Protokoll), dann Karte einsetzen — die geht ohne
+   Werkzeug rein und raus.
 
 ## Bespielen
 

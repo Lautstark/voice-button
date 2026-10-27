@@ -48,50 +48,36 @@ heraus. Die Ecken der Platte sind 45° gekappt und haben eine Aussparung
 Ost, damit die drei Schraubsäulen frei durchlaufen (0,3+ mm Spiel über den
 ganzen Hub, per `check_fit.sh` nachgewiesen).
 
-## Kartenhalter (blanke Mulde)
+## Kartenhalter (Mulde mit zwei Lippen)
 
-Auf der beweglichen Frontplatte, bewegt sich mit. Eine 40,4 × 40,4 mm große,
-0,9 mm tiefe Mulde im erhöhten Rahmenblock, mehr nicht. Die Karte wird von
-vorn flach eingelegt.
+Auf der beweglichen Frontplatte, bewegt sich mit. Die Mulde ist 1 mm höher
+als die Karte und hat je eine schmale Lippe oben (1,8 mm) und unten
+(0,8 mm). Das ist alles.
 
-**Gehalten wird sie von der Blende.** Deren Öffnung verengt sich 0,2 mm über
-dem Rahmen auf 38 mm und übergreift die Karte damit ringsum um 1 mm. Kein
-Klebeband, kein Rastelement, nichts, woran ein Kind picken könnte — die
-Karte kommt nur heraus, wenn die Blende abkommt. Geprüft mit
-`check_card_captive`: eine aus der Mulde gehobene Karte muss an allen vier
-Kanten an die Blendenlippe stoßen.
+**Einsetzen:** Karte oben unter die Lippe schieben, loslassen. Sie fällt
+auf die untere Lippe und sitzt. **Entnehmen:** mit dem Daumen 1 mm
+hochschieben, Unterkante herauskippen. Nichts biegt sich.
 
-**Herausnehmen:** drei M2-Schrauben hinten lösen, Blende ab, Platte
-herausnehmen, Karte durch die zwei 5-mm-Löcher im Bett von hinten
-herausdrücken. Deshalb gibt es keine Fingermulde: Der Rahmen bleibt vorn
-ungestört, und es gibt nichts, wo sich ein Fingernagel ansetzen könnte.
-Beide Löcher liegen über je einem Schaumpad, blicken im montierten Zustand
-also auf nichts als Schaum.
+### Warum nicht an drei Seiten, oben offen
 
-**Eckenradius:** Die Mulde hat 0,5 mm Eckenradius. Mehr geht nicht: eine
-spitze Kartenecke ragt √2·r in eine verrundete Ecke hinein, bei 1,5 mm wären
-das 0,34 mm zu viel und die Karte läge nicht plan. `check_card_seated` hat
-genau das gefunden.
+Naheliegend, aber es sperrt die Karte ein. Lippen links und rechts müssten
+über die volle Höhe laufen, damit sie etwas halten — dann kann die Karte
+nur noch in ihrer Ebene nach oben heraus, und genau das verhindert die
+Blende: deren Öffnung ist nur 0,3 mm höher als der Rahmen. Die Karte käme
+rein und nie wieder raus.
 
-### Warum kein Mechanismus
+Entscheidend ist: **sie ist auch so an allen vier Seiten gehalten.** Oben
+und unten von den Lippen, links und rechts von den Muldenwänden mit 0,2 mm
+Spiel. Seitlich kann sie nicht heraus, weil die Lippen Ober- und Unterkante
+festhalten; die Karte müsste sich dafür falten. Lippen an den Seiten würden
+also keine Sicherheit hinzufügen, sondern nur die Entnahme verhindern.
 
-Zwei Varianten sind vorher gescheitert, beide aus demselben Grund wert,
-festgehalten zu werden:
+Der Fluchtweg ist bewusst nach oben gelegt: Der Anhänger richtet sich am
+Ring immer mit der Öse nach oben aus, die Schwerkraft arbeitet also
+dauerhaft dagegen.
 
-1. **Lippen ringsum** (drei Schienen + Nase): Ein vierseitig berandeter
-   Rahmen hat keinen flachen Einlass. Die Karte muss sich wölben, und weil
-   die Sehnenverkürzung quadratisch mit dem Bogen geht, braucht 1,2 mm
-   Übergreifen rund 3 mm Bogen. Das knickt 0,6-mm-Laminat sichtbar.
-2. **Einschubschlitz:** nicht erreichbar. Der Rahmen ist ein *bewegliches*
-   Teil innerhalb der Blendenöffnung, mit 0,3 mm Luft ringsum; Gehäusewand
-   und Blendenkragen stehen mit 115 mm³ im Weg jeder seitlichen Zufuhr —
-   egal, an welcher Kante der Schlitz sitzt. Festgenagelt in
-   `check_card_insert_assembled`.
-
-Übrig bleibt die Vorderseite, und von vorn braucht es keinen Mechanismus.
-Nebeneffekt: Der Rahmen druckt jetzt **ohne einen einzigen Überhang und
-ohne Brücke** — die Lippenunterseiten und Schlitzdächer waren genau die
-Stellen, an denen das Druckbild gelitten hätte.
+**Beim ersten Druck prüfen:** Die obere Lippe steht 1,8 mm frei über der
+Mulde. Hängt sie durch, klemmt die Karte — dann `card_ch_h` erhöhen.
 
 ## Was Software-Checks NICHT beweisen
 

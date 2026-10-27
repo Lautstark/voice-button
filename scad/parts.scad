@@ -279,23 +279,25 @@ module bridge() {
 
 // ---------------------------------------------------------------------
 // CARD FRAME (shared by the front plate and the card test coupon)
-// A raised block with a plain recess milled into its top. No lips, no slot,
-// no catch: the card drops in from the front and two dots of double-sided
-// tape hold it. The block's outer face is what slides in the bezel collar.
+// A recess 1 mm taller than the card, a narrow lip at the top and at the
+// bottom. That is the whole holder. Slide the card up under the top lip,
+// let go; it drops onto the bottom lip. No side lips — they would stop the
+// card from being laid in flat, and they are not needed: the recess walls
+// already hold it sideways.
 // ---------------------------------------------------------------------
 module card_frame(ccx, ccy, face_z) {
     bed = face_z + bed_rise;
+    x0 = ccx - card_ch_w/2;
+    y0 = ccy - card_ch_l/2;  y1 = ccy + card_ch_l/2;
+    lip_z = bed + card_ch_h;
     difference() {
         translate([ccx - guide_w/2, ccy - guide_h/2, face_z])
             rbox(guide_w, guide_h, rail_h, 3);
-        // the card recess
-        translate([ccx - card_ch_w/2, ccy - card_ch_l/2, bed])
+        translate([x0, y0, bed])
             rbox(card_ch_w, card_ch_l, card_ch_h + 1, card_corner_r);
-        // push-out holes: with the bezel off, the card presses out from behind
-        for (ph = push_holes)
-            translate([ph[0], ph[1], face_z - plate_t - 1])
-                cylinder(d = push_hole_d, h = rail_h + plate_t + 2);
     }
+    translate([x0, y0, lip_z]) cube([card_ch_w, lip_bottom, rail_lip_t]);
+    translate([x0, y1 - lip_top, lip_z]) cube([card_ch_w, lip_top, rail_lip_t]);
 }
 
 // ---------------------------------------------------------------------
@@ -360,14 +362,11 @@ module bezel() {
         // flush with the collar over its whole height and never reaches into
         // the travel envelope of the moving plate.
         translate([cx - bezel_open_w/2, cy - bezel_open_h/2, stop_z - 1])
-            rbox(bezel_open_w, bezel_open_h, card_lip_z - stop_z + 1, 3 + bezel_gap);
-        // above it the opening narrows: that step IS the card retainer
-        translate([cx - bezel_inner_w/2, cy - bezel_inner_w/2, card_lip_z])
-            rbox(bezel_inner_w, bezel_inner_w, bezel_front_z - card_lip_z + 1, 2);
+            rbox(bezel_open_w, bezel_open_h, bezel_front_z - stop_z + 2, 3 + bezel_gap);
         // soft chamfer on the front inner edge
-        translate([cx, cy, bezel_front_z - 0.5]) linear_extrude(1.0, scale = 1.07)
-            translate([-bezel_inner_w/2 - 0.5, -bezel_inner_w/2 - 0.5])
-                rrect(bezel_inner_w + 1.0, bezel_inner_w + 1.0, 2.5);
+        translate([cx, cy, bezel_front_z - 0.5]) linear_extrude(1.0, scale = 1.06)
+            translate([-bezel_open_w/2 - 0.5, -bezel_open_h/2 - 0.5])
+                rrect(bezel_open_w + 1.0, bezel_open_h + 1.0, 3.5);
         // M2 self-tap pilots in the posts
         for (p = post_positions)
             translate([p[0], p[1], stop_z - 1]) cylinder(d = post_pilot_d, h = 6.2);

@@ -136,53 +136,47 @@ plate_corner_cut = 13.5; // 45° corner chamfer clearing the bezel posts
 stop_z         = plate_under_z - travel_stop;  // 11.6 — mid-wall rib stop height
 
 // Card frame on the plate front (moves with the plate)
-// A plain recess, nothing more. The card drops in flat from the front and is
-// held by two dots of double-sided tape. Two earlier mechanisms died here:
-// lips on all four sides have no flat entry, so the card creased; a slide-in
-// slot is unreachable, because the frame is a moving part sitting inside the
-// bezel opening with 0.3 mm of air around it. What is left is the thing that
-// needed no mechanism in the first place — and it prints without a single
-// overhang or bridge, which the lips and slot roofs did not.
+// The recess is 1 mm taller than the card, with a narrow lip top and bottom.
+// Slide the card up under the top lip, let go — it drops onto the bottom lip
+// and stays there. Nothing bends, nothing latches, no tape, no tool.
+//
+// Why it has to be this and not a side slot: the frame is a moving part
+// inside the bezel opening with 0.3 mm of air around it, so no card can
+// reach it from an edge (115 mm3 of housing wall and collar in the way, see
+// check_card_insert_assembled). Front loading is the only access, and a
+// front-loaded card can only be held by something it first has to pass —
+// hence the spare height that lets it duck under one lip at a time.
 card_w         = 40.0;  // laminated card, square
 card_t         = 0.6;   // laminate thickness (parameterised)
 card_clear     = 0.2;   // recess clearance per side
 card_corner_r  = 0.5;   // recess corner radius. Must stay small: a square
-                        // card corner reaches sqrt(2)*r into a rounded one,
-                        // so anything much over card_clear/(sqrt(2)-1) makes
-                        // the corners foul. Caught by check_card_seated.
+                        // card corner reaches sqrt(2)*r into a rounded one.
+                        // Caught by check_card_seated.
+card_lift      = 1.0;   // spare height above the seated card — the room it
+                        // needs to clear the bottom lip on the way in
+lip_bottom     = 0.8;   // must stay under card_lift
+lip_top        = card_lift + 0.8;  // 1.8 — still 0.8 mm over the card when
+                        // it sits down. Keep it modest: this is an
+                        // unsupported overhang over the recess when printed.
 rail_wall      = 2.2;   // rim thickness around the recess
-card_ch_h      = card_t + 0.3;           // 0.9 — recess depth; the card sits
-                        // a hair below the rim, protected but near flush
-rail_lip_t     = 1.7;   // rim height above the card bed; this is what slides
-                        // in the bezel collar, so it is not purely cosmetic
-rail_h         = card_ch_h + rail_lip_t; // 2.6 — rim rise above the plate face
-bed_rise       = rail_h - card_ch_h;     // 1.7 — the card bed is lifted this
-                        // far above the plate face, so the recess stays
-                        // shallow and the card does not sit in a deep well
-// Two holes through the bed instead of a finger scallop: with the bezel off
-// the plate comes out in your hand and the card pushes out from behind. No
-// interruption in the rim, and nothing to pick at from the front. Both sit
-// over a foam pad, so in the assembled device they look at nothing but foam.
-push_hole_d    = 5.0;
-push_holes     = [[12.0, 30.0], [44.0, 30.0]];
+card_ch_h      = card_t + 0.3;           // 0.9 — recess depth
+bed_rise       = 0.6;   // the card bed sits this far above the plate face
+rail_lip_t     = 1.1;   // lip thickness, flush with the rim top
+rail_h         = bed_rise + card_ch_h + rail_lip_t;  // 2.6 — rim rise; this
+                        // is also what slides in the bezel collar
 plate_front_z  = plate_under_z + plate_t;        // 15.4 — plate front face
-card_bed_z     = plate_front_z + bed_rise;       // 17.1 — card rests here
+card_bed_z     = plate_front_z + bed_rise;       // 16.0 — card rests here
 rail_top_z     = plate_front_z + rail_h;         // 18.0
 // Recess and guided block (the block slides in the bezel collar)
-card_ch_w      = card_w + 2*card_clear;   // 40.4
-card_ch_l      = card_ch_w;               // square
+card_ch_w      = card_w + 2*card_clear;              // 40.4
+card_ch_l      = card_w + 2*card_clear + card_lift;  // 41.4
 guide_w        = card_ch_w + 2*rail_wall; // 44.8
-guide_h        = guide_w;
-// The bezel reaches over the card's edge and is what holds it in: no tape,
-// no catch, nothing for a child to pick at. The price is that a card change
-// costs the three bezel screws — see docs/adr-001-architecture.md.
-bezel_card_lip = 1.0;   // overlap onto the card, all four sides
-bezel_inner_w  = card_w - 2*bezel_card_lip;  // 38.0 — the visible window
-card_lip_z     = rail_top_z + 0.2;           // 18.2 — underside of that lip
-// Where the card rests. (These live here, not in assembly.scad: `use <>`
-//  imports modules but not variables, so a check would silently get undef.)
+guide_h        = card_ch_l + 2*rail_wall; // 45.8
+// Where the card rests, and where it has to be pushed to get it in or out.
+// (These live here, not in assembly.scad: `use <>` imports modules but not
+//  variables, so a check in main.scad would silently get undef.)
 card_seat_x    = cavity_w/2 - card_w/2;
-card_seat_y    = cavity_h/2 - card_w/2;
+card_seat_y    = cavity_h/2 - card_ch_l/2 + card_clear;
 
 // ---------------------------------------------------------------------
 // Bezel (fixed front frame, screwed from the back)
@@ -193,7 +187,7 @@ card_seat_y    = cavity_h/2 - card_w/2;
 // plate's card-frame block. Outside the collar the face is thinner.
 bezel_gap      = 0.3;   // guide clearance: collar bore to guide block, per side
 bezel_open_w   = guide_w + 2*bezel_gap; // 45.4 — guides the moving block
-bezel_open_h   = guide_h + 2*bezel_gap; // 45.4 (square)
+bezel_open_h   = guide_h + 2*bezel_gap; // 46.4
 bezel_face_t   = 1.8;   // thin outer face region
 collar_w       = 2.0;   // collar ring radial width beyond the opening
 wall_top_z     = plate_front_z;                  // 15.4 — shell walls end here
@@ -238,8 +232,10 @@ assert(plate_under_z - bridge_top > foam_t - 0.5, "foam pad preload sane");
 assert(stop_z > bridge_top + bo_t + 2.0, "stops must sit above the breakout plane");
 
 assert(card_ch_h > card_t + 0.2, "card needs room in the recess");
-assert(card_lip_z > rail_top_z, "bezel lip must clear the rim at rest");
-assert(bezel_inner_w < card_w - 1, "bezel must actually overlap the card");
+assert(card_lift > lip_bottom + 0.15,
+       "the spare height must free the card from the bottom lip");
+assert(lip_top > card_lift + 0.5,
+       "the top lip must still hold the card once it has dropped");
 // Front loading is the only access the moving frame has, so the card must
 // pass through the bezel opening in both directions.
 assert(bezel_open_w > card_w + 1 && bezel_open_h > card_w + 1,

@@ -57,13 +57,18 @@ else if (part == "check_card_seated") intersection() { test_card(); mock_card();
 // check whose absence let a holder ship that could not be loaded at all.
 else if (part == "check_card_insert_assembled") intersection() {
     union() { rear_shell(); bezel(); front_plate(); }
-    mock_card();
+    union() { mock_card(); mock_card_lifted(); }
 }
-// Lifted out of its recess, the card MUST run into the bezel's lip: that is
-// the whole retention. Expect four patches, one per edge.
-else if (part == "check_card_captive") intersection() {
-    bezel();
-    translate([0, 0, card_ch_h - card_t + 0.3]) mock_card();
+// Lifted out of its recess, the card MUST run into both lips: that is the
+// whole retention. Expect two patches, top and bottom.
+else if (part == "check_card_retained") intersection() {
+    test_card();
+    translate([0, 0, card_ch_h - card_t + 0.1]) mock_card();
+}
+// Pushed up under the top lip it must lie free — this is the proof it can
+// be laid in flat, i.e. that nothing has to bend.
+else if (part == "check_card_lifted") intersection() {
+    test_card(); mock_card_lifted();
 }
 else if (part == "section_card") difference() {
     union() { test_card(); mock_card(); }

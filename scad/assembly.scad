@@ -58,6 +58,14 @@ module mock_card() {
             cube([card_w, card_w, card_t]);
 }
 
+// The card pushed up under the top lip, where its bottom edge has cleared
+// the bottom lip and it can be laid in flat or tipped back out.
+module mock_card_lifted() {
+    color([0.95, 0.6, 0.15])
+        translate([card_seat_x, card_seat_y + card_lift, card_bed_z + 0.02])
+            cube([card_w, card_w, card_t]);
+}
+
 // e = explode distance multiplier (0 = assembled)
 module assembly(e = 0) {
     color([0.72, 0.6, 0.85]) rear_shell();

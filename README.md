@@ -38,8 +38,8 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
 - Außen ca. **61 × 61 × 21 mm** (plus Öse), Kantenradius 7 mm, matt lila
   (eSUN ePLA-Matte Lilac).
 - Die ganze Vorderseite ist eine starre, schwimmend geführte Taste; die
-  Karte liegt flach in einer Mulde und wird von der Blende gehalten —
-  Wechsel über die drei Gehäuseschrauben ([docs/mechanism.md](docs/mechanism.md)).
+  Karte wird oben unter eine Lippe geschoben und fällt in ihre Mulde —
+  werkzeugfrei, ohne Kleben, ohne Biegen ([docs/mechanism.md](docs/mechanism.md)).
 - USB-C-Laden und Ein/Aus ohne Öffnen des Gehäuses (rechte Seite, vertieft).
 - Lautsprechergitter hinten mit 0,8-mm-Abstandsfüßen, damit Stoff es nicht
   abdichtet.

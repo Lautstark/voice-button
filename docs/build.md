@@ -9,18 +9,34 @@
 | 3 | M2 × 10 Senk-/Linsenkopf, selbstschneidend | Blende |
 | 2 | M2 × 6 selbstschneidend | Brücke |
 | 1 | M2 × 5 Linsenkopf (Pan-Head) | Breakout-Klemme |
-| 2 | **Weicher offenzelliger PU-Schaum** 10 × 10 × 6 mm | Rückstellfedern — siehe Warnung unten |
+| 2 | **Weicher offenzelliger Schaum** 10 × 10 × ~6 mm | Rückstellfedern — siehe Kasten unten |
 | 1 | EVA/Moosgummi 20 × 30 × 1–2 mm | unter den Akku (hier darf es steif sein) |
 | 1 | Schaumring ~Ø 29 außen, 2 mm | unter den Akku, wo er auf dem Lautsprecherrand aufliegt (optional) |
 | 1 | laminierte METACOM-Karte 40 × 40 mm, ~0,6 mm | selbst laminieren |
 | 1 | Schlüsselring oder kleiner Karabiner | Öse Ø 5,5 |
 
-> **Zum Schaum:** Nimm *keinen* Moosgummi und kein EVA. Zwei Pads von
-> 10 × 10 mm ergeben bei 33 % Stauchung rund 1 N mit weichem PU-Polster-
-> schaum, aber etwa 20 N mit Moosgummi. Der Taster selbst braucht 1,6–2,6 N
-> — mit EVA wäre die Taste für ein dreijähriges Kind unbedienbar. Wenn sie
-> sich trotzdem schwer anfühlt: Pads auf 6 × 6 mm verkleinern. Wenn die
-> Platte nicht zurückkommt: vergrössern.
+> **Zum Schaum.** Die Pads müssen nur eine 9-g-Platte zurückholen, also ist
+> weich besser als fest — und das Passende liegt vermutlich schon zu Hause:
+>
+> - **Spülschwamm**, weiche Seite, nicht das Scheuervlies. Offenzelliger
+>   PU, mit Abstand die beste Kennlinie.
+> - **Ohrpolster alter Kopfhörer** oder **Verpackungsschaum** aus einem
+>   Elektronikkarton.
+> - **Isomatte/Yogamatte**: geht, ist fester — dann Pads kleiner schneiden.
+>
+> Nimm *kein* Moosgummi und kein Bastel-EVA: Zwei Pads von 10 × 10 mm geben
+> damit rund 20 N statt 1 N, der Taster selbst braucht 1,6–2,6 N — die
+> Taste wäre für ein dreijähriges Kind unbedienbar. Auch **kein Memory-
+> Schaum** (Ohrstöpsel): der federt zu langsam zurück, die Taste fühlt sich
+> tot an. Filz federt gar nicht.
+>
+> Dicke ~6 mm, auf die markierten Felder der Brücke kleben (doppelseitiges
+> Klebeband). Zu schwergängig → Pads kleiner schneiden. Platte kommt nicht
+> zurück → grösser.
+>
+> Gekauft: selbstklebendes Dichtungsband aus Neopren, 10 mm breit × 6 mm
+> dick (z. B. Amazon B0BFQCQWND in der Grösse „10mm(B) x6mm(D)", ~7 €).
+> Das ist fester als Schwamm — damit erst 10 × 5 mm schneiden.
 
 ## Stufe A — Messen (Hardware da, Koffer auf)
 

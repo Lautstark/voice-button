@@ -242,6 +242,12 @@ module bridge() {
                 // pocket region extension (covers the full breakout footprint)
                 translate([po_x0, po_y0, bridge_z])
                     cube([po_x1 - po_x0, po_y1 - po_y0, bridge_t]);
+                // seats for the foam return pads: they lift standard 6 mm
+                // tape into the preload window AND show where to stick it,
+                // clear of the stiffening ribs and the pocket
+                for (fs = foam_seats)
+                    translate([fs[0], fs[1], bridge_top])
+                        cube([foam_w + 1, foam_w + 1, foam_seat_h]);
                 // stiffening ribs on TOP of the long edges (print flat)
                 for (yy = [bridge_y0, bridge_y1 - 1.6])
                     translate([bridge_x0, yy, bridge_top])

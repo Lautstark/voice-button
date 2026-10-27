@@ -259,8 +259,15 @@ center_stop_z  = plate_under_z - (act_gap + sw_travel + center_stop_over);
 // return a 9 g plate. So: SOFT OPEN-CELL PU. EVA would make the button
 // unusable for a three-year-old. Smaller pads if it still feels stiff.
 // ---------------------------------------------------------------------
+// The pads only have to return a 9 g plate, so softer is better and almost
+// anything open-celled around the house beats bought neoprene:
+//   dish sponge (soft side), headphone ear pad, electronics packing foam
+// all land near 1 N for two 10x10 pads. Closed-cell craft foam (Moosgummi)
+// is ~20 N and would make the button unusable for a child; memory foam
+// recovers too slowly and the button would feel dead.
+// Thickness is hand-cut, so the preload window below is deliberately wide.
 foam_w         = 10.0;
-foam_t         = 6.5;   // on the bridge top, beside the breakout pocket:
+foam_t         = 6.0;   // on the bridge top, beside the breakout pocket:
                         // space at rest = plate_under_z - bridge_top = 5.8
                         // -> 0.2 preload; at full stop = 4.0 -> 33% compression
 
@@ -276,9 +283,17 @@ assert(travel_stop * (cavity_h/2 - sw_y_shift)/cavity_h > act_gap + sw_travel + 
 // Two-sided: too thin and there is no return at all, too thick and the pads
 // fight the switch. (The old one-sided form let foam_t = 5.0 pass with
 // 0.8 mm of AIR under the plate and still called it "sane".)
-foam_preload   = foam_t - (plate_under_z - bridge_top);
-assert(foam_preload >= 0.4 && foam_preload <= 1.5,
-       "foam preload must be between 0.4 and 1.5 mm");
+// Printed seats lift the pads so that off-the-shelf 6 mm tape lands in the
+// right preload window instead of needing an odd thickness.
+foam_seat_h    = 0.5;
+foam_seats     = [[8.0, 26.0], [38.5, 26.0]];   // SW corners, 11 x 11 each
+foam_preload   = foam_t - (plate_under_z - (bridge_top + foam_seat_h));
+// Wide on purpose: hand-cut foam is +/-0.5 mm at best, and with SOFT foam
+// even 2.5 mm of preload is well under 1 N. With stiff foam the upper end
+// would be far too much — which is why the material note above matters
+// more than the number.
+assert(foam_preload >= 0.4 && foam_preload <= 2.5,
+       "foam preload must be between 0.4 and 2.5 mm");
 assert(rail_h - travel_stop >= 0.7,
        "the block must stay in the bezel collar over the whole travel");
 assert(center_stop_z > bridge_top + bo_t + 0.5,

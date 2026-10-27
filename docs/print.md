@@ -61,11 +61,15 @@ wiederholen, nicht der ganze Satz.
    Trichteröffnung, Schalter mit dem Fingernagel erreichbar? Lautsprecher
    in den Sitzring, Akku auf die Schale. Was nicht passt: messen und in
    `scad/config.scad` eintragen.
-4. **Druckpunkt:** Platte einlegen, Brücke mit Taster darunter — die Platte
+4. **Schaumpads:** zwei Stücke von ~10 × 10 × 6 mm aus der weichen Seite
+   eines Spülschwamms auf die beiden markierten Felder der Brücke kleben.
+   Kein Moosgummi (~20 N statt ~1 N), kein Memory-Schaum (federt zu
+   langsam). Dicke 5,7–7,8 mm ist in Ordnung.
+5. **Druckpunkt:** Platte einlegen, Brücke mit Taster darunter — die Platte
    muss nach 0,7 mm auf den Taschenwänden aufsitzen, *nicht* weiter. Wenn
    sie spürbar tiefer geht, ist der Mittenanschlag zu niedrig und der
    Taster nimmt die Last.
-5. **Öse:** kräftig am Ring ziehen.
+6. **Öse:** kräftig am Ring ziehen.
 
 Nach dem Messen `scad/render_all.sh` und `scad/check_fit.sh` laufen lassen —
 die Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.

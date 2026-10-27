@@ -279,41 +279,24 @@ module bridge() {
 
 // ---------------------------------------------------------------------
 // CARD FRAME (shared by the front plate and the card test coupon)
-// Hook-in holder, loaded from the front because that is the only side the
-// moving frame is reachable from. Deep pocket at the top, plain lip at the
-// bottom, NO side lips — those would block the card from being laid flat.
-// card_frame() is the additive half; card_frame_cuts() has to be subtracted
-// from the part it sits on, because the seat groove cuts into the bed.
+// A raised block with a plain recess milled into its top. No lips, no slot,
+// no catch: the card drops in from the front and two dots of double-sided
+// tape hold it. The block's outer face is what slides in the bezel collar.
 // ---------------------------------------------------------------------
-module card_frame(ccx, ccy, bed_z) {
-    x0 = ccx - card_ch_w/2;  y0 = ccy - card_ch_l/2;  y1 = ccy + card_ch_l/2;
-    lip_z = bed_z + card_ch_h;
-    // outer walls
+module card_frame(ccx, ccy, face_z) {
+    bed = face_z + bed_rise;
     difference() {
-        translate([ccx - guide_w/2, ccy - guide_h/2, bed_z])
+        translate([ccx - guide_w/2, ccy - guide_h/2, face_z])
             rbox(guide_w, guide_h, rail_h, 3);
-        translate([x0, y0, bed_z - 0.5])
-            cube([card_ch_w, card_ch_l, rail_h + 1]);
+        // the card recess
+        translate([ccx - card_ch_w/2, ccy - card_ch_l/2, bed])
+            rbox(card_ch_w, card_ch_l, card_ch_h + 1, card_corner_r);
+        // scallop in the south rim + dish in the bed, so a fingernail can
+        // get under the card's edge and lift it back out
+        translate([ccx - finger_w/2, ccy - guide_h/2 - 1, bed - finger_dish_d])
+            rbox(finger_w, guide_h/2 - card_ch_l/2 + 1 + 4,
+                 card_ch_h + finger_dish_d + 1, 2);
     }
-    // bottom lip: what the card rests under once it has dropped
-    translate([x0, y0, lip_z]) cube([card_ch_w, lip_bottom, rail_lip_t]);
-    // top pocket: deep enough to stay engaged over the whole lift
-    translate([x0, y1 - lip_top, lip_z]) cube([card_ch_w, lip_top, rail_lip_t]);
-}
-
-module card_frame_cuts(ccx, ccy, bed_z) {
-    x0 = ccx - card_ch_w/2;  y0 = ccy - card_ch_l/2;
-    lip_z = bed_z + card_ch_h;
-    // seat groove: the bed steps down under the bottom lip, so the card's
-    // bottom edge drops in and has to climb the ramp to ride up and out
-    translate([x0, y0 - 0.5, bed_z - seat_groove_d])
-        cube([card_ch_w, seat_groove_w + 0.5, seat_groove_d + 0.01]);
-    translate([x0, y0 + seat_groove_w, bed_z])
-        rotate([90, 0, 90]) linear_extrude(card_ch_w)
-            polygon([[0, 0], [seat_ramp, 0], [0, -seat_groove_d]]);
-    // finger notch in the bottom lip: push the card up to free it
-    translate([ccx - finger_w/2, y0 - 0.5, lip_z - 0.01])
-        cube([finger_w, lip_bottom + 0.5, rail_lip_t + 1]);
 }
 
 // ---------------------------------------------------------------------
@@ -341,7 +324,6 @@ module front_plate() {
         translate([notch_x0, notch_y[0], plate_under_z - 0.5])
             cube([cavity_w - notch_x0 + 1, notch_y[1] - notch_y[0],
                   plate_t + rail_h + 1]);
-        card_frame_cuts(cx, cy, plate_front_z);
     }
 }
 
@@ -395,14 +377,9 @@ module bezel() {
 // ---------------------------------------------------------------------
 // Stage C: card holder coupon — prints in minutes, verifies the real card.
 module test_card() {
-    difference() {
-        union() {
-            translate([cx - guide_w/2 - 2, cy - guide_h/2 - 2, plate_front_z - 1.8])
-                rbox(guide_w + 4, guide_h + 4, 1.8, 4);
-            card_frame(cx, cy, plate_front_z);
-        }
-        card_frame_cuts(cx, cy, plate_front_z);
-    }
+    translate([cx - guide_w/2 - 2, cy - guide_h/2 - 2, plate_front_z - 1.8])
+        rbox(guide_w + 4, guide_h + 4, 1.8, 4);
+    card_frame(cx, cy, plate_front_z);
 }
 
 // Stage A/E: PCB bay coupon — east-wall slice with USB/switch openings,

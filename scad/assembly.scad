@@ -53,14 +53,7 @@ module mock_foam_pads() {
 
 module mock_card() {
     color([0.95, 0.6, 0.15])
-        translate([card_seat_x, card_seat_y, plate_front_z])
-            cube([card_w, card_w, card_t]);
-}
-// The card pushed up to the loading position, where its bottom edge has
-// just cleared the bottom lip and it can be laid flat / lifted out.
-module mock_card_lifted() {
-    color([0.95, 0.6, 0.15])
-        translate([card_seat_x, card_seat_y + card_lift, plate_front_z])
+        translate([card_seat_x, card_seat_y, card_bed_z])
             cube([card_w, card_w, card_t]);
 }
 

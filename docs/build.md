@@ -31,13 +31,11 @@ Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
 
 ## Stufen B–D — Testdrucke
 
-1. **`test_card`** (~20 min): Karte schräg mit der Oberkante in die obere
-   Tasche schieben, hochdrücken, flach ablegen, loslassen. Schütteln,
-   kopfüber halten, durch die Fingermulde unten wieder herausdrücken.
-   Zu stramm / Karte klemmt oben → `card_ch_h` hoch (Überhang der oberen
-   Tasche hängt durch); rutscht von allein heraus → `seat_groove_d` hoch
-   (0,4 → 0,6, immer in 0,2-Schritten); geht zu schwer rein →
-   `seat_groove_d` runter oder `seat_ramp` länger.
+1. **`test_card`** (~20 min): Karte flach in die Mulde legen. Prüfen, ob
+   sie plan liegt (Ecken!), ob sie bündig sitzt und ob man sie über die
+   Fingerkerbe unten wieder herausbekommt.
+   Karte wackelt → `card_ch_h` runter; Ecken stehen hoch → `card_corner_r`
+   runter oder `card_clear` hoch; zu stramm → `card_clear` hoch.
 
 2. **`test_pcb_coupon` / `test_speaker_coupon`**: Modul, Akku und
    Lautsprecher probeliegen; USB-Kabel durch die Öffnung stecken,

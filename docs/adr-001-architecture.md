@@ -54,3 +54,22 @@ aber bewegte Kabel an der Taste und Montage-Gefummel. Verworfen.
   Kavitätenecke; die Fase lässt ≥ 2,6 mm Restwand (Außenradius 7 > Innen 4,6).
 - Karten-Nase oben statt vierter Schiene: gewählter Halter aus der Spec,
   Karte biegt sich beim Einsetzen, PLA nie.
+
+## Nachtrag: Kartenhalterung (2026-10-27)
+
+Drei Eigenschaften, von denen nur zwei gleichzeitig zu haben sind:
+kein Klebeband, kein Mechanismus, Wechsel ohne Werkzeug.
+
+Zwei Mechanismen sind unterwegs gescheitert — Lippen ringsum knicken die
+Karte (quadratische Sehnenverkürzung), ein Einschubschlitz ist nicht
+erreichbar (der Rahmen ist ein bewegliches Teil in der Blendenöffnung).
+Damit fiel „kein Mechanismus" nicht mehr weg, sondern war erzwungen.
+
+Entschieden gegen **Wechsel ohne Werkzeug**: Die Blende übergreift die
+Karte um 1 mm. Begründung: Karten wechseln selten; es ist die einfachste
+Geometrie von allen (ein Absatz in der Blendenöffnung, sonst nichts); und
+was eine Dreijährige nicht herausbekommt, kann sie auch nicht in den Mund
+nehmen. Die Blende muss für den Akkuservice ohnehin abnehmbar sein.
+
+Verworfen: **Klebeband.** Funktioniert, hinterlässt aber Rückstände auf
+der laminierten Karte und macht aus einem Wechsel eine Bastelei.

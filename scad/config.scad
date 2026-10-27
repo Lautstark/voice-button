@@ -159,8 +159,12 @@ rail_h         = card_ch_h + rail_lip_t; // 2.6 — rim rise above the plate fac
 bed_rise       = rail_h - card_ch_h;     // 1.7 — the card bed is lifted this
                         // far above the plate face, so the recess stays
                         // shallow and the card does not sit in a deep well
-finger_w       = 16.0;  // scallop in the rim for getting the card back out
-finger_dish_d  = 1.0;   // and how far the bed dips there, for a fingernail
+// Two holes through the bed instead of a finger scallop: with the bezel off
+// the plate comes out in your hand and the card pushes out from behind. No
+// interruption in the rim, and nothing to pick at from the front. Both sit
+// over a foam pad, so in the assembled device they look at nothing but foam.
+push_hole_d    = 5.0;
+push_holes     = [[12.0, 30.0], [44.0, 30.0]];
 plate_front_z  = plate_under_z + plate_t;        // 15.4 — plate front face
 card_bed_z     = plate_front_z + bed_rise;       // 17.1 — card rests here
 rail_top_z     = plate_front_z + rail_h;         // 18.0
@@ -169,6 +173,12 @@ card_ch_w      = card_w + 2*card_clear;   // 40.4
 card_ch_l      = card_ch_w;               // square
 guide_w        = card_ch_w + 2*rail_wall; // 44.8
 guide_h        = guide_w;
+// The bezel reaches over the card's edge and is what holds it in: no tape,
+// no catch, nothing for a child to pick at. The price is that a card change
+// costs the three bezel screws — see docs/adr-001-architecture.md.
+bezel_card_lip = 1.0;   // overlap onto the card, all four sides
+bezel_inner_w  = card_w - 2*bezel_card_lip;  // 38.0 — the visible window
+card_lip_z     = rail_top_z + 0.2;           // 18.2 — underside of that lip
 // Where the card rests. (These live here, not in assembly.scad: `use <>`
 //  imports modules but not variables, so a check would silently get undef.)
 card_seat_x    = cavity_w/2 - card_w/2;
@@ -228,6 +238,8 @@ assert(plate_under_z - bridge_top > foam_t - 0.5, "foam pad preload sane");
 assert(stop_z > bridge_top + bo_t + 2.0, "stops must sit above the breakout plane");
 
 assert(card_ch_h > card_t + 0.2, "card needs room in the recess");
+assert(card_lip_z > rail_top_z, "bezel lip must clear the rim at rest");
+assert(bezel_inner_w < card_w - 1, "bezel must actually overlap the card");
 // Front loading is the only access the moving frame has, so the card must
 // pass through the bezel opening in both directions.
 assert(bezel_open_w > card_w + 1 && bezel_open_h > card_w + 1,

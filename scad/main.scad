@@ -59,6 +59,12 @@ else if (part == "check_card_insert_assembled") intersection() {
     union() { rear_shell(); bezel(); front_plate(); }
     mock_card();
 }
+// Lifted out of its recess, the card MUST run into the bezel's lip: that is
+// the whole retention. Expect four patches, one per edge.
+else if (part == "check_card_captive") intersection() {
+    bezel();
+    translate([0, 0, card_ch_h - card_t + 0.3]) mock_card();
+}
 else if (part == "section_card") difference() {
     union() { test_card(); mock_card(); }
     translate([-10, -10, 0]) cube([cavity_w/2 + 10, 100, 60]);

@@ -53,7 +53,8 @@ module mock_foam_pads() {
 
 module mock_card() {
     color([0.95, 0.6, 0.15])
-        translate([card_seat_x, card_seat_y, card_bed_z])
+        translate([card_seat_x, card_seat_y, card_bed_z + 0.02])  // +0.02: keeps the
+            // preview from z-fighting with the recess floor it rests on
             cube([card_w, card_w, card_t]);
 }
 

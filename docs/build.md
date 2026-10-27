@@ -32,8 +32,8 @@ Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
 ## Stufen B–D — Testdrucke
 
 1. **`test_card`** (~20 min): Karte flach in die Mulde legen. Prüfen, ob
-   sie plan liegt (Ecken!), ob sie bündig sitzt und ob man sie über die
-   Fingerkerbe unten wieder herausbekommt.
+   sie plan liegt (Ecken!) und ob sie sich durch die beiden Löcher von
+   hinten herausdrücken lässt.
    Karte wackelt → `card_ch_h` runter; Ecken stehen hoch → `card_corner_r`
    runter oder `card_clear` hoch; zu stramm → `card_clear` hoch.
 
@@ -64,7 +64,9 @@ Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
    Magneten auf.
 6. Schaumpads auf die Brücke, Platte einlegen (Aussparung zur Ostwand),
    Blende auflegen, 3 × M2×10 von hinten.
-7. Funktionstest (Stufe-D-Protokoll), dann Karte einsetzen.
+7. Karte in die Mulde der Frontplatte legen, **dann** Blende auflegen und
+   3 × M2×10 von hinten anziehen — die Blende hält die Karte.
+8. Funktionstest (Stufe-D-Protokoll).
 
 ## Bespielen
 

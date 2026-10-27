@@ -291,11 +291,10 @@ module card_frame(ccx, ccy, face_z) {
         // the card recess
         translate([ccx - card_ch_w/2, ccy - card_ch_l/2, bed])
             rbox(card_ch_w, card_ch_l, card_ch_h + 1, card_corner_r);
-        // scallop in the south rim + dish in the bed, so a fingernail can
-        // get under the card's edge and lift it back out
-        translate([ccx - finger_w/2, ccy - guide_h/2 - 1, bed - finger_dish_d])
-            rbox(finger_w, guide_h/2 - card_ch_l/2 + 1 + 4,
-                 card_ch_h + finger_dish_d + 1, 2);
+        // push-out holes: with the bezel off, the card presses out from behind
+        for (ph = push_holes)
+            translate([ph[0], ph[1], face_z - plate_t - 1])
+                cylinder(d = push_hole_d, h = rail_h + plate_t + 2);
     }
 }
 
@@ -361,11 +360,14 @@ module bezel() {
         // flush with the collar over its whole height and never reaches into
         // the travel envelope of the moving plate.
         translate([cx - bezel_open_w/2, cy - bezel_open_h/2, stop_z - 1])
-            rbox(bezel_open_w, bezel_open_h, bezel_front_z - stop_z + 2, 3 + bezel_gap);
+            rbox(bezel_open_w, bezel_open_h, card_lip_z - stop_z + 1, 3 + bezel_gap);
+        // above it the opening narrows: that step IS the card retainer
+        translate([cx - bezel_inner_w/2, cy - bezel_inner_w/2, card_lip_z])
+            rbox(bezel_inner_w, bezel_inner_w, bezel_front_z - card_lip_z + 1, 2);
         // soft chamfer on the front inner edge
-        translate([cx, cy, bezel_front_z - 0.5]) linear_extrude(1.0, scale = 1.06)
-            translate([-bezel_open_w/2 - 0.5, -bezel_open_h/2 - 0.5])
-                rrect(bezel_open_w + 1.0, bezel_open_h + 1.0, 3.5);
+        translate([cx, cy, bezel_front_z - 0.5]) linear_extrude(1.0, scale = 1.07)
+            translate([-bezel_inner_w/2 - 0.5, -bezel_inner_w/2 - 0.5])
+                rrect(bezel_inner_w + 1.0, bezel_inner_w + 1.0, 2.5);
         // M2 self-tap pilots in the posts
         for (p = post_positions)
             translate([p[0], p[1], stop_z - 1]) cylinder(d = post_pilot_d, h = 6.2);

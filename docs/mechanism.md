@@ -52,8 +52,21 @@ ganzen Hub, per `check_fit.sh` nachgewiesen).
 
 Auf der beweglichen Frontplatte, bewegt sich mit. Eine 40,4 × 40,4 mm große,
 0,9 mm tiefe Mulde im erhöhten Rahmenblock, mehr nicht. Die Karte wird von
-vorn flach eingelegt. Unten eine 16 mm breite Kerbe im Rahmen, in der das
-Bett um 1,0 mm abfällt — da kommt ein Fingernagel unter die Kartenkante.
+vorn flach eingelegt.
+
+**Gehalten wird sie von der Blende.** Deren Öffnung verengt sich 0,2 mm über
+dem Rahmen auf 38 mm und übergreift die Karte damit ringsum um 1 mm. Kein
+Klebeband, kein Rastelement, nichts, woran ein Kind picken könnte — die
+Karte kommt nur heraus, wenn die Blende abkommt. Geprüft mit
+`check_card_captive`: eine aus der Mulde gehobene Karte muss an allen vier
+Kanten an die Blendenlippe stoßen.
+
+**Herausnehmen:** drei M2-Schrauben hinten lösen, Blende ab, Platte
+herausnehmen, Karte durch die zwei 5-mm-Löcher im Bett von hinten
+herausdrücken. Deshalb gibt es keine Fingermulde: Der Rahmen bleibt vorn
+ungestört, und es gibt nichts, wo sich ein Fingernagel ansetzen könnte.
+Beide Löcher liegen über je einem Schaumpad, blicken im montierten Zustand
+also auf nichts als Schaum.
 
 **Eckenradius:** Die Mulde hat 0,5 mm Eckenradius. Mehr geht nicht: eine
 spitze Kartenecke ragt √2·r in eine verrundete Ecke hinein, bei 1,5 mm wären
@@ -79,12 +92,6 @@ festgehalten zu werden:
 Nebeneffekt: Der Rahmen druckt jetzt **ohne einen einzigen Überhang und
 ohne Brücke** — die Lippenunterseiten und Schlitzdächer waren genau die
 Stellen, an denen das Druckbild gelitten hätte.
-
-### Was die Karte hält
-
-Im Moment: nichts außer der Mulde. Das reicht, wenn zwei Punkte
-doppelseitiges Klebeband dazukommen. Tool- und klebefrei zugleich geht
-nicht — siehe `docs/adr-001-architecture.md`, Abschnitt Kartenhalterung.
 
 ## Was Software-Checks NICHT beweisen
 

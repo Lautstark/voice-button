@@ -48,12 +48,17 @@ module corner_relief(ax, ay, dx, dy, z0, h, R) {
     px = ax + ux*R;   py = ay + uy*R;
     vx = -uy;         vy = ux;
     L = 25;
-    // NACH INNEN abtragen (-u), nicht nach aussen. Die erste Fassung hat
-    // genau andersherum geschnitten und damit die Aussenhaut auf den
-    // Diagonalen entfernt statt das Inneneck freizustellen.
-    translate([0, 0, z0]) linear_extrude(h)
-        polygon([[px + vx*L,        py + vy*L],
-                 [px - vx*L,        py - vy*L],
-                 [px - vx*L - ux*L, py - vy*L - uy*L],
-                 [px + vx*L - ux*L, py + vy*L - uy*L]]);
+    // BEGRENZT auf den eigenen Eckquadranten. Die Halbebene allein ist ein
+    // 50 x 25 mm grosses Rechteck und hat die halbe Ostwand und ein
+    // Brueckenauflager mit entfernt, ohne dass ein Check anschlug.
+    B = corner_r + 6;
+    intersection() {
+        translate([0, 0, z0]) linear_extrude(h)
+            polygon([[px + vx*L,        py + vy*L],
+                     [px - vx*L,        py - vy*L],
+                     [px - vx*L - ux*L, py - vy*L - uy*L],
+                     [px + vx*L - ux*L, py + vy*L - uy*L]]);
+        translate([min(ax, ax + dx*B), min(ay, ay + dy*B), z0 - 1])
+            cube([B, B, h + 2]);
+    }
 }

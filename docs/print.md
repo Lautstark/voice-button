@@ -13,21 +13,19 @@ fertigen Gerät, wenn die Karte passt.
 
 | Teil | Maße | Material | Lage auf dem Bett | Stützen |
 |---|---|---|---|---|
-| `rear_shell.stl` | 61 × 74 × 17,4 mm | ~21 g | Rücken aufs Bett — die Rückseite ist plan, die Öse liegt in derselben Ebene | nein |
-| `front_plate.stl` | 55 × 55 × 4,6 mm | ~9 g | Rücken aufs Bett, Rahmen oben | nein |
-| `bezel.stl` | 61 × 61 × 7,4 mm | ~6 g | **Gesicht aufs Bett** | nein |
-| `bridge.stl` | 47 × 25 × 6,9 mm | ~3 g | flach, Tasche nach oben | nein |
+| `rear_shell.stl` | 61 × 74 × 20 mm | ~27 g | Rücken aufs Bett — plan, die Öse liegt in derselben Ebene | nein |
+| `front_plate.stl` | 55 × 55 × 4,6 mm | ~10 g | Rücken aufs Bett, Kartenrahmen oben | nein |
+| `bridge.stl` | 47 × 25 × 6,5 mm | ~3 g | flach, Tasche nach oben | nein |
 
-Zusammen ~39 g massiv gerechnet (mit 25 % Infill eher 30 g), fertiges
-Gerät ~60 g.
+Drei Teile — die Blende ist entfallen.
 
 ## Alles auf einmal: ja
 
 Mit 8 mm Abstand und 10 mm Rand belegen die vier Teile **150 × 156 mm** von
 den 220 × 220 mm des Ender 3 V2 — 70 bzw. 64 mm Reserve.
 
-    Reihe 1   Rückschale (61 × 74) │ Blende (61 × 61)
-    Reihe 2   Frontplatte (55 × 55) │ Brücke (47 × 25)
+    Reihe 1   Rückschale (61 × 74) │ Frontplatte (55 × 55)
+    Reihe 2   Brücke (47 × 25)
 
 Rechne mit 4–6 Stunden. Drei Dinge dabei:
 

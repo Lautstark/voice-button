@@ -91,12 +91,12 @@ if python3 check_scope.py; then :; else fail=1; fi
 
 echo "— Selbsttest der Messwerkzeuge —"
 must_engage selftest_wall_probes
-must_engage selftest_bore_probes
+must_engage selftest_feature_probes
 
 echo "— Teile gegeneinander —"
-for c in check_shell_bridge check_shell_plate check_shell_bezel \
-         check_plate_bezel check_plate_bridge check_plate_pressed \
-         check_mocks check_screw_heads; do must_be_clear "$c"; done
+for c in check_shell_bridge check_shell_plate check_plate_bridge \
+         check_plate_pressed check_mocks check_screw_heads \
+         check_plate_drop_in; do must_be_clear "$c"; done
 
 echo "— Karte —"
 for c in check_card_seated check_card_lifted check_card_insert_assembled; do
@@ -106,8 +106,11 @@ must_engage   check_card_retained
 
 echo "— Anschlag und Gehaeuse —"
 must_engage   check_centre_stop
+must_engage   check_plate_retained
 must_be_empty check_wall_solid
-must_be_empty check_screw_bores_open
+must_be_empty check_loop_hole_open
+must_be_empty check_features_shell
+must_be_empty check_features_bridge
 must_be_empty check_bridge_seats
 must_be_empty check_breakout_path
 

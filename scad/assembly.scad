@@ -69,8 +69,16 @@ module mock_card_lifted() {
 // Schraubenkoepfe als Huellkoerper. Sie fehlten in allen Kollisions-
 // modellen, deshalb blieb unbemerkt, dass der Klemmschraubenkopf in die
 // Frontplatte ragt.
+// Unterlegscheiben auf den Domen — sie halten die Platte.
+module mock_washers() {
+    color("silver") for (p = post_positions)
+        translate([p[0], p[1], boss_top_z]) cylinder(d = washer_d, h = washer_t);
+}
 module mock_screw_heads() {
     color("silver") {
+        for (p = post_positions)
+            translate([p[0], p[1], boss_top_z + washer_t])
+                cylinder(d = screw_head_d, h = screw_head_h);
         // Brueckenschrauben
         for (p = [bridge_scr_w, bridge_scr_e])
             translate([p[0], p[1], bridge_z + bridge_t + 1.6 - 0.6])

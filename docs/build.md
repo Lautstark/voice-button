@@ -2,41 +2,28 @@
 
 ## Stückliste (pro Gerät)
 
-| Menge | Teil | Quelle |
+| Menge | Teil | Anmerkung |
 |---|---|---|
-| 1 | diymore Soundmodul-Set (PCB, LiPo 402030, Lautsprecher, Taster-Breakout, USB-Kabel) | Amazon B0HC2YW72V (2er-Set) |
-| 1 | `rear_shell`, `front_plate`, `bezel`, `bridge` | Druck, ePLA-Matte Lilac |
-| 3 | M2 × 10 Senk-/Linsenkopf, selbstschneidend | Blende |
-| 2 | M2 × 6 selbstschneidend | Brücke |
-| — | *(die frühere Breakout-Klemmschraube entfällt — siehe mechanism.md)* | |
-| 2 | **Weicher offenzelliger Schaum** 8 × 8 × ~6 mm | Rückstellfedern — siehe Kasten unten |
-| 1 | EVA/Moosgummi 20 × 30 × **1 mm** | unter den Akku. Die Dicke steht als `bat_pad_t` im Höhenstapel — nimmst du dickeres, prüf `check_mocks`. |
-| 1 | Schaumring ~Ø 29 außen, 2 mm | unter den Akku, wo er auf dem Lautsprecherrand aufliegt (optional) |
-| 1 | laminierte METACOM-Karte 40 × 40 mm, ~0,6 mm | selbst laminieren |
+| 1 | diymore Soundmodul-Set (PCB, LiPo 402030, Lautsprecher, Taster-Breakout, USB-Kabel) | Amazon B0HC2YW72V, 2er-Set |
+| 1 | `rear_shell`, `front_plate`, `bridge` | Druck, ePLA-Matte Lilac |
+| 3 | M2 × 8 **Linsen- oder Zylinderkopf**, selbstschneidend | Platte. **Kein Senkkopf** — der würde sich in die Aussparung ziehen und die Platte festklemmen |
+| 3 | **Unterlegscheibe Ø ≈ 8 mm** (Karosseriescheibe M2/M2,5) | hält die Platte; siehe Kasten unten |
+| 2 | M2 × 6 selbstschneidend | Tasterbrücke |
+| 2 | weicher offenzelliger Schaum 8 × 8 × ~6 mm | Rückstellfedern — siehe Kasten |
+| 1 | dünne Schaumscheibe 20 × 30 × ~1 mm | unter den Akku (geht aus demselben Schwamm) |
+| 1 | doppelseitiges Klebeband | Schaumpads und Akkuscheibe fixieren |
+| 4 | selbstklebende Möbelpuffer (optional) | hinten aufkleben, damit anliegender Stoff das Gitter nicht abdichtet |
+| 1 | laminierte METACOM-Karte 39,3–40,7 mm quadratisch | selbst laminieren |
 | 1 | Schlüsselring oder kleiner Karabiner | Öse Ø 5,5 |
 
-> **Zum Schaum.** Die Pads müssen nur eine 9-g-Platte zurückholen, also ist
-> weich besser als fest — und das Passende liegt vermutlich schon zu Hause:
->
-> - **Spülschwamm**, weiche Seite, nicht das Scheuervlies. Offenzelliger
->   PU, mit Abstand die beste Kennlinie.
-> - **Ohrpolster alter Kopfhörer** oder **Verpackungsschaum** aus einem
->   Elektronikkarton.
-> - **Isomatte/Yogamatte**: geht, ist fester — dann Pads kleiner schneiden.
->
-> Nimm *kein* Moosgummi und kein Bastel-EVA: Zwei Pads von 10 × 10 mm geben
-> damit rund 20 N statt 1 N, der Taster selbst braucht 1,6–2,6 N — die
-> Taste wäre für ein dreijähriges Kind unbedienbar. Auch **kein Memory-
-> Schaum** (Ohrstöpsel): der federt zu langsam zurück, die Taste fühlt sich
-> tot an. Filz federt gar nicht.
->
-> Dicke ~6 mm, auf die markierten Felder der Brücke kleben (doppelseitiges
-> Klebeband). Zu schwergängig → Pads kleiner schneiden. Platte kommt nicht
-> zurück → grösser.
->
-> Gekauft: selbstklebendes Dichtungsband aus Neopren, 10 mm breit × 6 mm
-> dick (z. B. Amazon B0BFQCQWND in der Grösse „10mm(B) x6mm(D)", ~7 €).
-> Das ist fester als Schwamm — damit erst 10 × 5 mm schneiden.
+> **Warum Unterlegscheiben nötig sind.** Die Platte schwimmt auf drei
+> Schrauben: Jede wird auf einen Dom der Schale festgezogen, der durch eine
+> Aussparung der Platte ragt. Der Kopf steht also auf dem Dom und klemmt die
+> Platte nicht. Damit sie trotzdem gehalten wird, muss etwas den Rand der
+> Aussparung überlappen — und ein M2-Linsenkopf hat nur 3,8 mm, während ein
+> Dom mit tragfähiger Wand um das Kernloch mindestens 4,4 mm braucht. Der
+> Kopf allein ist also immer kleiner als das Loch, das er halten soll. Eine
+> 8-mm-Scheibe löst das für ein paar Cent.
 
 ## Stufe A — Messen (Hardware da, Koffer auf)
 

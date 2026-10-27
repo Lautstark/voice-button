@@ -35,16 +35,17 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
 
 ## Gehäuse
 
-- Außen ca. **61 × 61 × 21 mm** (plus Öse), Kantenradius 7 mm, matt lila
+- Außen ca. **61 × 61 × 20 mm** (plus Öse), Kantenradius 7 mm, matt lila
   (eSUN ePLA-Matte Lilac).
 - Die ganze Vorderseite ist eine starre, schwimmend geführte Taste; die
   Karte wird oben unter eine Lippe geschoben und fällt in ihre Mulde —
   werkzeugfrei, ohne Kleben, ohne Biegen ([docs/mechanism.md](docs/mechanism.md)).
 - USB-C-Laden und Ein/Aus ohne Öffnen des Gehäuses (rechte Seite, vertieft).
-- Lautsprechergitter hinten in einer 0,8 mm flachen Mulde, damit anliegender
-  Stoff es nicht abdichtet — die Rückseite bleibt dabei plan und druckbar.
-- Verschraubt mit 3 × M2 von hinten (versenkt), plus 2 × M2 für die
-  Tasterbrücke.
+- Rückseite plan mit Lautsprechergitter; gegen anliegenden Stoff vier
+  selbstklebende Möbelpuffer (eine gedruckte Mulde wäre eine 37-mm-Brücke).
+- Drei Druckteile. Die Frontplatte schwimmt auf drei M2-Schrauben, die auf
+  Dome der Schale gezogen werden; Unterlegscheiben halten sie. Eine Blende
+  gibt es nicht mehr.
 - Gedrucktes Gewicht ≈ 40 g massiv gerechnet (mit 25 % Infill eher 30 g),
   Gerät komplett ≈ 60 g.
 
@@ -52,7 +53,7 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
 
 - `scad/config.scad` — alle Parameter, inkl. `[MEASURE]`-Markierungen und
   Stack-up-Asserts. Nach dem Messen hier anpassen, alles andere folgt.
-- `scad/parts.scad` — Rückschale, Frontplatte, Blende, Brücke, Testteile.
+- `scad/parts.scad` — Rückschale, Frontplatte, Brücke, Testteile.
 - `scad/assembly.scad` — Baugruppe, Explosion, Schnitte, Komponenten-Mockups.
 - `scad/main.scad` — Teil wählen: `openscad -D 'part="rear_shell"' …`
 - `scad/render_all.sh` — alle Ansichten (`renders/`) und STLs (`stl/`).
@@ -79,7 +80,7 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
   0,4), die Lippe darf also durchhängen, ohne die Karte zu klemmen.
 - 3 Wände, 25 % Gyroid, **keine Stützen** — alle Teile liegen flach:
   Rückschale auf dem Rücken, Frontplatte auf dem Rücken (Schienen oben),
-  Blende auf dem Gesicht, Brücke flach (Tasche oben).
+  Brücke flach (Tasche oben).
 - Bridging aktiv lassen (Akkuschale überbrückt den Lautsprecherrand intern).
 - Matte-PLA ist spröder als normales PLA: Öse nicht untersintern — bei
   Bedarf `loop_t`/`loop_od` in `config.scad` erhöhen.
@@ -87,8 +88,8 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
 ## Reihenfolge
 
 1. Kompletten Satz drucken — Druckliste in [docs/print.md](docs/print.md).
-   Frontplatte und Blende sind Echtteile; die Rückschale ist Passprobe,
-   bis das Modul vermessen ist.
+   Frontplatte ist Echtteil; Rückschale und Brücke sind Passprobe, bis
+   das Modul vermessen ist.
 2. Hardware ankommt → messen, `config.scad` aktualisieren,
    `test_pcb_coupon` + `test_speaker_coupon` drucken → Modul einlegen.
 3. `press_rig` + `front_plate` + `bezel` + `bridge` drucken → Taster
@@ -99,4 +100,4 @@ Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
 Sicherheits­hinweis: DIY-Prototyp für den beaufsichtigten Gebrauch. Akku
 vollständig eingeschlossen, keine Kleinteile außen, keine Schnur — aber
 keine Spielzeugnorm-Prüfung. Vor der Übergabe Sichtprüfung und Zugtest an
-Öse und Blende.
+Öse und Frontplatte.

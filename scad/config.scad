@@ -50,7 +50,12 @@ grille_hole_d  = 2.4;   // rear grille holes
 // gleiche Wirkung gegen anliegenden Stoff, aber druckbar.
 foot_h         = 0;     // bleibt als Parameter, damit der Stapel stimmt
 foot_d         = 0;
-grille_dish_d  = 0.8;   // Tiefe der Gittermulde
+// Mulde auf 0: eine 0,8 mm tiefe, 37 mm weite Aussparung in der Rueckwand
+// laesst den verbleibenden Gitterboden in der Luft beginnen (~975 mm2 freie
+// Unterseite) und reicht ueber zwei Aussenkanten hinaus, wodurch die erste
+// Schicht in zwei Inseln zerfaellt. Gegen anliegenden Stoff helfen vier
+// selbstklebende Moebelpuffer — siehe docs/build.md.
+grille_dish_d  = 0;     // Tiefe der Gittermulde
 grille_dish_m  = 4.0;   // Rand der Mulde um den Lautsprecher herum
 
 // ---------------------------------------------------------------------
@@ -129,9 +134,11 @@ sw_h           = 4.3;   // tactile height above breakout incl. cap  [MEASURE]
 sw_travel      = 0.25;  // datasheet-typical tactile pretravel
 sw_off_y       = -3.0;  // switch center offset from breakout center (toward -y,
                         // away from the connector)  [MEASURE]
-sw_y_shift     = 4.4;   // switch sits this far NORTH of the cavity center so the
-                        // breakout pocket clears the battery. Corner-press lever
-                        // ratio stays >= 0.42, see docs/mechanism.md.
+sw_y_shift     = 2.6;   // switch sits this far NORTH of the cavity center so the
+                        // Breakout-Tasche am Akku vorbeikommt. Weiter zur Mitte
+                        // geht nicht: die Platine liegt 1,3 mm tiefer als die
+                        // Tasteroberkante und darf den Akku nicht ueberlappen.
+                        // Der assert unten rechnet die Grenze nach.
 
 // ---------------------------------------------------------------------
 // Bridge (carries the breakout so the switch sits at cavity center)
@@ -166,7 +173,7 @@ bridge_screw_d = 1.7;   // M2 self-tap pilot
 // Front plate / button mechanism
 // ---------------------------------------------------------------------
 act_gap        = 0.3;   // rest gap between plate underside and switch cap
-travel_stop    = 1.8;   // perimeter hard-stop travel (tilting corner press
+travel_stop    = 1.4;   // perimeter hard-stop travel (tilting corner press
                         //  then yields >= travel_stop/2 at the central switch)
 plate_under_z  = sw_top + act_gap;      // 13.4 — plate underside at rest
 plate_t        = 2.0;   // plate slab
@@ -237,8 +244,6 @@ post_positions = [[3.4, 2.6], [3.4, cavity_h - 2.6], [53.2, 24.7]];
 bridge_scr_w   = [5.8, 32.25];   // 0,55 weiter oestlich: der Kopfsitz liess
 bridge_scr_e   = [47.3, 26.0];   // vorher 0,05 mm Steg stehen, der oestliche
                                  // 0,6 mm genau im verschraubten Lastpfad
-screw_head_d   = 3.8;   // M2 Linsenkopf  [MEASURE am gekauften Satz]
-screw_head_h   = 1.4;
 card_lift_max  = card_ch_l - card_clear - card_w;  // 1.48 — how far a nominal
                         // card can be pushed up before it hits the recess top
 guide_w        = card_ch_w + 2*rail_wall; // 45.2
@@ -250,36 +255,37 @@ card_seat_x    = cavity_w/2 - card_w/2;
 card_seat_y    = cavity_h/2 - card_ch_l/2 + card_clear;
 
 // ---------------------------------------------------------------------
-// Bezel (fixed front frame, screwed from the back)
+// Plattenaufhaengung (ersetzt die fruehere Blende)
 // ---------------------------------------------------------------------
-// The bezel has a full-depth collar ring around its opening. The collar's
-// bottom face (z = plate_front_z) is the REST surface the foam pushes the
-// plate slab against, and the collar bore is the ONLY sliding guide for the
-// plate's card-frame block. Outside the collar the face is thinner.
-bezel_gap      = 0.3;   // guide clearance: collar bore to guide block, per side
-bezel_open_w   = guide_w + 2*bezel_gap; // 45.8 — guides the moving block
-bezel_open_h   = guide_h + 2*bezel_gap; // 46.68
-bezel_face_t   = 1.8;   // thin outer face region
-collar_w       = 2.0;   // collar ring radial width beyond the opening
-wall_top_z     = plate_front_z;                  // 15.4 — shell walls end here
-bezel_front_z  = wall_top_z + travel_stop + bezel_face_t;  // 19.0
-bezel_under_z  = bezel_front_z - bezel_face_t;   // 17.2 — outer face underside
-housing_d      = wall_back + bezel_front_z;      // 20.6 external (plus feet)
-// Corner screw bosses (shell) + bezel posts
-boss_d         = 6.0;
-boss_hole_d    = 2.2;   // through-hole in the shell boss (M2 shank)
-boss_cb_d      = 4.3;   // counterbore for the M2 head
-post_d         = 5.6;
-post_pilot_d   = 1.7;   // self-tap pilot in the bezel post
-// Mindestrestwand unter den Innenfasen an den Ecken. Zu grosse Fasen haben
-// die Aussenhaut auf den Diagonalen komplett aufgeschnitten; check_wall_solid
-// misst das jetzt.
-corner_wall_min = 1.5;  // verbleibende Aussenwand auf der Eckdiagonale.
-                        // Bemessen am ungünstigsten Bauteil: der Schalter
-                        // sitzt laut Foto 2,4 mm vom Nordende der Platine
-                        // und reicht damit 0,56 mm in die Eckrundung.
-wall_rib_w     = 6.0;   // mid-wall stop ribs (N and S walls)
-wall_rib_d     = 1.6;   // protrusion into the cavity
+// Die Platte schwimmt auf drei Schrauben. Jede wird auf einen Dom der
+// Schale festgezogen, der durch eine Aussparung der Platte hindurchragt —
+// der Kopf steht also auf dem Dom, nicht auf der Platte, und klemmt sie
+// nicht. Eine Unterlegscheibe unter dem Kopf ueberlappt den Rand der
+// Aussparung und haelt die Platte. Der Schaum drueckt sie von unten
+// dagegen; das ist die Ruhelage.
+//
+// Warum eine Scheibe sein muss: ein M2-Linsenkopf hat 3,8 mm, ein Dom mit
+// tragfaehiger Wand um das 1,7-mm-Kernloch mindestens 4,4 mm. Der Kopf
+// allein ist also immer kleiner als die Aussparung, die er halten soll.
+wall_rib_w     = 6.0;   // Breite der Wandrippen (Umfangsanschlag)
+wall_rib_d     = 1.6;   // wie weit sie in die Kavitaet ragen
+corner_wall_min = 1.5;  // Restwand unter den Eckfreistellungen
+boss_d         = 4.4;   // Dom-Aussendurchmesser
+boss_pilot_d   = 1.7;   // Kernloch M2 selbstschneidend
+plate_hole_d   = boss_d + 0.8;   // 5,2 — Aussparung in der Platte
+washer_d       = 8.0;   // Karosseriescheibe; haelt den Aussparungsrand
+washer_t       = 0.8;
+screw_head_d   = 3.8;   // M2 Linsenkopf  [MEASURE am gekauften Satz]
+screw_head_h   = 1.4;
+assert(washer_d > plate_hole_d + 1.0,
+       "Scheibe muss den Rand der Plattenaussparung sicher ueberlappen");
+// Die Waende enden buendig mit dem Kartenrahmen. Die Platte faellt also in
+// einen Topf; Schraubenkoepfe und Scheiben liegen darin versenkt und sind
+// mit Kinderfingern nicht zu erreichen.
+wall_top_z     = rail_top_z;                     // 18.0
+housing_d      = wall_back + wall_top_z;         // 20.0
+boss_top_z     = plate_front_z;                  // 15.4 — Scheibe liegt hier
+                        // auf; die Platte haengt mit ihrer Vorderseite daran
 
 // ---------------------------------------------------------------------
 // Hanging loop (integral with the rear shell, top wall)
@@ -290,31 +296,20 @@ loop_t         = 5.0;   // thickness along z
 loop_rise      = 5.0;   // ring center above the outer top wall
 
 center_stop_z  = plate_under_z - (act_gap + sw_travel + center_stop_over);
-// Querriegel ueber dem Breakout, dicht noerdlich des Tasters. Ohne ihn ist
-// der naechste Anschlag in Nordrichtung der Taschenrand 14,3 mm entfernt;
-// die Platte kippt dann so weit, dass der Taster zu kurz kommt.
-xbar_y0        = cavity_h/2 + sw_y_shift + 6.9;   // 39.5, 0,9 mm noerdlich
-                        // der Tasterkappe
-xbar_y1        = xbar_y0 + 2.0;
-xbar_z0        = bo_z + bo_t + 0.5;               // ueber der Platine durch
-bo_slot_h      = bo_t + 0.8;   // Einschubschlitz in der Nordwand der Tasche:
-                        // die Platine wird von Norden eingeschoben, nicht
-                        // von oben eingelegt — von oben versperrt sie der
-                        // Querriegel. Darueber bleibt die Wand als Anschlag.
-
 // Kippbetrachtung fuer Druck auf eine Kantenmitte. Die Platte dreht um die
-// gegenueberliegende Plattenkante, der am weitesten vom Drehpunkt entfernte
-// Anschlag begrenzt. Ersetzt die alte Hebelformel, die Drehpunkt und
-// Druckpunkt an die Kavitaetswaende legte und nur mit 0,01 mm hielt.
+// gegenueberliegende Plattenkante; der vom Drehpunkt am weitesten entfernte
+// Anschlag begrenzt. Begrenzende Anschlaege sind die Waende der
+// Breakout-Tasche — deshalb enden deren Nord-Enden bewusst frueh (po_n).
+bo_slot_h      = 0;     // kein Einschubschlitz mehr: die Platine wird von
+                        // oben eingelegt, es spannt nichts mehr darueber
 function tilt_travel(d_press, d_stop, d_sw) =
-    (plate_under_z - center_stop_z) * d_stop > 0
-    ? (plate_under_z - center_stop_z) / d_stop * d_sw : 0;
+    d_stop > 0 ? (plate_under_z - center_stop_z) / d_stop * d_sw : 0;
 sw_y           = cavity_h/2 + sw_y_shift;
-plate_s        = cavity_h/2 - plate_w/2;          // Plattenkante Sued
+plate_s        = cavity_h/2 - plate_w/2;
 plate_n        = cavity_h/2 + plate_w/2;
-po_n           = cavity_h/2 + sw_y_shift - sw_off_y + bo_l/2 + pocket_wall;
-po_s           = cavity_h/2 + sw_y_shift - sw_off_y - bo_l/2 - pocket_wall;
-travel_press_n = tilt_travel(plate_n - plate_s, xbar_y1 - plate_s, sw_y - plate_s);
+po_n           = sw_y + 8.4;       // Nordende der Taschenwaende
+po_s           = sw_y - sw_off_y - bo_l/2 - pocket_wall;
+travel_press_n = tilt_travel(plate_n - plate_s, po_n - plate_s, sw_y - plate_s);
 travel_press_s = tilt_travel(plate_n - plate_s, plate_n - po_s, plate_n - sw_y);
 travel_press_e = tilt_travel(plate_w, plate_w/2 + (bo_w/2 + pocket_wall), plate_w/2);
 assert(min(travel_press_n, travel_press_s, travel_press_e)
@@ -351,10 +346,13 @@ foam_t         = 6.0;   // on the bridge top, beside the breakout pocket:
 // ---------------------------------------------------------------------
 assert(bridge_z >= spk_depth + 0.4, "bridge must clear the speaker magnet");
 assert(bridge_z >= pcb_top + pcb_comp_h + 0.4, "bridge must clear PCB components");
-assert(bat_z + bat_t + bat_swell < plate_under_z - travel_stop,
-       "battery face must clear the fully pressed plate");
-assert(travel_stop * (cavity_h/2 - sw_y_shift)/cavity_h > act_gap + sw_travel + 0.2,
-       "corner-tilt must still actuate the (near-)central switch with margin");
+assert(bat_envelope < stop_z - 0.5,
+       "Akku samt Unterlage und Schwellreserve muss unter den Anschlaegen bleiben");
+assert(stop_z < center_stop_z,
+       "der Umfangsanschlag darf nicht vor dem Mittenanschlag greifen");
+// (Die fruehere Hebelformel stand hier. Sie legte Drehpunkt UND Druckpunkt
+//  an die Kavitaetswaende, prueste damit die ungefaehrdete Richtung und
+//  hielt nur mit 0,01 mm. Ersetzt durch die Kipprechnung weiter oben.)
 // Two-sided: too thin and there is no return at all, too thick and the pads
 // fight the switch. (The old one-sided form let foam_t = 5.0 pass with
 // 0.8 mm of AIR under the plate and still called it "sane".)
@@ -382,10 +380,11 @@ assert(lip_bottom > (card_ch_h - card_t) + 0.4,
        "bottom lip must out-reach the card's lift inside the recess");
 assert(card_h_max - card_h_min > 1.0,
        "usable card-height range is too narrow to cut by hand");
-// Front loading is the only access the moving frame has, so the card must
-// pass through the bezel opening in both directions.
-assert(bezel_open_w > card_w + 1 && bezel_open_h > card_w + 1,
-       "card must pass through the bezel opening");
+// Die Karte wird von vorn eingelegt. Seit die Blende entfaellt, ist der
+// Zugang die offene Wanne der Schale — die Waende enden buendig mit dem
+// Kartenrahmen, nichts greift mehr ueber die Karte.
+assert(wall_top_z >= rail_top_z - 0.01,
+       "die Waende duerfen nicht unter dem Kartenrahmen enden");
 
 assert(corner_wall_min >= 1.2,
        "Eckfase darf nicht mehr als corner_r - 1.2 Restwand wegnehmen");

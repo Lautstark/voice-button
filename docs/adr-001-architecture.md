@@ -39,8 +39,8 @@ Matte-PLA ist zusätzlich spröde. M2 selbstschneidend ist servicefreundlich
 und kindersicher (Werkzeug nötig).
 
 **Vier statt drei Gehäuseschrauben:** Die vierte Säule (Südost) kollidiert
-mit dem Akkufach; drei Säulen + umlaufende Wandauflage klemmen die Blende
-ausreichend (Hebelweg < 30 mm, Blende 3,6 mm stark).
+mit dem Akkufach. (Gilt sinngemäß weiter für die drei Schraubendome der
+Plattenaufhängung, siehe Nachtrag unten.)
 
 **Taster am Plattenrücken, Amboss unten:** hätte den Stapel ~1 mm gekürzt,
 aber bewegte Kabel an der Taste und Montage-Gefummel. Verworfen.
@@ -139,3 +139,33 @@ Alle zwölf damaligen Checks waren dabei grün.
 Jeder neue Check prüft außerdem sein eigenes Messwerkzeug
 (`selftest_wall_probes`, `selftest_bore_probes`): Eine Sonde, die aus
 undef entsteht, würde sonst jeden Einschluss-Check grün melden.
+
+## Nachtrag: Blende entfällt, Platte schwimmt auf Schrauben (2026-10-27)
+
+Nach dem zweiten externen Review kam die Frage auf, ob der
+Druckmechanismus nicht einfacher gehen könnte: eine Kiste, eine
+angeschraubte Platte mit Kartenmulde, ein Nöpsi dahinter.
+
+**Durchbiegen der Platte scheidet aus.** Für 0,55 mm Weg in der Mitte
+einer 55-mm-Platte braucht es bei 2 mm Dicke 439 N, bei 1 mm noch 55 N.
+Bei 0,6 mm wären es 12 N, aber die Platte wäre labberig, würde sich beim
+Drucken verziehen und an der Dauerbiegung reißen — die Spec schließt
+wiederholte PLA-Verformung ausdrücklich aus.
+
+**Als starr bewegte Platte funktioniert es.** Drei Dome der Schale ragen
+durch Aussparungen der Platte; die Schraube wird auf den Dom gezogen und
+klemmt die Platte deshalb nicht, eine Unterlegscheibe hält sie. Damit
+entfallen die Blende als Teil, ihr Führungskragen, die Öffnungsbemaßung,
+das Führungsspiel, die Eckfasen für die Blendensäulen und die
+Ostaussparung der Platte — zusammen die Geometrie, in der in beiden
+externen Reviews die meisten Fehler saßen.
+
+**Preis:** drei Unterlegscheiben. Ein M2-Linsenkopf misst 3,8 mm, ein Dom
+mit tragfähiger Wand um das 1,7-mm-Kernloch mindestens 4,4 mm — der Kopf
+allein ist also immer kleiner als die Aussparung, die er halten soll. Das
+ist keine Bequemlichkeit, sondern geometrisch unausweichlich.
+
+**Nebenbei korrigiert:** Der Taster rückt von 4,4 auf 2,6 mm an die Mitte.
+Ganz mittig geht nicht — die Breakout-Platine liegt tiefer als die
+Tasteroberkante und darf den Akku nicht überlappen, und der Akku hat bei
+diesem Modul nur in der Südostecke Platz.

@@ -19,8 +19,6 @@ else if (part == "press_rig")
     translate([0, 0, wall_back + foot_h]) press_rig();
 else if (part == "front_plate")
     translate([0, 0, -plate_under_z]) front_plate();             // back face down, rails up
-else if (part == "bezel")                                        // front face down
-    rotate([180, 0, 0]) translate([0, 0, -bezel_front_z]) bezel();
 else if (part == "bridge")
     translate([0, 0, -bridge_z]) bridge();                       // flat, pocket up
 else if (part == "test_card")
@@ -42,8 +40,6 @@ else if (part == "section_x")
 // is allowed, shared volume is a design error).
 else if (part == "check_shell_bridge")   intersection() { rear_shell(); bridge(); }
 else if (part == "check_shell_plate")    intersection() { rear_shell(); front_plate(); }
-else if (part == "check_shell_bezel")    intersection() { rear_shell(); bezel(); }
-else if (part == "check_plate_bezel")    intersection() { front_plate(); bezel(); }
 else if (part == "check_plate_bridge")   intersection() { front_plate(); bridge(); }
 // Pressed to the CENTRE stop (the pocket walls), everything must still be
 // clear — that is the deepest the plate may go on a straight press.
@@ -63,7 +59,7 @@ else if (part == "check_card_seated") intersection() { test_card(); mock_card();
 // ...and it must lie free with the device fully assembled, which is the
 // check whose absence let a holder ship that could not be loaded at all.
 else if (part == "check_card_insert_assembled") intersection() {
-    union() { rear_shell(); bezel(); front_plate(); }
+    union() { rear_shell(); front_plate(); }
     union() { mock_card(); mock_card_lifted(); }
 }
 // Lifted out of its recess, the card MUST run into both lips: that is the
@@ -82,28 +78,57 @@ else if (part == "check_card_lifted") intersection() {
 // und jede Blende, die ueber die Karte greift. Erwartet: LEER.
 // Selbsttests der Messwerkzeuge: eine Sonde, die aus undef-Koordinaten
 // entsteht, rendert nichts und wuerde jeden Einschluss-Check gruen melden.
-else if (part == "selftest_wall_probes") wall_probes();
-else if (part == "selftest_bore_probes")
-    union() for (p = post_positions)
-        translate([p[0], p[1], -wall_back - foot_h - 0.5])
-            cylinder(d = boss_hole_d - 0.3, h = stop_z + wall_back + foot_h + 0.5);
+else if (part == "selftest_wall_probes")
+    difference() { translate([-wall, -wall, 0]) wall_band(); wall_openings(); }
 
 // Schaumsitze muessen frei von den Schraubenkopfsitzen bleiben, sonst
 // steht das Pad schief auf einem Schraubenkopf. Erwartet: LEER.
-// Einschubweg der Platine: von ausserhalb der Tasche bis an den
-// Suedanschlag, auf Platinenhoehe. Erwartet: LEER. Genau dieser Check
-// fehlte, als der Querriegel die Platine eingesperrt hat.
+// Einlegeweg der Platine, mit TASTER — senkrecht von oben in die Tasche.
+// Der frueere Check fuhr nur einen 1,2-mm-Quader und haette nicht bemerkt,
+// dass der aufgeloetete Taster an einem Riegel haengenbleibt.
 else if (part == "check_breakout_path") intersection() {
     bridge();
-    translate([cavity_w/2 - bo_w/2, cavity_h/2 + sw_y_shift - sw_off_y - bo_l/2,
-               bridge_top + 0.05])
-        cube([bo_w, bo_l + 14, bo_t]);
+    minkowski() {
+        mock_breakout();
+        cylinder(d = 0.01, h = wall_top_z + 4 - bridge_top);
+    }
 }
 else if (part == "check_bridge_seats") intersection() {
     union() for (fs = foam_seats)
         translate([fs[0], fs[1], bridge_top]) cube([foam_w + 1, foam_w + 1, 0.4]);
     union() for (p = [bridge_scr_w, bridge_scr_e])
         translate([p[0], p[1], bridge_top - 0.8]) cylinder(d = 4.4, h = 2);
+}
+// Jedes Merkmal muss nach allen Booleans noch im Material liegen.
+// Das Oesenloch muss durchgehen. Es war ein Sackloch, weil die Oese in die
+// Rueckebene wanderte und der Lochschneider bei -1 stehen blieb.
+else if (part == "check_loop_hole_open") intersection() {
+    rear_shell();
+    translate([cavity_w/2, cavity_h + wall + loop_rise, -wall_back - 0.5])
+        cylinder(d = loop_id - 0.4, h = loop_t + wall_back + 1);
+}
+else if (part == "check_features_shell") difference() {
+    feature_probes_shell(); rear_shell();
+}
+else if (part == "check_features_bridge") difference() {
+    feature_probes_bridge(); bridge();
+}
+else if (part == "selftest_feature_probes")
+    union() { feature_probes_shell(); feature_probes_bridge(); }
+// Die Platte muss von vorn in die Wanne fallen koennen: ihr Weg von der
+// Ruhelage bis ueber die Waende hinaus darf nirgends an die Schale stossen.
+else if (part == "check_plate_drop_in") intersection() {
+    rear_shell();
+    minkowski() {
+        front_plate();
+        cylinder(d = 0.01, h = wall_top_z + 4 - plate_under_z);
+    }
+}
+// Angehoben muss die Platte an die Scheiben stossen — das ist ihre
+// einzige Sicherung nach vorn.
+else if (part == "check_plate_retained") intersection() {
+    mock_washers();
+    translate([0, 0, 0.4]) front_plate();
 }
 else if (part == "check_card_front_open") intersection() {
     translate([card_seat_x + 1, card_seat_y + lip_bottom + 0.5, card_bed_z + card_t])
@@ -114,15 +139,8 @@ else if (part == "check_card_front_open") intersection() {
 }
 // Jede Wandsonde muss vollstaendig im Material liegen. Erwartet: LEER.
 else if (part == "check_wall_solid") difference() {
-    wall_probes();
+    difference() { translate([-wall, -wall, 0]) wall_band(); wall_openings(); }
     rear_shell();
-}
-// Die drei Schraubenkanaele muessen bis zur Domoberkante frei sein.
-else if (part == "check_screw_bores_open") intersection() {
-    rear_shell();
-    union() for (p = post_positions)
-        translate([p[0], p[1], -wall_back - foot_h - 0.5])
-            cylinder(d = boss_hole_d - 0.3, h = stop_z + wall_back + foot_h + 0.5);
 }
 // Schraubenkoepfe gegen die ruhende Frontplatte.
 else if (part == "check_screw_heads") intersection() {

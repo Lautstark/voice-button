@@ -320,7 +320,7 @@ wird auch nicht gebraucht: Das nachgiebige Druckstück begrenzt, was beim
 ## Stand
 
 ```
-git log -1 --format='%H %s'
+c1cb0c4  Gemessene Hardware: Kavitaet 84, Lautsprecher in den Deckel eingesenkt
 ```
 
 Prüfbar mit:

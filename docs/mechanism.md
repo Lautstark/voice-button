@@ -43,14 +43,16 @@ also genau zwischen beiden — sein Weg ist das arithmetische Mittel aus
 | Fall | Weg am Druckpunkt | Weg am Taster | Reserve | erster Kontakt |
 |---|---:|---:|---:|---|
 | gerade | 2,000 | 1,700 | 1,250 | Anschlagring |
-| Kante N/S/O/W | 1,937 | 0,702 | 0,252 | Anschlagring |
-| Ecke NO/NW/SO/SW | 1,687 | 0,716 | 0,266 | Anschlagring |
+| Kante N/S/O/W | 1,953 | 0,703 | 0,253 | Anschlagring |
+| Ecke NO/NW/SO/SW | 1,692 | 0,714 | 0,264 | Anschlagring |
 
 Gebraucht werden 0,45 mm (0,20 mm Stauchung des Pads bis zur Schaltkraft
 plus 0,25 mm Schaltvorlauf), nachdem die 0,3 mm Luft überwunden sind.
 
 **In allen neun Fällen ist der erste Kontakt der Anschlagring** — nie
 der Akku, die Hauptplatine, die Tasterplatine oder der Lautsprecher.
+Der Ring fängt bei z 14,90 ab; das höchste Bauteil darunter ist der
+Tasterstempel mit 13,00, der Akku samt Schwellreserve kommt auf 11,00.
 `scad/kinematics.py` rechnet das unabhängig von der Geometrie nach,
 `check_tilt_*` prüft dieselben acht Richtungen noch einmal als Volumen.
 
@@ -74,8 +76,10 @@ Die Mulde ist 1,7 mm höher als die Karte, mit je einer Lippe oben
 (3,0 mm) und unten (0,8 mm). Karte schräg unter die obere Lippe
 schieben, loslassen — sie fällt auf die untere und bleibt dort.
 
-Die nutzbare Kartenhöhe ist deshalb **39,3 bis 40,7 mm**: mit der Schere
-zu treffen. Unter der oberen Lippe senkt sich der Muldenboden um 0,6 mm
+Die nutzbare Kartenhöhe ist deshalb **63,3 bis 64,7 mm**: ein Fenster
+von 1,45 mm, mit der Schere zu treffen. Es hängt nur an den beiden
+Lippen, nicht an der Kartengröße — eine größere Karte wird dadurch
+nicht schwerer zuzuschneiden. Unter der oberen Lippe senkt sich der Muldenboden um 0,6 mm
 ab, damit der 3-mm-Überhang beim Drucken durchhängen darf, ohne die
 Karte zu klemmen.
 
@@ -85,10 +89,10 @@ Fenster und die Taste steht 1,5 mm heraus.
 ## Verbleibende Führung
 
 Der Halt nach vorn ist keine Kontaktfrage, sondern ein Breitenverhältnis:
-Flansch 66,4 gegen Fenster 62,8, also 1,8 mm Überdeckung je Seite. Das
+Flansch 83,4 gegen Fenster 79,8, also 1,8 mm Überdeckung je Seite. Das
 gilt gekippt wie in Ruhe — die Taste kann nach vorn gar nicht heraus.
 
 Geführt wird sie in Ruhe vom umlaufenden Konus, der sie selbst
 zentriert, und beim Drücken von der Konusseite am Drehpunkt plus 0,3 mm
 Wandspiel. Die Drehung selbst begrenzt der Anschlagring auf höchstens
-**1,73 Grad**.
+**1,37 Grad**.

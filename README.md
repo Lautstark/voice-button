@@ -6,18 +6,20 @@ dahinter lässt sich ohne Werkzeug wechseln, am fertig montierten Gerät.
 
 Gebaut für ein dreieinhalbjähriges Kind, das nicht spricht.
 
-> **Vorläufig.** Das Soundmodul liegt noch nicht vor. Vier Maße sind
-> Annahmen, nicht Messungen — welche, und was sie ändern, steht in
-> [REVIEW_HANDOFF.md](REVIEW_HANDOFF.md). Gedruckt werden kann der
-> Rückdeckel und die Taste; **das Frontgehäuse erst nach dem Messen
-> der Portlagen.**
+> **Hardware gemessen (2026-10-28).** Lautsprecher, Akku, Platinen und
+> Portlagen liegen als Messwerte vor; das Gerät ist dadurch von 76 auf
+> 93 mm gewachsen und von 22,4 auf 21,3 mm abgeflacht. Offen sind nur
+> noch die Kennlinien der beiden Schaumteile und der Schaltvorlauf —
+> alles, was das Druckstück beim Zusammenbau ausgleicht. Siehe
+> [REVIEW_HANDOFF.md](REVIEW_HANDOFF.md).
 
 | | |
 |---|---|
-| Außenmaß | 76 × 76 × 22,4 mm |
+| Außenmaß | 93 × 93 × 21,3 mm |
 | Druckteile | drei, alle ohne Stützen |
 | Befestigung | vier M2 × 8, von hinten |
-| Karte | 40 × 40 mm, zulässig 39,3–40,7 mm |
+| Karte | 64 × 64 mm, zulässig 63,3–64,7 mm |
+| Druckfläche | 79 × 79 mm |
 | Tastenweg | 2,0 mm bis zum Anschlag |
 
 ## Aufbau
@@ -32,11 +34,13 @@ die vier Gewinde.
 Sie kann nach vorn nicht heraus, und **keine Schraube geht durch sie
 hindurch**.
 
-**Rückdeckel** — trägt Lautsprecher, Akku, Hauptplatine und die Aufnahme
-der Tasterplatine, dazu den umlaufenden Anschlagring.
+**Rückdeckel** — trägt Akku, Hauptplatine und die Aufnahme der
+Tasterplatine, dazu den umlaufenden Anschlagring. Der Lautsprecher liegt
+in einer **Tasche im Deckel**, nicht auf dem Boden: das hält ihn flach
+genug, dass die Tasterplatine über ihn hinweglaufen darf.
 
 Warum es so und nicht anders aussieht — besonders, warum das Gerät
-76 statt 61 mm breit ist und warum das Druckstück weich sein muss —
+93 statt 61 mm breit ist und warum das Druckstück weich sein muss —
 steht in [docs/adr-002-architektur.md](docs/adr-002-architektur.md).
 
 ## Weiterlesen

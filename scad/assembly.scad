@@ -10,11 +10,13 @@ include <config.scad>
 use <lib.scad>
 use <parts.scad>
 
+// Der Korb liegt in der Tasche, nicht auf dem Boden.
 module mock_speaker()
-    translate([spk_cx, spk_cy, bay_z + seat_eps]) cylinder(d = spk_d, h = spk_depth);
+    translate([spk_cx, spk_cy, spk_z0 + seat_eps]) cylinder(d = spk_d, h = spk_depth);
 
+// 28 mm in x, 20 mm in y — die Buchse zeigt nach Norden zur Platine.
 module mock_battery()
-    translate([bat_x0, bat_y0, bat_z + seat_eps]) cube([bat_w, bat_l, bat_t]);
+    translate([bat_x0, bat_y0, bat_z + seat_eps]) cube([bat_l, bat_w, bat_t]);
 
 module mock_pcb() {
     translate([pcb_x0, pcb_y0, pcb_z + seat_eps]) cube([pcb_w, pcb_h, pcb_t]);
@@ -86,15 +88,17 @@ module button_tilt(dx, dy) {
 // --- Darstellungen ----------------------------------------------------
 // Die Explosionsabstaende muessen groesser sein als die Teile hoch
 // sind, sonst steckt die Taste beim Auseinanderziehen noch im Gehaeuse.
+// Das Frontgehaeuse ist 15,8 mm tief; die 34 mm der ersten Fassung
+// liessen die Taste gerade 0,2 mm herausschauen.
 module assembly(e = 0) {
-    color([0.80, 0.72, 0.92]) translate([0, 0, e*34]) front_housing();
-    color([0.90, 0.90, 0.95]) translate([0, 0, e*26]) mock_card();
-    color([0.62, 0.50, 0.78]) translate([0, 0, e*18]) button();
-    color([0.55, 0.55, 0.60]) translate([0, 0, e*18]) mock_pad();
-    color([0.95, 0.90, 0.55]) translate([0, 0, e*9])  mock_foam();
+    color([0.80, 0.72, 0.92]) translate([0, 0, e*52]) front_housing();
+    color([0.90, 0.90, 0.95]) translate([0, 0, e*40]) mock_card();
+    color([0.62, 0.50, 0.78]) translate([0, 0, e*28]) button();
+    color([0.55, 0.55, 0.60]) translate([0, 0, e*28]) mock_pad();
+    color([0.95, 0.90, 0.55]) translate([0, 0, e*14]) mock_foam();
     color([0.35, 0.60, 0.35]) mock_electronics();
-    color([0.75, 0.75, 0.80]) translate([0, 0, -e*14]) rear_lid();
-    color([0.40, 0.40, 0.45]) translate([0, 0, -e*26]) mock_screws();
+    color([0.75, 0.75, 0.80]) translate([0, 0, -e*22]) rear_lid();
+    color([0.40, 0.40, 0.45]) translate([0, 0, -e*40]) mock_screws();
 }
 
 module section(axis = 0, e = 0) {

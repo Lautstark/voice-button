@@ -55,6 +55,30 @@ run "Kartenfenster zu" parts.scad \
     's|    translate(\[cx - card_ch_w/2, y0 + lip_bottom, card_bed_z + card_ch_h\])|    if (false) translate([cx - card_ch_w/2, y0 + lip_bottom, card_bed_z + card_ch_h])|' \
     check_card_window_open ueberschneidung
 # Anschlagring entfernt: die Taste faellt bis auf die Elektronik
+# Haltenasen ohne Ueberdeckung: der Korb liegt nur noch in der Tasche
+# und kann herausfallen, sobald das Geraet auf dem Ruecken liegt.
+# An den asserts vorbei: die Listen bleiben stimmig, nur die Geometrie
+# baut die Nase nicht. Haette die Mutation in config.scad gesessen,
+# haetten die Abdeckungs-asserts zuerst zugeschlagen und die
+# Volumenpruefung waere nie dran gekommen — bewiesen waere dann nichts.
+run "Haltenasen ohne Nase" parts.scad \
+    's/if (has_lip(a))/if (false)/' \
+    check_speaker_retained leer
+# Nase ringsum: haelt praechtig — nur kommt der starre Metallkorb dann
+# gar nicht mehr hinein. Halten und Einbaubarkeit sind zwei Dinge.
+run "Nase ringsum" parts.scad \
+    's/if (has_lip(a))/if (true)/; s/has_lip(a) ?/true ?/' \
+    check_speaker_insert_free ueberschneidung
+# Und die Luecke, durch die die beiden Checks oben einmal gefallen sind:
+# wer die Liste der freien Richtungen leert, macht den Pruefkoerper
+# gegenstandslos. Das muss ein assert abfangen, nicht ein leeres PASS.
+run "Freirichtungen geleert" config.scad \
+    's/^spk_free_a     = \[115, 210\];/spk_free_a = [];/' \
+    check_speaker_insert_free renderfehler
+# Schallloecher vergessen: der Lautsprecher spielt gegen 1,5 mm PLA.
+run "Schallloecher zu" parts.scad \
+    's|^module lid_grille() {|module lid_grille() { if (true) {} else|' \
+    check_grille_open ueberschneidung
 run "Anschlagring weg" parts.scad \
     's|^module lid_rim() {|module lid_rim() { if (true) {} else|' \
     check_stop_engages leer

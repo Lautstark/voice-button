@@ -84,6 +84,11 @@ for c in check_housing_button check_housing_button_pressed check_housing_lid \
          check_mocks_printed check_mocks_button check_mocks_button_pressed \
          check_screws_clear; do must_be_clear "$c"; done
 
+echo "— Lautsprecher —"
+must_engage   check_speaker_retained
+must_be_empty check_speaker_insert_free
+must_be_empty check_grille_open
+
 echo "— Halten, Anschlag, Rueckstellung —"
 must_engage check_button_retained
 must_engage check_stop_engages

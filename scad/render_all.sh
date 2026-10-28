@@ -17,15 +17,24 @@ done
 
 # Jede Ansicht braucht ihre eigene Kamera, sonst sind "iso" und "front"
 # dasselbe Bild. Format: tx,ty,tz,rx,ry,rz,dist
+#
+# Kameraziel ist die Mitte des Gehaeuses (cx, cy, halbe Bauhoehe). Die
+# Abstaende sind auf 93 mm Kantenmass abgestimmt — waechst das Geraet,
+# muessen sie mitwachsen, sonst steht es ausserhalb des Bildes.
+#
+# Und die Schnittansichten brauchen die Drehung, die auf die SCHNITT-
+# flaeche sieht, nicht auf die stehengebliebene Aussenwand. section(0)
+# nimmt die Nordhaelfte weg, man schaut also von Norden (rz=180);
+# section(1) nimmt den Osten weg, also von Osten (rz=270).
 render_view() {
-  if "$SC" -D "part=\"$1\"" --camera="38,38,11,$2" --imgsize=1400,1050 \
+  if "$SC" -D "part=\"$1\"" --camera="42,42,10,$2" --imgsize=1400,1050 \
        --colorscheme=Tomorrow -o "../render/$1.png" main.scad 2>/dev/null; then
     echo "png $1 ok"
   else echo "png $1 FEHLER"; rc=1; fi
 }
-render_view view_iso        "55,0,25,230"
-render_view view_front      "0,0,0,200"
-render_view view_exploded   "62,0,30,420"
-render_view view_section_x  "90,0,90,210"
-render_view view_section_y  "90,0,0,210"
+render_view view_iso        "55,0,25,285"
+render_view view_front      "0,0,0,250"
+render_view view_exploded   "62,0,30,620"
+render_view view_section_x  "90,0,270,265"
+render_view view_section_y  "90,0,180,265"
 exit $rc

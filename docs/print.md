@@ -5,11 +5,13 @@ Stützen**. Alle drei Teile sind in `stl/` schon in Drucklage gedreht.
 
 ## Reihenfolge
 
-1. **Rückdeckel** und **Taste** — ihre Maße hängen nicht von den
-   ungemessenen Portlagen ab.
-2. **Frontgehäuse zuletzt**, nachdem USB-C- und Schalterlage am echten
-   Modul gemessen und in `config.scad` eingetragen sind. Sitzen die
-   Durchbrüche falsch, ist das Gehäuse Ausschuss.
+Die Portlagen sind gemessen, deshalb gibt es keine Reihenfolge mehr, die
+sich aus offenen Maßen ergibt. Zwei Platten sind trotzdem besser als
+eine: das Gehäuse braucht einen Brim und wird mit ihm 109 × 116 mm groß.
+
+1. **Frontgehäuse** allein, mit 8 mm Brim.
+2. **Rückdeckel und Taste** zusammen — 93 + 83,4 + 8 mm Abstand sind
+   184,4 mm, das passt bequem nebeneinander.
 
 Es gibt keine Testteile und keine Coupons: gedruckt wird nur, was ins
 fertige Gerät geht.
@@ -29,13 +31,12 @@ fertige Gerät geht.
 
 | Teil | Grundfläche in Drucklage | erste Schicht |
 |---|---|---|
-| Frontgehäuse | 76 × 83 mm (mit Öse) | Wandkranz, ca. 1300 mm² |
-| Taste | 66,4 × 66,4 mm | volle Fläche, ca. 4400 mm² |
-| Rückdeckel | 76 × 76 mm | volle Fläche, ca. 5700 mm² |
+| Frontgehäuse | 93 × 100 mm (mit Öse) | Wandkranz, ca. 1600 mm² |
+| Taste | 83,4 × 83,4 mm | volle Fläche, ca. 6900 mm² |
+| Rückdeckel | 93 × 93 mm | volle Fläche, ca. 8600 mm² |
 
-Nebeneinander mit 8 mm Abstand und 10 mm Rand: rund 168 × 93 mm für
-Gehäuse und Deckel, die Taste in Reihe zwei. Passt auf 220 × 220 mm.
-Ein Brim am Gehäuse braucht zusätzlich Platz.
+Alle drei nebeneinander gehen **nicht** mehr: 93 + 83,4 + 93 plus
+Abstände sind über 285 mm. Zwei Platten, siehe oben.
 
 ## Die kritischen Stellen
 
@@ -68,8 +69,23 @@ breiter und die Taste klemmt in der Kavität: erste Schicht nicht
 überdrücken, Z-Offset sauber einstellen.
 
 **Durchbrüche in der Südwand.** Über jeder Öffnung steht eine Brücke von
-10,2 bzw. 9,0 mm Spannweite. Unkritisch, die Unterseite ist keine
-Funktionsfläche.
+10,2 mm (USB-C) bzw. 4,6 mm (Schieber) Spannweite. Unkritisch, die
+Unterseite ist keine Funktionsfläche. Dazwischen bleiben 4,0 mm Wand
+stehen — nicht nacharbeiten, das ist tragendes Material.
+
+**Lautsprechertasche (Deckel).** Eine flachbodige Vertiefung von 2,5 mm
+in den ersten Schichten; darunter bleiben 1,5 mm Deckelmaterial, durch
+die die Schalllöcher gehen. Kein Überhang, aber **dünn**: diese 1,5 mm
+sind sieben bis acht Schichten, perforiert von 37 Löchern Ø 2,2 mm.
+Nicht im Lastpfad — den trägt der Anschlagring am Rand —, aber beim
+Entfernen von Stützstrukturen oder beim Entgraten vorsichtig sein.
+
+**Haltenasen des Lautsprechers (Deckel).** Vier Wandsegmente von 1,5 mm
+Dicke rund um die Tasche. Zwei davon haben oben eine 0,8 mm weit nach
+innen stehende Nase; deren Unterseite ist ein kurzer waagerechter
+Überhang auf 26 Grad Bogen. Druckbar, wird rau. Wird sie zu rau, bleibt
+sie trotzdem funktionsfähig — sie soll nur verhindern, dass der Korb aus
+der Tasche steigt. Nicht abfeilen.
 
 **Anschlagfläche und Stufe (Deckel).** Außen bleibt eine 2,05 mm breite,
 massive Anschlagfläche stehen, die bis zum Deckelboden durchgeht — das

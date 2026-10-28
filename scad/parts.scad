@@ -37,8 +37,10 @@ module housing_void() {
     }
 }
 
+// Beide Durchbrueche liegen in der SUEDWAND: USB-C bei 10 mm und der
+// ON-OFF-Schieber bei 23 mm der 28-mm-Platinenkante, gemessen am Bauteil.
 module housing_ports() {
-    // Suedwand: USB-C und Schiebeschalter. Lage entlang der Kante [ANNAHME].
+    // --- Suedwand: USB-C, mit Einfuehrtrichter aussen
     translate([usb_x_c, -wall - 1, usb_z_c])
         rotate([-90, 0, 0]) linear_extrude(wall + 2)
             translate([-usb_cut_w/2, -usb_cut_h/2]) rrect(usb_cut_w, usb_cut_h, 1.0);
@@ -46,6 +48,7 @@ module housing_ports() {
         rotate([-90, 0, 0]) linear_extrude(usb_funnel_d + 0.01)
             translate([-usb_funnel_w/2, -usb_funnel_h/2])
                 rrect(usb_funnel_w, usb_funnel_h, 1.5);
+    // --- Suedwand: Schiebeschalter, mit flacher Griffmulde aussen
     translate([psw_x_c, -wall - 1, psw_z_c])
         rotate([-90, 0, 0]) linear_extrude(wall + 2)
             translate([-psw_cut_w/2, -psw_cut_h/2]) rrect(psw_cut_w, psw_cut_h, 1.0);
@@ -143,12 +146,55 @@ module lid_rim() {
     }
 }
 
+// Der Lautsprecher liegt in einer TASCHE im Deckel. Gedruckt wird der
+// Deckel mit der Aussenflaeche auf dem Bett, die Tasche ist also eine
+// flachbodige Vertiefung in den ersten Schichten — kein Ueberhang.
+// Gehalten wird der Korb seitlich von der Taschenwand und nach oben von
+// vier einzelnen Nasen; ein umlaufender Ring haette 1,5 mm Rand ringsum
+// gebraucht und das Geraet um 10 mm wachsen lassen.
+module lid_speaker_pocket() {
+    translate([spk_cx, spk_cy, spk_z0])
+        cylinder(r = spk_pocket_r, h = spk_recess + 0.01);
+}
+
 module lid_speaker() {
-    difference() {
-        translate([spk_cx, spk_cy, bay_z])
-            cylinder(d = spk_d + 2*spk_clear + 3.0, h = spk_seat_h);
-        translate([spk_cx, spk_cy, bay_z - 1])
-            cylinder(d = spk_d + 2*spk_clear, h = spk_seat_h + 2);
+    for (a = spk_tab_a) {
+        // Ringsektor von der Taschenwand nach aussen, vom Deckelboden
+        // bis ueber die Korboberkante, mit einer Nase nach innen.
+        translate([spk_cx, spk_cy, 0]) rotate([0, 0, a - spk_tab_arc/2])
+            difference() {
+                union() {
+                    // senkrechte Wand auf dem Boden
+                    linear_extrude(has_lip(a) ? spk_lip_z + spk_tab_lip
+                                                       : spk_top)
+                        difference() {
+                            circle(r = spk_tab_ro, $fn = 96);
+                            circle(r = spk_pocket_r, $fn = 96);
+                            translate([-spk_tab_ro - 1, -spk_tab_ro - 1])
+                                square([2*spk_tab_ro + 2, spk_tab_ro + 1]);
+                            rotate([0, 0, spk_tab_arc])
+                                translate([-spk_tab_ro - 1, 0])
+                                    square([2*spk_tab_ro + 2, spk_tab_ro + 1]);
+                        }
+                    // Nase nach innen, oberhalb der Korboberkante —
+                    // nur in den Richtungen aus spk_lip_a
+                    if (has_lip(a))
+                    translate([0, 0, spk_lip_z])
+                        linear_extrude(spk_tab_lip)
+                            difference() {
+                                circle(r = spk_tab_ro, $fn = 96);
+                                circle(r = spk_pocket_r - spk_tab_lip, $fn = 96);
+                                translate([-spk_tab_ro - 1, -spk_tab_ro - 1])
+                                    square([2*spk_tab_ro + 2, spk_tab_ro + 1]);
+                                rotate([0, 0, spk_tab_arc])
+                                    translate([-spk_tab_ro - 1, 0])
+                                        square([2*spk_tab_ro + 2, spk_tab_ro + 1]);
+                            }
+                }
+                // unterhalb des Bodens steht nichts
+                translate([-spk_tab_ro - 2, -spk_tab_ro - 2, -1])
+                    cube([2*spk_tab_ro + 4, 2*spk_tab_ro + 4, bay_z + 1]);
+            }
     }
 }
 
@@ -184,13 +230,16 @@ module lid_features() {
     // Hauptplatine sich durchbiegen kann.
     translate([pcb_x0 - pcb_clear, pcb_y0 - pcb_clear, bay_z])
         cube([pcb_w + 2*pcb_clear, pcb_h + 2*pcb_clear, pcb_standoff]);
-    corner_clips(pcb_x0, pcb_y0, pcb_w, pcb_h, pcb_clear, 1.2,
-                 pcb_standoff + pcb_t + 1.0, 4.0);
-    // Akkufach: Nord- und Westwand; Sueden und Osten uebernimmt der Ring
-    translate([bat_x0 - bat_clear - 1.2, bat_y0 - bat_clear, bay_z])
-        cube([1.2, bat_l + 2*bat_clear, bat_t + bat_pad_t]);
-    translate([bat_x0 - bat_clear - 1.2, bat_y0 + bat_l + bat_clear, bay_z])
-        cube([bat_w + 2*bat_clear + 2.4, 1.2, bat_t + bat_pad_t]);
+    corner_clips(pcb_x0, pcb_y0, pcb_w, pcb_h, pcb_clear, pcb_clip_t,
+                 pcb_standoff + pcb_t + 1.0, pcb_clip_leg);
+    // Akkufach: West- und Nordwand. Nach Sueden begrenzt die Platinen-
+    // auflage, nach Osten der freie Boden — dort kommt man mit dem
+    // Finger an die Zelle, um sie beim Zusammenbau einzulegen.
+    translate([bat_x0 - bat_clear - bat_wall_t, bat_y0 - bat_clear - bat_wall_t, bay_z])
+        cube([bat_wall_t, bat_ey + 2*bat_wall_t, bat_t + bat_pad_t]);
+    translate([bat_x0 - bat_clear - bat_wall_t,
+               bat_y0 - bat_clear + bat_ey, bay_z])
+        cube([bat_ex + 2*bat_wall_t, bat_wall_t, bat_t + bat_pad_t]);
     // Aufnahme der Tasterplatine: massiver Block auf freiem Boden
     translate([ped_x0, ped_y0, bay_z])
         cube([ped_x1 - ped_x0, ped_y1 - ped_y0, ped_top - bay_z]);
@@ -210,6 +259,7 @@ module lid_port_tunnels() {
 module rear_lid() {
     difference() {
         union() { lid_plate(); lid_rim(); lid_features(); }
+        lid_speaker_pocket();
         lid_port_tunnels();
         lid_grille();
         for (p = screw_pos) {

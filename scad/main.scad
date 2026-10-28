@@ -80,7 +80,12 @@ module probes_lid() {
     probe_at(cx, cavity - 0.15 - stop_band/2, bay_z + 1.0);   // Ring Nord
     probe_at(0.15 + stop_band/2, cy, bay_z + 1.0);            // Ring West
     probe_at(cavity - 0.15 - stop_band/2, cy, bay_z + 1.0);   // Ring Ost
-    probe_at(spk_cx + (spk_d + spk_clear*2 + 1.5)/2, spk_cy, bay_z + spk_seat_h/2);
+    // Haltenase am Lautsprecher: auf der ersten der vier Richtungen
+    probe_at(spk_cx + (spk_pocket_r + spk_tab_t/2)*cos(spk_tab_a[0]),
+             spk_cy + (spk_pocket_r + spk_tab_t/2)*sin(spk_tab_a[0]),
+             bay_z + (spk_top - bay_z)/2);
+    // Material unter der Lautsprechertasche
+    probe_at(spk_cx + spk_pocket_r - 1.0, spk_cy, spk_floor/2);
     probe_at(pcb_x0 + pcb_w/2, pcb_y0 + pcb_h/2, bay_z + pcb_standoff/2);
     probe_at(cx, cy, lid_t/2 - 0.0);                          // Deckelboden
 }
@@ -178,6 +183,54 @@ else if (part == "check_port_tunnel_open")
                 cube([psw_cut_w, stop_band, psw_cut_h]);
         }
         union() { rear_lid(); front_housing(); }
+    }
+// Die oestlichen Nasen muessen den Korbrand wirklich uebergreifen:
+// angehoben muss er an sie stossen.
+else if (part == "check_speaker_retained")
+    intersection() {
+        rear_lid();
+        translate([0, 0, spk_tab_lip + 0.5]) mock_speaker();
+    }
+// Und in den Richtungen OHNE Nase muss der Weg nach unten frei sein,
+// sonst kommt der starre Korb nicht hinein.
+//
+// Der Pruefkoerper laeuft ueber spk_free_a, NICHT ueber "spk_tab_a ohne
+// Lippe". Der Unterschied ist der ganze Punkt: leitet er seine Form aus
+// spk_lip_a ab, dann loescht die Mutation "Nase ringsum" den Pruefkoerper
+// gleich mit, der Check meldet leer und besteht aus dem falschen Grund.
+// Genau das hat der Negativtest gefunden.
+else if (part == "check_speaker_insert_free")
+    intersection() {
+        rear_lid();
+        for (a = spk_free_a)
+            translate([spk_cx, spk_cy, spk_lip_z + 0.05])
+                rotate([0, 0, a - spk_tab_arc/2])
+                    linear_extrude(spk_tab_lip - 0.1)
+                        difference() {
+                            circle(r = spk_d/2, $fn = 96);
+                            circle(r = spk_d/2 - 0.6, $fn = 96);
+                            translate([-spk_d, -spk_d]) square([2*spk_d, spk_d]);
+                            rotate([0, 0, spk_tab_arc])
+                                translate([-spk_d, 0]) square([2*spk_d, spk_d]);
+                        }
+    }
+// Die Schallloecher muessen durch den 1,5 mm starken Taschenboden gehen.
+// Der Pruefkoerper ist bewusst NICHT lid_grille(): mit dem Fehler
+// verschwaende sonst der Pruefkoerper selbst. Er ist aus denselben
+// Masszahlen neu gebaut, aber unabhaengig vom geprueften Modul — und um
+// 0,4 mm schlanker, damit die Facettierung der Bohrungen nicht als
+// fehlendes Loch zaehlt.
+else if (part == "check_grille_open")
+    intersection() {
+        rear_lid();
+        translate([spk_cx, spk_cy, 0.05]) union() {
+            cylinder(d = grille_hole_d - 0.4, h = spk_floor - 0.1);
+            for (k = [1 : grille_ring_n])
+                for (i = [0 : 6*k - 1])
+                    rotate([0, 0, 360*i/(6*k)])
+                        translate([k*(grille_hole_d + 2.0), 0, 0])
+                            cylinder(d = grille_hole_d - 0.4, h = spk_floor - 0.1);
+        }
     }
 else if (part == "check_screws_clear")
     intersection() { mock_screws(); union() { button(); mock_electronics(); } }

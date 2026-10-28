@@ -1,80 +1,86 @@
-# Druckliste — ein kompletter Satz
+# Drucken
 
-Stand: alle vier Teile sind exportiert und kollisionsgeprüft. Die
-Rückschale enthält noch `[MEASURE]`-Platzhalter (Lautsprechermaße, exakte
-Lage von USB-C und Schiebeschalter, Breakout-Maße). Sie ist deshalb als
-**Passprobe** gedacht: Modul einlegen, schauen, ob es grob passt, und die
-Abweichungen messen.
+Ender 3 V2, 0,4-mm-Düse, 0,2-mm-Schichten, eSUN matte PLA, **ohne
+Stützen**. Alle drei Teile sind in `stl/` schon in Drucklage gedreht.
 
-Frontplatte und Blende sind dagegen **unabhängig von diesen Messwerten** —
-nachgewiesen, indem alle offenen Hardware-Größen auf Anschlag verstellt
-wurden: identische Bounding Box, identisches Volumen. Die bleiben im
-fertigen Gerät, wenn die Karte passt.
+## Reihenfolge
 
-| Teil | Maße | Material | Lage auf dem Bett | Stützen |
-|---|---|---|---|---|
-| `rear_shell.stl` | 61 × 74 × 20 mm | ~27 g | Rücken aufs Bett — plan, die Öse liegt in derselben Ebene | nein |
-| `front_plate.stl` | 55 × 55 × 4,6 mm | ~10 g | Rücken aufs Bett, Kartenrahmen oben | nein |
-| `bridge.stl` | 47 × 25 × 6,5 mm | ~3 g | flach, Tasche nach oben | nein |
+1. **Rückdeckel** und **Taste** — ihre Maße hängen nicht von den
+   ungemessenen Portlagen ab.
+2. **Frontgehäuse zuletzt**, nachdem USB-C- und Schalterlage am echten
+   Modul gemessen und in `config.scad` eingetragen sind. Sitzen die
+   Durchbrüche falsch, ist das Gehäuse Ausschuss.
 
-Drei Teile — die Blende ist entfallen.
+Es gibt keine Testteile und keine Coupons: gedruckt wird nur, was ins
+fertige Gerät geht.
 
-## Alles auf einmal: ja
+## Einstellungen
 
-Mit 8 mm Abstand und 10 mm Rand belegen die vier Teile **150 × 156 mm** von
-den 220 × 220 mm des Ender 3 V2 — 70 bzw. 64 mm Reserve.
+| | |
+|---|---|
+| Schichthöhe | 0,2 mm |
+| Wandlinien | 3 (= 1,2 mm) |
+| Boden/Decke | 4 Schichten |
+| Füllung | 25 %, Gyroid |
+| Stützen | **keine** |
+| Brim | Gehäuse ja (8 mm), Deckel und Taste nein |
 
-    Reihe 1   Rückschale (61 × 74) │ Frontplatte (55 × 55)
-    Reihe 2   Brücke (47 × 25)
+## Passt alles auf eine Druckplatte?
 
-Rechne mit 4–6 Stunden. Drei Dinge dabei:
+| Teil | Grundfläche in Drucklage | erste Schicht |
+|---|---|---|
+| Frontgehäuse | 76 × 83 mm (mit Öse) | Wandkranz, ca. 1300 mm² |
+| Taste | 66,4 × 66,4 mm | volle Fläche, ca. 4400 mm² |
+| Rückdeckel | 76 × 76 mm | volle Fläche, ca. 5700 mm² |
 
-- Nur die Rückschale ist höher als 7,4 mm; darüber druckt der Kopf allein
-  an ihr weiter. Unproblematisch, macht den Druck aber nicht schneller.
-- Vier Teile heißt viele Leerfahrten. Retraction und Combing an, sonst
-  zieht Matte-PLA Fäden quer über das Bett.
-- Die Brücke hat die kleinste Aufstandsfläche — ein Brim darum ist billige
-  Versicherung gegen Ablösen.
+Nebeneinander mit 8 mm Abstand und 10 mm Rand: rund 168 × 93 mm für
+Gehäuse und Deckel, die Taste in Reihe zwei. Passt auf 220 × 220 mm.
+Ein Brim am Gehäuse braucht zusätzlich Platz.
 
-Falls die Karte am Ende nicht passt, ist nur die Frontplatte (9 g) zu
-wiederholen, nicht der ganze Satz.
+## Die kritischen Stellen
 
-## Einstellungen (eSUN ePLA-Matte, Ender 3 V2)
+**Wandkranz des Gehäuses.** Die erste Schicht ist nur ein 4,5 mm
+breiter Ring. Das ist die einzige Stelle mit echtem Verzugsrisiko —
+Brim verwenden, Bett sauber, Zugluft vermeiden.
 
-- Düse 0,4 mm · Schicht 0,2 mm · Düse 215–225 °C · Bett 50 °C
-- Perimeter ≤ 40 mm/s, Fluss 102–105 %, trockenes Filament
-- **Deckschicht-Muster: monoton**, nicht konzentrisch — die Rahmenstege
-  sind nur 2,2 mm breit, konzentrisch zieht der Slicer dort Rillen
-- 3 Wände, 25 % Gyroid
-- Brücken aktiviert lassen. Die beiden einzigen echten Brücken sitzen in
-  der **Tasterbrücke**: der Querriegel über der Platine und der Balken über
-  dem Einschubschlitz, je ~19 mm Spannweite. Beide dürfen durchhängen —
-  funktional ist nur ihre Oberseite (der Anschlag). Darunter sind 0,5 bzw.
-  0,8 mm Luft über der Platine eingeplant.
+**Obere Kartenlippe (Taste).** 3 mm Überhang über die Kartenmulde.
+Darunter ist der Muldenboden um 0,6 mm abgesenkt, der Überhang darf also
+durchhängen, ohne die Karte zu klemmen. Nacharbeiten mit einem Messer
+ist möglich, ändert aber den Halt — danach die Karte prüfen.
 
-## Worauf beim ersten Satz achten
+**Fase der Taste.** Verjüngt sich in Drucklage nach oben, jede Schicht
+steht also voll auf der darunter — überhangfrei.
 
-1. **Rückseite:** Die erste Schicht muss die **volle** Grundfläche samt Öse
-   abdecken. Sieht der Slicer dort nur Inseln, stimmt die Orientierung
-   nicht — gedruckte Abstandsfüße gibt es bewusst nicht mehr.
-2. **Karte:** oben unter die Lippe schieben, loslassen. **39,3–40,7 mm in
-   beiden Richtungen.** Klemmt sie oben, hängt die 3-mm-Lippe durch →
-   `card_ch_h` erhöhen.
-3. **Platte im Blendenkragen:** muss mit 0,3 mm Spiel laufen, ohne zu
-   klemmen und ohne zu klappern. Das ist die kritischste Passung.
-4. **Modul in der Rückschale:** PCB ins Fach, USB-Kabel durch die
-   Trichteröffnung, Schalter mit dem Fingernagel erreichbar? Lautsprecher
-   in den Sitzring, Akku auf die Schale. Was nicht passt: messen und in
-   `scad/config.scad` eintragen.
-5. **Schaumpads:** zwei Stücke von ~8 × 8 × 6 mm aus der weichen Seite
-   eines Spülschwamms auf die beiden markierten Felder der Brücke kleben.
-   Kein Moosgummi (~20 N statt ~1 N), kein Memory-Schaum (federt zu
-   langsam). Dicke 5,7–7,8 mm ist in Ordnung.
-6. **Druckpunkt:** Platte einlegen, Brücke mit Taster darunter — die Platte
-   muss nach 0,7 mm auf den Taschenwänden aufsitzen, *nicht* weiter. Wenn
-   sie spürbar tiefer geht, ist der Mittenanschlag zu niedrig und der
-   Taster nimmt die Last.
-7. **Öse:** kräftig am Ring ziehen.
+**Haltekonus im Gehäuse.** Hier ist es umgekehrt: der Hohlraum verjüngt
+sich nach vorn, das Material wächst nach innen, und das sind **genau
+45 Grad Überhang**. Druckbar, aber die Unterseite wird rau — und genau
+diese Fläche ist der Sitz, auf dem die Taste ruht. Rechne damit, dass
+die Taste 0,1 bis 0,2 mm tiefer sitzt als gezeichnet. Die Luft über dem
+Taster wird dadurch kleiner, nicht größer — das Drücken wird also eher
+leichter. Erst wenn sie auf null schrumpft, drückt das Pad den Taster
+dauerhaft, und das Gerät spielt von selbst. Genau dagegen wird beim
+Zusammenbau gemessen und die Padstärke gewählt (siehe
+[build.md](build.md)).
 
-Nach dem Messen `scad/render_all.sh` und `scad/check_fit.sh` laufen lassen —
-die Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
+**Elefantenfuß an der Taste.** Die erste Schicht ist der Flansch, also
+die Fläche, die den Sitz bildet. Wird sie gequetscht, wird der Flansch
+breiter und die Taste klemmt in der Kavität: erste Schicht nicht
+überdrücken, Z-Offset sauber einstellen.
+
+**Durchbrüche in der Südwand.** Über jeder Öffnung steht eine Brücke von
+10,2 bzw. 9,0 mm Spannweite. Unkritisch, die Unterseite ist keine
+Funktionsfläche.
+
+**Anschlagfläche und Stufe (Deckel).** Außen bleibt eine 2,05 mm breite,
+massive Anschlagfläche stehen, die bis zum Deckelboden durchgeht — das
+ist der Lastpfad, hier zählt volles Material. Die Stufe daneben ist
+2,4 mm breit und nach innen offen; sie darf nicht zugeschmiert werden,
+sonst passt der Schwammstreifen nicht.
+
+**Schalllöcher (Deckel).** Senkrechte Bohrungen Ø 2,2 mm, unkritisch.
+
+## Was sich am Druck erst zeigt
+
+Durchhang unter der Kartenlippe, die tatsächliche Betätigungskraft, der
+Halt der selbstschneidenden Schrauben in der Wand und ob die Karte sich
+bequem wechseln lässt. Dafür gibt es keinen Ersatz im CAD.

@@ -1,399 +1,415 @@
 // =====================================================================
-// Lautstark Mini Voice Button — configuration
+// Lautstark Mini Voice Button — Konfiguration
 // =====================================================================
-// All dimensions in mm. Coordinate system: origin at the SW corner of
-// the INTERNAL cavity, z=0 on the cavity floor, +z toward the front
-// (the child-facing side). The back wall lies at z = -wall_back.
+// Architektur B (2026-10-28): festes Frontgehaeuse, eingefangene Taste,
+// verschraubter Rueckdeckel. Loest Architektur A (Blende/Bruecke) ab.
 //
-// Every value marked [MEASURE] is a placeholder envelope taken from the
-// diymore B0HC2YW72V listing (PCB 27x29, battery 402030, speaker ~29 mm,
-// 12x12 tactile on a green breakout). Verify with calipers when the
-// hardware arrives and re-export.
-
-// ---------------------------------------------------------------------
-// Print / tolerance
-// ---------------------------------------------------------------------
-fit_clear      = 0.25;  // sliding fit per side (tune with test prints)
-loose_clear    = 0.5;   // generous clearance for non-guiding surfaces
-$fn            = 48;
-
-// ---------------------------------------------------------------------
-// Housing
-// ---------------------------------------------------------------------
-cavity_w       = 56.4;  // internal cavity, x
-cavity_h       = 56.4;  // internal cavity, y
-wall           = 2.4;   // side wall thickness
-wall_back      = 2.0;   // back wall thickness (0,4 mehr als noetig,
-                        // damit die Gittermulde unten 1,2 mm stehen laesst)
-corner_r       = 7.0;   // outer corner radius
-housing_w      = cavity_w + 2*wall;   // 61.2
-housing_h      = cavity_h + 2*wall;   // 61.2
-cx             = cavity_w/2;          // cavity center x
-cy             = cavity_h/2;          // cavity center y
-
-// ---------------------------------------------------------------------
-// Speaker  [MEASURE]
-// ---------------------------------------------------------------------
-spk_d          = 29.0;  // frame outer diameter
-spk_depth      = 5.5;   // total depth incl. magnet
-spk_rim_depth  = 4.0;   // frame depth at the rim (magnet protrudes past this)
-spk_magnet_d   = 16.0;  // magnet diameter (front side; diaphragm faces back)
-spk_clear      = 0.4;   // radial clearance in the seat
-spk_cx         = 16.0;  // speaker center (lower-left quadrant)
-spk_cy         = 15.6;
-spk_seat_h     = 2.0;   // seat ring height holding the rim laterally
-grille_hole_d  = 2.4;   // rear grille holes
-// KEINE Fuesse. Gedruckte Abstandsfuesse haetten die Rueckwand 0,8 mm ueber
-// dem Bett beginnen lassen: die erste Schicht waeren drei Zapfen von
-// zusammen 69 mm2 gewesen, darueber 3462 mm2 Boden in der Luft. Stattdessen
-// ist die Rueckseite plan und das Gitter liegt in einer flachen Mulde —
-// gleiche Wirkung gegen anliegenden Stoff, aber druckbar.
-foot_h         = 0;     // bleibt als Parameter, damit der Stapel stimmt
-foot_d         = 0;
-// Mulde auf 0: eine 0,8 mm tiefe, 37 mm weite Aussparung in der Rueckwand
-// laesst den verbleibenden Gitterboden in der Luft beginnen (~975 mm2 freie
-// Unterseite) und reicht ueber zwei Aussenkanten hinaus, wodurch die erste
-// Schicht in zwei Inseln zerfaellt. Gegen anliegenden Stoff helfen vier
-// selbstklebende Moebelpuffer — siehe docs/build.md.
-grille_dish_d  = 0;     // Tiefe der Gittermulde
-grille_dish_m  = 4.0;   // Rand der Mulde um den Lautsprecher herum
-
-// ---------------------------------------------------------------------
-// Battery 402030 LiPo  [MEASURE]
-// ---------------------------------------------------------------------
-bat_l          = 30.0;  // along x
-bat_w          = 20.0;  // along y
-bat_t          = 4.8;   // thickness incl. wrap; allow for swelling below
-bat_clear      = 0.3;   // per side in plan
-bat_swell      = 1.0;   // free space above the battery face
-// The battery shelf is a SOLID pedestal from the floor, but only where the
-// floor is actually free of the speaker (x >= bat_shelf_x0). West of that
-// the speaker's own rim carries the battery. A flat shelf spanning the
-// whole pocket would be a 31 x 21 mm plate hanging 4.3 mm in mid-air — it
-// would need supports or fail outright.
-bat_shelf_x0   = 33.0;  // derived from the seat ring: see docs/mechanism.md
-bat_pad_t      = 1.0;   // EVA-Unterlage; sie hebt den Akku und gehoert
-                        // deshalb in den Stapel, nicht nur in die Stueckliste
-bat_z          = spk_rim_depth + 0.3;            // 4.3 — Oberkante Sockel
-bat_top        = bat_z + bat_pad_t + bat_t;      // Oberkante Akku
-bat_envelope   = bat_top + bat_swell;            // inkl. Schwellreserve
-bat_x0         = 25.1;  // battery SW corner (pocket interior = this - bat_clear;
-bat_y0         = 1.1;   //  the east side of the pocket is the cavity wall itself)
-
-// ---------------------------------------------------------------------
-// Main PCB  [MEASURE]  (27 x 29, USB-C + slide switch on one edge)
-// ---------------------------------------------------------------------
-// Read off the listing's own close-up: USB-C and the ON-OFF slider sit on
-// the SAME edge, with three 1.25 mm JST blocks on the others (speaker left,
-// one right, battery B-/B+ top right). Positions along that edge are scaled
-// off the photo and still want a caliper.  [MEASURE]
-pcb_w          = 29.0;  // along x
-pcb_h          = 27.0;  // along y — the east edge, carrying USB-C and the
-                        // slider. Which of the two board edges is 27 and
-                        // which is 29 is not readable from the photo.  [MEASURE]
-pcb_t          = 1.2;
-pcb_standoff   = 0.8;   // keeps solder side off the floor
-pcb_z          = pcb_standoff;          // pcb underside
-pcb_top        = pcb_z + pcb_t;         // 2.0
-pcb_comp_h     = 3.3;   // tallest component on top  [MEASURE]
-pcb_clear      = 0.3;   // pocket clearance per side
-pcb_x0         = cavity_w - 1.5 - pcb_w;   // 1,5 statt 0,6: damit die
-pcb_y0         = cavity_h - 1.5 - pcb_h;   // Platinenecke innerhalb der
-                        // Kavitaetsrundung bleibt und gar keine Eckfase braucht   // 26.8 — east edge near wall
-
-// USB-C opening in the east wall  [MEASURE positions!]
-// Die Platine wird um 180 Grad gedreht eingebaut. Herum sitzt der Schalter
-// 2,4 mm vom Nordende und damit in der Eckrundung — dort kann kein
-// brauchbarer Durchbruch liegen, ohne die Aussenhaut aufzuschneiden
-// (check_wall_solid). Gedreht liegen beide Durchbrueche in der geraden
-// Wand. Die Lage entlang der Kante stammt aus dem Produktfoto.  [MEASURE]
-usb_y_c        = pcb_y0 + (pcb_h - 11.0);   // 43.9
-usb_z_c        = pcb_top + 1.7; // port center height (3.2 mm tall connector)
-usb_cut_w      = 10.2;  // opening width (connector 8.9 + clearance)
-usb_cut_h      = 4.6;   // opening height
-usb_funnel_w   = 13.5;  // outside recess for the plug body
-usb_funnel_h   = 8.0;
-usb_funnel_d   = 1.2;   // recess depth into the wall
-
-// Power slide switch through the east wall  [MEASURE positions!]
-psw_y_c        = pcb_y0 + (pcb_h - 24.6);   // 30.3
-psw_z_c        = pcb_top + 1.4;
-psw_cut_w      = 9.0;   // Schlitzbreite (Nagelzugang, vertieft)
-psw_recess_off = 0;     // keine Verschiebung noetig, seit die Platine gedreht ist
-psw_cut_h      = 4.2;
-psw_recess_d   = 1.2;   // outside recess so it can't be toggled by bumping
-
-// ---------------------------------------------------------------------
-// Button breakout (green PCB, 12x12 tactile)  [MEASURE]
-// ---------------------------------------------------------------------
-bo_l           = 22.0;  // along y (connector end points +y, toward the PCB)
-bo_w           = 16.0;  // along x
-bo_t           = 1.2;
-sw_size        = 12.0;  // tactile body
-sw_h           = 4.3;   // tactile height above breakout incl. cap  [MEASURE]
-sw_travel      = 0.25;  // datasheet-typical tactile pretravel
-sw_off_y       = -3.0;  // switch center offset from breakout center (toward -y,
-                        // away from the connector)  [MEASURE]
-sw_y_shift     = 2.6;   // switch sits this far NORTH of the cavity center so the
-                        // Breakout-Tasche am Akku vorbeikommt. Weiter zur Mitte
-                        // geht nicht: die Platine liegt 1,3 mm tiefer als die
-                        // Tasteroberkante und darf den Akku nicht ueberlappen.
-                        // Der assert unten rechnet die Grenze nach.
-
-// ---------------------------------------------------------------------
-// Bridge (carries the breakout so the switch sits at cavity center)
-// ---------------------------------------------------------------------
-bridge_t       = 1.6;
-bridge_w       = 17.0;  // strip width along y
-bridge_z       = 6.0;   // underside; clears speaker magnet (5.5) and PCB comps (5.3)
-bridge_top     = bridge_z + bridge_t;   // 7.6
-bridge_rib_h   = 2.2;   // stiffening ribs on both long edges (downward)
-bo_z           = bridge_top;            // breakout sits on the bridge
-sw_top         = bo_z + bo_t + sw_h;    // 13.1 — switch cap front face
-pocket_wall    = 1.6;   // walls of the breakout pocket
-// THE TRAVEL STOP THAT MATTERS. The perimeter ribs sit at travel_stop = 1.8,
-// but the tactile switch goes solid after act_gap + sw_travel = 0.55 mm —
-// so on a centre press the plate would drive 1.25 mm PAST a bottomed-out
-// switch and put a child's whole hand force through a 12 x 12 cap, the
-// breakout and a 1.6 mm bridge. The breakout pocket walls are therefore
-// raised to catch the plate right beside the switch. The perimeter ribs
-// stay as the anti-cocking backstop.
-center_stop_over = 0.4;   // Ueberhub des Tasters, bis die Platte aufsitzt.
-                          // 0,15 war zu wenig: bei Druck auf eine Kanten-
-                          // mitte kippt die Platte, der weit entfernte
-                          // Taschenrand setzt zuerst auf und am Taster kamen
-                          // nur 0,48 statt 0,55 mm an. Endgueltig erst mit
-                          // dem echten Taster festzulegen.  [MEASURE]
-// Bridge supports: west leg to the floor, east tab onto a wall ledge
-bridge_leg_x   = 3.0;   // west leg west face (near west wall)
-bridge_ledge_d = 3.0;   // east wall ledge protrusion
-bridge_screw_d = 1.7;   // M2 self-tap pilot
-
-// ---------------------------------------------------------------------
-// Front plate / button mechanism
-// ---------------------------------------------------------------------
-act_gap        = 0.3;   // rest gap between plate underside and switch cap
-travel_stop    = 1.4;   // perimeter hard-stop travel (tilting corner press
-                        //  then yields >= travel_stop/2 at the central switch)
-plate_under_z  = sw_top + act_gap;      // 13.4 — plate underside at rest
-plate_t        = 2.0;   // plate slab
-plate_clear    = 0.8;   // slab to cavity wall, per side (NOT a guide surface;
-                        // the bezel collar is the only sliding guide)
-plate_w        = cavity_w - 2*plate_clear;  // 54.8
-plate_corner_cut = 13.5; // 45° corner chamfer clearing the bezel posts
-stop_z         = plate_under_z - travel_stop;  // 11.6 — mid-wall rib stop height
-
-// Card frame on the plate front (moves with the plate)
-// The recess is ~1.7 mm taller than the card, with a narrow lip top and bottom.
-// Slide the card up under the top lip, let go — it drops onto the bottom lip
-// and stays there. Nothing bends, nothing latches, no tape, no tool.
+// Koordinaten: Ursprung in der SW-Ecke der KAVITAET, z = 0 an der
+// Rueckaussenflaeche des Deckels, +z zur Kinderseite.
 //
-// Why it has to be this and not a side slot: the frame is a moving part
-// inside the bezel opening with 0.3 mm of air around it, so no card can
-// reach it from an edge (115 mm3 of housing wall and collar in the way, see
-// check_card_insert_assembled). Front loading is the only access, and a
-// front-loaded card can only be held by something it first has to pass —
-// hence the spare height that lets it duck under one lip at a time.
-card_w         = 40.0;  // laminated card, square
-card_t         = 0.6;   // laminate thickness (parameterised)
-card_clear     = 0.4;   // recess clearance per side. Not cosmetic: it sets
-                        // the WIDTH tolerance of the card, and the same
-                        // scissors cut both edges, so it has to be in the
-                        // same league as the height window below.
-card_corner_r  = 0.5;   // recess corner radius. Must stay small: a square
-                        // card corner reaches sqrt(2)*r into a rounded one.
-                        // Caught by check_card_seated.
-lip_bottom     = 0.8;   // bottom lip; must exceed the card's lift in the
-                        // recess (card_ch_h - card_t) by a clear margin
-lip_top        = 3.0;   // top pocket. This is what makes the holder tolerant
-                        // of the card's cut size: the usable range of card
-                        // heights is lip_top - lip_bottom - 0.75 mm wide, so
-                        // 1.8 mm here would demand a card cut to +/-0.12 mm.
-                        // 3.0 gives +/-0.7 mm, which scissors can hit.
-lip_relief     = 0.4;   // the recess floor steps down under the top lip, so
-                        // the 3 mm overhang may sag that far without ever
-                        // pinching the card
-rail_wall      = 2.2;   // rim thickness around the recess
-card_ch_h      = card_t + 0.3;           // 0.9 — recess depth
-bed_rise       = 0.6;   // the card bed sits this far above the plate face
-rail_lip_t     = 1.1;   // lip thickness, flush with the rim top
-rail_h         = bed_rise + card_ch_h + rail_lip_t;  // 2.6 — rim rise; this
-                        // is also what slides in the bezel collar
-plate_front_z  = plate_under_z + plate_t;        // 15.4 — plate front face
-card_bed_z     = plate_front_z + bed_rise;       // 16.0 — card rests here
-rail_top_z     = plate_front_z + rail_h;         // 18.0
-// Recess and guided block (the block slides in the bezel collar)
-// Recess height is derived so the nominal card lands in the MIDDLE of the
-// usable range, and the range itself is echoed at render time.
-card_spare_min = lip_bottom + 0.15;         // less than this and the card's
-                                            // bottom edge will not clear
-card_spare_max = lip_top - 0.6;             // more than this and the top lip
-                                            // no longer holds it
-card_ch_w      = card_w + 2*card_clear;                        // 40.8
-card_ch_l      = card_w + (card_spare_min + card_spare_max)/2; // 41.68
+// DREI KLASSEN VON WERTEN, bewusst getrennt:
+//   [GEMESSEN]  belegt (Listing, Datenblatt, Messschieber)
+//   [ANNAHME]   geschaetzt, Hardware liegt nicht vor — vor dem Druck pruefen
+//   abgeleitet  aus den beiden obigen gerechnet; nie von Hand eintragen
+//
+// ACHTUNG: Alles, was main.scad, parts.scad oder assembly.scad braucht,
+// MUSS hier stehen. `use <...>` importiert Module, aber KEINE Variablen.
+// Ein Modul, das eine fremde Variable liest, bekommt undef und rendert
+// lautlos nichts — der Check meldet dann "leer" und gilt als bestanden.
+// check_scope.py sucht genau danach, auch in lib.scad.
+
+$fn = 32;
+
+// ---------------------------------------------------------------------
+// Fertigung
+// ---------------------------------------------------------------------
+min_wall       = 0.8;   // kein tragender Steg duenner (2 Bahnen)
+load_wall      = 1.6;   // im Lastpfad: mindestens 4 Bahnen
+
+// ---------------------------------------------------------------------
+// HARDWARE
+// ---------------------------------------------------------------------
+// Soundmodul diymore B0HC2YW72V, 16-MB-Variante.
+pcb_w          = 29.0;  // [GEMESSEN] Listing: "size of only 27 x 29 mm"
+pcb_h          = 27.0;  // [GEMESSEN] dito
+pcb_t          = 1.2;   // [ANNAHME]
+pcb_comp_h     = 3.3;   // [ANNAHME] hoechstes Bauteil auf der Oberseite
+pcb_standoff   = 0.8;   // gedruckte Auflage, haelt die Loetseite frei
+pcb_clear      = 0.3;   // Taschenspiel je Seite
+
+// Akku: Listing nennt 3,7 V / 200 mAh. Das ist der Standardtyp 402030,
+// also 4,0 x 20 x 30 mm. Dicke und Wickelzugabe bleiben zu messen.
+bat_l          = 30.0;  // [GEMESSEN] aus der Typbezeichnung
+bat_w          = 20.0;  // [GEMESSEN] dito
+bat_t          = 4.3;   // [ANNAHME] 4,0 nominal + Wickel
+bat_clear      = 0.3;
+bat_pad_t      = 1.0;   // [ANNAHME] weiche Unterlage unter der Zelle
+bat_swell      = 1.0;   // Freiraum ueber der Zelle gegen Aufblaehen
+
+// Lautsprecher: Groesse steht NICHT im Listing. Das Modul wird fuer
+// Grusskarten verkauft, der beiliegende Lautsprecher ist deshalb ein
+// flacher Mylar-Typ. 23 x 4 mm ist die gaengige Groesse dafuer.
+// DIESER WERT BESTIMMT DIE GERAETEGROESSE — siehe REVIEW_HANDOFF.md.
+spk_d          = 23.0;  // [ANNAHME]
+spk_depth      = 4.0;   // [ANNAHME]
+spk_clear      = 0.4;
+spk_seat_h     = 2.0;   // Haltering, fasst den Rand seitlich
+spk_seat_wall  = 1.5;   // Wandstaerke des Halterings
+grille_hole_d  = 2.2;   // Schallaustritt im Deckel
+grille_ring_n  = 2;     // Lochkreise
+
+// Tasterplatine (gruene Platine am Kabel, 12x12-Taster)
+bo_w           = 16.0;  // [ANNAHME] quer
+bo_l           = 22.0;  // [ANNAHME] laengs
+bo_t           = 1.2;   // [ANNAHME]
+sw_size        = 12.0;  // [ANNAHME] Tasterkoerper
+sw_h           = 4.3;   // [ANNAHME] Oberkante Stempel ueber der Platine
+sw_travel      = 0.25;  // [ANNAHME] Schaltvorlauf bis zum Klick.
+                        // NICHT der zulaessige Gesamtweg — der ist
+                        // unbekannt und wird hier auch nicht gebraucht,
+                        // weil das Druckstueck nachgiebig ist.
+sw_off_l       = 3.0;   // [ANNAHME] Taster sitzt so weit aus der
+                        // Platinenmitte, weg vom Steckerende
+
+// ---------------------------------------------------------------------
+// GEHAEUSE — Grundmasse
+// ---------------------------------------------------------------------
+// Die Kavitaet ist NICHT frei gewaehlt. Sie ist das Ergebnis einer
+// Packungssuche: Taster exakt mittig, Hauptplatine/Akku/Lautsprecher
+// flach auf dem Boden, dazu ein umlaufender Randstreifen fuer den
+// Anschlagring. Kleiner geht nur, wenn der Anschlag in vier einzelne
+// Pfosten zerfaellt (dann 60 mm) — das waere unsymmetrisch und
+// verkantungsanfaellig. Siehe docs/adr-002-architektur.md.
+cavity         = 67.0;  // abgeleitet aus der Packung, quadratisch
+wall           = 4.5;   // Seitenwand; traegt auch die Eckverschraubung
+lid_t          = 3.0;   // Rueckdeckel
+corner_r       = 8.0;   // Aussenradius
+housing        = cavity + 2*wall;        // 76.0
+corner_ri      = corner_r - wall;        // 3.5 — Innenradius der Kavitaet
+cx             = cavity/2;               // 33.5 — Kavitaetsmitte
+cy             = cavity/2;
+bay_z          = lid_t;                  // 3.0 — Boden des Elektronikraums
+
+// ---------------------------------------------------------------------
+// BAUTEILLAGE (Kavitaetskoordinaten, Ergebnis der Packungssuche)
+// ---------------------------------------------------------------------
+stop_band      = 4.6;   // Breite des Anschlagrings; Bauteile bleiben draussen
+pcb_x0         = 4.9;   // Hauptplatine SW, Portkante nach SUEDEN
+pcb_y0         = 4.9;
+bat_x0         = 41.9;  // Akku SO, 20 mm in x, 30 mm in y
+bat_y0         = 4.9;
+spk_cx         = 17.1;  // Lautsprecher NW
+spk_cy         = 45.8;
+seat_ro        = spk_d/2 + spk_clear + spk_seat_wall;  // 13.4 — Haltering aussen
+bo_x0          = cx - bo_w/2;            // 25.5
+bo_y0          = cy - bo_l/2 - sw_off_l; // 25.5 — so liegt der Taster mittig
+ped_x0         = 30.9;  // Aufnahme der Tasterplatine, auf freiem Boden
+ped_x1         = 41.0;
+ped_y0         = 32.2;
+ped_y1         = 42.2;
+
+// ---------------------------------------------------------------------
+// HOEHENSTAPEL (alles abgeleitet)
+// ---------------------------------------------------------------------
+spk_top        = bay_z + spk_depth;                 // 7.0
+pcb_z          = bay_z + pcb_standoff;              // 3.8
+pcb_top        = pcb_z + pcb_t;                     // 5.0
+pcb_comp_top   = pcb_top + pcb_comp_h;              // 8.3
+bat_z          = bay_z + bat_pad_t;                 // 4.0
+bat_top        = bat_z + bat_t;                     // 8.3
+bat_env        = bat_top + bat_swell;               // 9.3
+ped_top        = pcb_comp_top + 0.3;                // 8.6 — die Tasterplatine
+                        // liegt ueber der Hauptplatine; die Aufnahme selbst
+                        // steht auf freiem Boden, nicht auf Elektronik
+bo_z           = ped_top;                           // 8.6
+bo_top         = bo_z + bo_t;                       // 9.8
+sw_top         = bo_top + sw_h;                     // 14.1 — Stempeloberkante
+
+// ---------------------------------------------------------------------
+// DRUCKSTUECK, SPIEL UND ANSCHLAG
+// ---------------------------------------------------------------------
+// Das Druckstueck ist NACHGIEBIG. Das ist die tragende Entscheidung des
+// Entwurfs: ein starres Druckstueck zwingt dazu, den Tasterweg mit einem
+// zweiten, mittigen Anschlag zu begrenzen — und der blockiert rechnerisch
+// genau den Eckendruck, den er zulassen muesste (Kippverhaeltnis 1:2).
+// Mit einem nachgiebigen Pad genuegt EIN umlaufender Anschlag am Rand:
+// er faengt die Handkraft ab, und der Ueberhub danach geht ins Pad,
+// nicht in Taster, Platine oder Akku.
+pad_t          = 4.0;   // [ANNAHME] Moosgummi/EVA, auf die Tastenrueckseite geklebt
+pad_seat_d     = 0.4;   // flache Tasche, in der das Pad beim Kleben sitzt
+pad_w          = 8.0;   // geklebt, mittig ueber dem Taster
+pad_click      = 0.20;  // [ANNAHME] Stauchung, bis die Schaltkraft steht
+act_gap        = 0.30;  // Luft zwischen Pad und Stempel in Ruhe
+travel_stop    = 2.0;   // Weg bis zum umlaufenden Anschlag.
+// WARUM 2,0 UND NICHT WENIGER: Anschlagring und Haltekonus liegen beide
+// am Flanschrand, also im selben Radius. Kippt die Taste, ist der
+// Drehpunkt der gegenueberliegende Konuskontakt und der Anschlag der
+// nahe — der Taster in der Mitte liegt genau dazwischen und bekommt
+// deshalb IMMER die HAELFTE des Anschlagwegs ab, egal wo man drueckt.
+// Gebraucht werden act_gap + pad_click + sw_travel = 0,75 mm.
+
+// Das Pad sitzt 0,4 mm versenkt — das gehoert in den Stapel, sonst waere
+// die Luft ueber dem Taster um genau diesen Betrag groesser als gerechnet.
+plate_under_z  = sw_top + pad_t - pad_seat_d + act_gap;   // 18.00
+stop_z         = plate_under_z - travel_stop;  // 16.0 — Oberkante Ring
+sw_need        = act_gap + pad_click + sw_travel;   // 0.75 — fuer den Klick
+sw_have_tilt   = travel_stop/2;                     // 1.00 — bei jedem Kippen
+sw_have_flat   = travel_stop - act_gap;             // 1.70 — bei geradem Druck
+
+// ---------------------------------------------------------------------
+// TASTE
+// ---------------------------------------------------------------------
+plate_clear    = 0.30;  // Taste zur Kavitaetswand, je Seite
+plate_t        = 2.4;   // Grundplatte
+retain         = 1.8;   // radiale Ueberdeckung des Haltekonus
+seat_clear     = 0.40;  // Luft zwischen Tastenprisma und Fensterkante
+flange_w       = cavity - 2*plate_clear;       // 66.4
+window_w       = flange_w - 2*retain;          // 62.8
+prism_w        = window_w - 2*seat_clear;      // 62.0 — sichtbare Druckflaeche
+cone_run       = (flange_w - prism_w)/2;       // 2.2 — 45 Grad, druckbar
+// Konzentrisch zur Kavitaetsrundung und um das Spiel KLEINER — so wie
+// beim Anschlagring daneben. Mit + statt - waere die Ecke der Taste
+// zurueckgesetzt und der Haltekonus laege nur an den vier Geraden an.
+flange_r       = corner_ri - plate_clear;      // 3.2
+protrude       = 1.5;   // so weit steht die Taste aus dem Fenster
+
+cone_z0        = plate_under_z;                      // 17.25
+cone_z1        = cone_z0 + cone_run;                 // 19.45
+card_bed_z     = plate_under_z + plate_t;            // 19.65
+plate_front_z  = plate_under_z + plate_t + 0.9 + 1.1;// 21.65 — Tastenvorderseite
+house_front_z  = plate_front_z - protrude;           // 20.15
+win_z1         = house_front_z;
+// Der Konus des Gehaeuses ist dieselbe 45-Grad-Flaeche, 0,3 mm tiefer:
+// bei der Flanschbreite 66,4 liegt er genau auf der Tastenrueckseite.
+house_cone_z0  = plate_under_z - plate_clear;        // 16.95
+win_z0         = house_cone_z0 + (cavity - window_w)/2;  // 19.05 — Konusende
+
+// ---------------------------------------------------------------------
+// KARTENHALTER (aus Architektur A uebernommen, dort am Druck erprobt)
+// ---------------------------------------------------------------------
+// Die Mulde ist rund 1,7 mm hoeher als die Karte, mit je einer Lippe
+// oben und unten. Karte schraeg unter die obere Lippe schieben,
+// loslassen, sie faellt auf die untere. Kein Klebeband, kein Werkzeug,
+// kein Schnapphaken. Breite der nutzbaren Kartenhoehe:
+// lip_top - lip_bottom - 0.75 — deshalb ist lip_top gross.
+card_w         = 40.0;  // [GEMESSEN] laminierte Karte, quadratisch
+card_t         = 0.6;   // [ANNAHME] Laminatdicke
+card_clear     = 0.4;
+card_corner_r  = 0.5;
+lip_bottom     = 0.8;
+lip_top        = 3.0;
+lip_relief     = 0.6;   // Mulde senkt sich unter der oberen Lippe ab, damit
+                        // der 3-mm-Ueberhang durchhaengen darf ohne zu klemmen
+rail_lip_t     = 1.1;   // Lippendicke = Deckhaut der Taste
+card_ch_h      = card_t + 0.3;                       // 0.9
+card_spare_min = lip_bottom + 0.15;
+card_spare_max = lip_top - 0.6;
+card_ch_w      = card_w + 2*card_clear;              // 40.8
+card_ch_l      = card_w + (card_spare_min + card_spare_max)/2;
 card_h_min     = card_ch_l - card_spare_max;
 card_h_max     = card_ch_l - card_spare_min;
-// Wie weit die obere Lippe die sitzende Karte ueberdeckt. Gebraucht vom
-// Sichtfenster-Check, der beweist, dass die Mulde nach vorn offen ist.
-card_top_engage = card_clear + card_w - card_ch_l + lip_top;
-// ACHTUNG: Alles, was auch main.scad oder assembly.scad braucht, MUSS hier
-// stehen. `use <parts.scad>` importiert Module, aber KEINE Variablen — ein
-// Check mit undef-Koordinaten rendert lautlos nichts und meldet "leer".
-// Genau so hat der Bohrungs-Check eine echte 0,6-mm-Membran uebersehen.
-post_positions = [[3.4, 2.6], [3.4, cavity_h - 2.6], [53.2, 24.7]];
-bridge_scr_w   = [5.8, 32.25];   // 0,55 weiter oestlich: der Kopfsitz liess
-bridge_scr_e   = [47.3, 26.0];   // vorher 0,05 mm Steg stehen, der oestliche
-                                 // 0,6 mm genau im verschraubten Lastpfad
-card_lift_max  = card_ch_l - card_clear - card_w;  // 1.48 — how far a nominal
-                        // card can be pushed up before it hits the recess top
-guide_w        = card_ch_w + 2*rail_wall; // 45.2
-guide_h        = card_ch_l + 2*rail_wall; // 46.08
-// Where the card rests, and where it has to be pushed to get it in or out.
-// (These live here, not in assembly.scad: `use <>` imports modules but not
-//  variables, so a check in main.scad would silently get undef.)
-card_seat_x    = cavity_w/2 - card_w/2;
-card_seat_y    = cavity_h/2 - card_ch_l/2 + card_clear;
+rail_wall      = (prism_w - card_ch_w)/2;            // 10.6 — Rand um die Karte
+card_lift_max  = card_ch_l - card_clear - card_w;
 
 // ---------------------------------------------------------------------
-// Plattenaufhaengung (ersetzt die fruehere Blende)
+// ANSCHLAGRING UND RUECKSTELLUNG (auf dem Deckel)
 // ---------------------------------------------------------------------
-// Die Platte schwimmt auf drei Schrauben. Jede wird auf einen Dom der
-// Schale festgezogen, der durch eine Aussparung der Platte hindurchragt —
-// der Kopf steht also auf dem Dom, nicht auf der Platte, und klemmt sie
-// nicht. Eine Unterlegscheibe unter dem Kopf ueberlappt den Rand der
-// Aussparung und haelt die Platte. Der Schaum drueckt sie von unten
-// dagegen; das ist die Ruhelage.
-//
-// Warum eine Scheibe sein muss: ein M2-Linsenkopf hat 3,8 mm, ein Dom mit
-// tragfaehiger Wand um das 1,7-mm-Kernloch mindestens 4,4 mm. Der Kopf
-// allein ist also immer kleiner als die Aussparung, die er halten soll.
-wall_rib_w     = 6.0;   // Breite der Wandrippen (Umfangsanschlag)
-wall_rib_d     = 1.6;   // wie weit sie in die Kavitaet ragen
-corner_wall_min = 1.5;  // Restwand unter den Eckfreistellungen
-boss_d         = 4.4;   // Dom-Aussendurchmesser
-boss_pilot_d   = 1.7;   // Kernloch M2 selbstschneidend
-plate_hole_d   = boss_d + 0.8;   // 5,2 — Aussparung in der Platte
-washer_d       = 8.0;   // Karosseriescheibe; haelt den Aussparungsrand
-washer_t       = 0.8;
-screw_head_d   = 3.8;   // M2 Linsenkopf  [MEASURE am gekauften Satz]
+rim_h          = stop_z - bay_z;         // 12.85 — Hoehe des Rings
+rim_in         = cavity - 2*stop_band;   // 57.8 — lichte Weite im Ring
+// Rueckstellung: EIN umlaufender Schaumstreifen in einer Nut im Ring,
+// nicht vier Einzelpads. Gleichmaessig, symmetrisch, aus einem Stueck
+// Spuelschwamm zu schneiden, und er dichtet den Spalt gegen Krumen ab.
+foam_t         = 5.0;   // [ANNAHME] Streifen aus weichem Spuelschwamm
+foam_w         = 2.4;   // Nutbreite
+foam_pre       = 0.4;   // Vorspannung in Ruhe
+foam_groove_z  = plate_under_z + foam_pre - foam_t;   // Nutboden
+foam_groove_d  = stop_z - foam_groove_z;              // Nuttiefe
+rim_out        = cavity - 0.3;                        // Aussenmass des Rings
+rim_band       = (rim_out - rim_in)/2;                // 4.45 — Ringbreite
+// Die Nut liegt NICHT mittig in der Ringoberkante. Mittig geteilt
+// blieben links und rechts nur 1,0 mm stehen — und genau diese Stege
+// tragen die Handkraft. Stattdessen ist die Nut eine Stufe an der
+// Ringinnenseite: aussen bleibt eine massive Anschlagflaeche stehen,
+// die bis zum Deckelboden durchgeht.
+stop_face      = rim_band - foam_w;                   // 2.05 — Anschlagflaeche
+foam_out       = rim_out - 2*stop_face;               // 62.60
+foam_in        = rim_in;                              // 57.80 — nach innen offen
+// Auflagespiel NUR fuer die Pruefkoerper: eine Platine, die rechnerisch
+// exakt auf ihrer Auflage liegt, erzeugt deckungsgleiche Flaechen, und
+// CGAL meldet dafuer mal 0 und mal ein paar mm3 Rauschen. 0,05 mm Film
+// macht die Pruefung eindeutig — und blendet zugleich Ueberschneidungen
+// unter 0,05 mm aus. Das ist der bewusst in Kauf genommene blinde Fleck.
+seat_eps       = 0.05;
+
+// ---------------------------------------------------------------------
+// DURCHBRUECHE  [ANNAHME — Lage entlang der Platinenkante ungemessen]
+// ---------------------------------------------------------------------
+// Die Portkante zeigt nach Sueden. WO entlang dieser Kante Buchse und
+// Schalter sitzen, ist nicht belegt; das Produktfoto gibt es nicht
+// zuverlaessig her und eine "Drehung" der Platine waere geometrisch eine
+// Spiegelung. Deshalb: Gehaeuse ZULETZT drucken, nach dem Messen.
+usb_x_c        = pcb_x0 + 11.0;      // [ANNAHME]
+usb_z_c        = pcb_top + 1.7;      // 6.7
+usb_cut_w      = 10.2;
+usb_cut_h      = 4.6;
+usb_funnel_w   = 13.5;
+usb_funnel_h   = 8.0;
+usb_funnel_d   = 1.2;
+psw_x_c        = pcb_x0 + 24.6;      // [ANNAHME]
+psw_z_c        = pcb_top + 1.4;      // 6.4
+psw_cut_w      = 9.0;
+psw_cut_h      = 4.2;
+psw_recess_d   = 1.2;
+
+// ---------------------------------------------------------------------
+// VERSCHRAUBUNG
+// ---------------------------------------------------------------------
+// Vier M2x8 von hinten durch den Deckel in die Stirnflaechen der Wand.
+// Keine Schraube durch die bewegliche Taste, keine lose Scheibe.
+screw_pilot_d  = 1.7;   // Kernloch fuer M2-Blechschraube in PLA
+screw_free_d   = 2.4;
+screw_head_d   = 3.8;
 screw_head_h   = 1.4;
-assert(washer_d > plate_hole_d + 1.0,
-       "Scheibe muss den Rand der Plattenaussparung sicher ueberlappen");
-// Die Waende enden buendig mit dem Kartenrahmen. Die Platte faellt also in
-// einen Topf; Schraubenkoepfe und Scheiben liegen darin versenkt und sind
-// mit Kinderfingern nicht zu erreichen.
-wall_top_z     = rail_top_z;                     // 18.0
-housing_d      = wall_back + wall_top_z;         // 20.0
-boss_top_z     = plate_front_z;                  // 15.4 — Scheibe liegt hier
-                        // auf; die Platte haengt mit ihrer Vorderseite daran
+screw_len      = 8.0;   // Gewindelaenge unter dem Kopf (M2x8)
+// Was wirklich in der Wand steckt: die Schraubenlaenge minus dem, was
+// im Deckel bleibt. 5,0 mm Kernloch waren zu kurz — die letzten 1,4 mm
+// haetten sich in massives PLA geschnitten statt zu klemmen.
+screw_in_wall  = screw_len - (lid_t - screw_head_h);  // 6.4
+screw_depth    = screw_in_wall + 1.0;                 // 7.4 Kernlochtiefe
+screw_cb_d     = screw_head_d + 0.4;
+screw_cb_h     = screw_head_h + 0.2;
+// Aussen- und Innenrundung haben denselben Mittelpunkt (corner_ri,
+// corner_ri). Das Eckmaterial ist also ein Kreisring; die Schraube sitzt
+// auf dessen Mittellinie, auf der Diagonale nach aussen.
+scr_r          = (corner_ri + corner_r)/2;   // 5.75
+scr_off        = corner_ri - scr_r/sqrt(2);  // -0.566, liegt in der Wand
+screw_pos      = [[scr_off, scr_off], [cavity - scr_off, scr_off],
+                  [scr_off, cavity - scr_off], [cavity - scr_off, cavity - scr_off]];
+
+// Oese
+loop_w         = 9.0;
+loop_t         = 4.0;
+loop_hole_d    = 4.0;
+loop_out       = 7.0;
+
+// Abstand eines Punktes von einem achsparallelen Rechteck.
+function rect_dist(px, py, x0, y0, x1, y1) =
+    sqrt(pow(max(x0 - px, 0, px - x1), 2) + pow(max(y0 - py, 0, py - y1), 2));
 
 // ---------------------------------------------------------------------
-// Hanging loop (integral with the rear shell, top wall)
+// NACHWEISE
 // ---------------------------------------------------------------------
-loop_od        = 15.0;
-loop_id        = 5.5;   // takes a standard split ring
-loop_t         = 5.0;   // thickness along z
-loop_rise      = 5.0;   // ring center above the outer top wall
+// Jede dieser Zeilen hat schon einmal einen Fehler gefunden. Sie ersetzen
+// keine Messung an der Hardware und keinen Festigkeitsnachweis.
 
-center_stop_z  = plate_under_z - (act_gap + sw_travel + center_stop_over);
-// Kippbetrachtung fuer Druck auf eine Kantenmitte. Die Platte dreht um die
-// gegenueberliegende Plattenkante; der vom Drehpunkt am weitesten entfernte
-// Anschlag begrenzt. Begrenzende Anschlaege sind die Waende der
-// Breakout-Tasche — deshalb enden deren Nord-Enden bewusst frueh (po_n).
-bo_slot_h      = 0;     // kein Einschubschlitz mehr: die Platine wird von
-                        // oben eingelegt, es spannt nichts mehr darueber
-function tilt_travel(d_press, d_stop, d_sw) =
-    d_stop > 0 ? (plate_under_z - center_stop_z) / d_stop * d_sw : 0;
-sw_y           = cavity_h/2 + sw_y_shift;
-plate_s        = cavity_h/2 - plate_w/2;
-plate_n        = cavity_h/2 + plate_w/2;
-po_n           = sw_y + 8.4;       // Nordende der Taschenwaende
-po_s           = sw_y - sw_off_y - bo_l/2 - pocket_wall;
-travel_press_n = tilt_travel(plate_n - plate_s, po_n - plate_s, sw_y - plate_s);
-travel_press_s = tilt_travel(plate_n - plate_s, plate_n - po_s, plate_n - sw_y);
-travel_press_e = tilt_travel(plate_w, plate_w/2 + (bo_w/2 + pocket_wall), plate_w/2);
-assert(min(travel_press_n, travel_press_s, travel_press_e)
-         > act_gap + sw_travel + 0.1,
-       "Druck auf eine Kantenmitte muss den Taster noch erreichen");
+// 1. Betaetigung in allen Richtungen
+assert(sw_have_tilt > sw_need + 0.15,
+       str("Eckendruck loest nicht aus: ", sw_have_tilt, " statt ", sw_need));
+assert(sw_have_flat > sw_need,
+       "gerader Druck loest nicht aus");
+assert(pad_t > sw_have_flat - act_gap - sw_travel + 1.0,
+       "Pad zu duenn: der Ueberhub bei geradem Druck staucht es zu stark");
 
-// ---------------------------------------------------------------------
-// Foam return pads (not printed)
-// MATERIAL MATTERS MORE THAN SIZE HERE. Two 10 x 10 pads are 200 mm^2; at
-// 33 % compression that gives roughly:
-//    soft open-cell PU upholstery foam (25-35 kg/m3)  ~5 kPa ->  1 N
-//    soft EPDM weather-strip foam                    ~20 kPa ->  4 N
-//    closed-cell EVA / Moosgummi                    ~100 kPa -> 20 N
-// The tactile switch itself needs 1.6-2.6 N, and the pads only have to
-// return a 9 g plate. So: SOFT OPEN-CELL PU. EVA would make the button
-// unusable for a three-year-old. Smaller pads if it still feels stiff.
-// ---------------------------------------------------------------------
-// The pads only have to return a 9 g plate, so softer is better and almost
-// anything open-celled around the house beats bought neoprene:
-//   dish sponge (soft side), headphone ear pad, electronics packing foam
-// all land near 1 N for two 10x10 pads. Closed-cell craft foam (Moosgummi)
-// is ~20 N and would make the button unusable for a child; memory foam
-// recovers too slowly and the button would feel dead.
-// Thickness is hand-cut, so the preload window below is deliberately wide.
-foam_w         = 8.0;   // kleiner als frueher: zwischen Bruecken-
-                        // schraube, Rippen und Tasche ist nicht mehr Platz,
-                        // und weniger Flaeche heisst weniger Gegenkraft
-foam_t         = 6.0;   // on the bridge top, beside the breakout pocket:
-                        // space at rest = plate_under_z - bridge_top = 5.8
-                        // -> 0.2 preload; at full stop = 4.0 -> 33% compression
+// 2. Die Taste laeuft frei und wird gehalten
+assert(stop_z > bat_env + 0.4, "Anschlagring tiefer als der Akku samt Schwellreserve");
+assert(stop_z > bo_top + 0.4,  "Anschlagring tiefer als die Tasterplatine");
+assert(stop_z > pcb_comp_top + 0.4, "Anschlagring tiefer als die Hauptplatine");
+assert(stop_z > spk_top + 0.4, "Anschlagring tiefer als der Lautsprecher");
+assert(stop_z > bay_z + 6.0,   "Anschlagring zu niedrig, um den Ring zu drucken");
+assert(window_w < flange_w - 2.0, "Haltekonus greift zu wenig");
+assert(flange_w < cavity - 0.4, "Taste passt nicht in die Kavitaet");
+assert(prism_w < window_w, "Tastenprisma klemmt im Fenster");
+assert(cone_run > 1.5, "Konus zu kurz, um sicher zu halten");
 
-// ---------------------------------------------------------------------
-// Derived sanity checks
-// ---------------------------------------------------------------------
-assert(bridge_z >= spk_depth + 0.4, "bridge must clear the speaker magnet");
-assert(bridge_z >= pcb_top + pcb_comp_h + 0.4, "bridge must clear PCB components");
-assert(bat_envelope < stop_z - 0.5,
-       "Akku samt Unterlage und Schwellreserve muss unter den Anschlaegen bleiben");
-assert(stop_z < center_stop_z,
-       "der Umfangsanschlag darf nicht vor dem Mittenanschlag greifen");
-// (Die fruehere Hebelformel stand hier. Sie legte Drehpunkt UND Druckpunkt
-//  an die Kavitaetswaende, prueste damit die ungefaehrdete Richtung und
-//  hielt nur mit 0,01 mm. Ersetzt durch die Kipprechnung weiter oben.)
-// Two-sided: too thin and there is no return at all, too thick and the pads
-// fight the switch. (The old one-sided form let foam_t = 5.0 pass with
-// 0.8 mm of AIR under the plate and still called it "sane".)
-// Printed seats lift the pads so that off-the-shelf 6 mm tape lands in the
-// right preload window instead of needing an odd thickness.
-foam_seat_h    = 0.5;
-foam_seats     = [[8.5, 26.0], [38.5, 29.0]];   // SW-Ecken, je foam_w+1
-                        // Beide liegen zwischen den Rippen und frei von den
-                        // Schraubenkopfsitzen — per check_bridge_seats belegt.
-foam_preload   = foam_t - (plate_under_z - (bridge_top + foam_seat_h));
-// Wide on purpose: hand-cut foam is +/-0.5 mm at best, and with SOFT foam
-// even 2.5 mm of preload is well under 1 N. With stiff foam the upper end
-// would be far too much — which is why the material note above matters
-// more than the number.
-assert(foam_preload >= 0.4 && foam_preload <= 2.5,
-       "foam preload must be between 0.4 and 2.5 mm");
-assert(rail_h - travel_stop >= 0.7,
-       "the block must stay in the bezel collar over the whole travel");
-assert(center_stop_z > bridge_top + bo_t + 0.5,
-       "centre stop must clear the breakout it stands around");
-assert(stop_z > bridge_top + bo_t + 2.0, "stops must sit above the breakout plane");
-
-assert(card_ch_h > card_t + 0.2, "card needs room in the recess");
-assert(lip_bottom > (card_ch_h - card_t) + 0.4,
-       "bottom lip must out-reach the card's lift inside the recess");
+// 3. Karte
 assert(card_h_max - card_h_min > 1.0,
-       "usable card-height range is too narrow to cut by hand");
-// Die Karte wird von vorn eingelegt. Seit die Blende entfaellt, ist der
-// Zugang die offene Wanne der Schale — die Waende enden buendig mit dem
-// Kartenrahmen, nichts greift mehr ueber die Karte.
-assert(wall_top_z >= rail_top_z - 0.01,
-       "die Waende duerfen nicht unter dem Kartenrahmen enden");
+       str("Kartenhoehe zu eng toleriert: ", card_h_max - card_h_min));
+assert(lip_bottom > card_ch_h - card_t + 0.1, "untere Lippe haelt die Karte nicht");
+assert(rail_wall > 3.0, "Rand um die Kartenmulde zu schmal");
+assert(card_ch_w + 2*rail_wall <= prism_w + 0.001, "Kartenmulde passt nicht aufs Prisma");
 
-assert(corner_wall_min >= 1.2,
-       "Eckfase darf nicht mehr als corner_r - 1.2 Restwand wegnehmen");
-assert(foot_h == 0,
-       "gedruckte Fuesse lassen die Rueckwand in der Luft beginnen");
+// 4. Wandstaerken und Verschraubung
+assert(wall >= screw_pilot_d + 2*1.2, "Wand zu duenn fuer das Kernloch");
+assert(scr_r - screw_pilot_d/2 >= corner_ri + 1.2,
+       "Kernloch zu nah an der Kavitaet");
+assert(scr_r + screw_pilot_d/2 <= corner_r - 1.2,
+       "Kernloch zu nah an der Aussenhaut");
+assert(screw_depth > screw_in_wall + 0.5,
+       "Kernloch flacher als das einlaufende Gewinde");
+assert(bay_z + screw_depth < house_front_z - 2.0,
+       "Kernloch durchbricht die Vorderseite");
+assert(lid_t >= screw_cb_h + 1.2, "Deckel zu duenn fuer die Senkung");
+assert(stop_band >= 3.0, "Anschlagring zu schmal");
+assert(corner_ri >= 2.0, "Innenradius zu klein");
+assert(rim_in > prism_w - 2*stop_band + 0.1, "Ring trifft die Taste nicht");
+assert(foam_groove_d > 1.5 && foam_groove_d < rim_h - 3.0,
+       str("Schaumnut unbrauchbar tief: ", foam_groove_d));
+assert(stop_band >= foam_w + 2*min_wall + 0.2, "Nut laesst zu wenig Ringmaterial");
+assert(stop_face >= load_wall,
+       str("Anschlagflaeche zu schmal fuer den Lastpfad: ", stop_face));
+assert(flange_w/2 > rim_out/2 - stop_face + 0.5,
+       "Flansch trifft die Anschlagflaeche nicht sicher");
 
-echo(str("Karte: ", card_w, " mm breit (max ", card_ch_w,
-         "), Hoehe ", card_h_min, " .. ", card_h_max, " mm"));
-echo(str("housing: ", housing_w, " x ", housing_h, " x ", housing_d,
-         " mm external (+", foot_h, " feet, + loop)"));
-echo(str("switch top z=", sw_top, "  plate rest z=", plate_under_z,
-         "  stop z=", stop_z, "  bezel front z=", bezel_front_z));
+// 5. Bauteile bleiben aus dem Randstreifen heraus
+assert(pcb_x0 >= stop_band + 0.2 && pcb_y0 >= stop_band + 0.2, "Hauptplatine im Ring");
+assert(pcb_x0 + pcb_w <= cavity - stop_band - 0.2, "Hauptplatine zu weit oestlich");
+assert(bat_x0 >= stop_band + 0.2, "Akku im Ring");
+assert(bat_x0 + bat_w <= cavity - stop_band - 0.2, "Akku zu weit oestlich");
+assert(bat_y0 + bat_l <= cavity - stop_band - 0.2, "Akku zu weit noerdlich");
+// Der Lautsprecher darf bis an den Ring heran: wo sein Haltering in den
+// Ring laufen wuerde, bildet der Ring selbst die Wand des Sitzes.
+assert(spk_cx - spk_d/2 - spk_clear >= stop_band, "Lautsprecher ragt in den Ring");
+assert(spk_cy + spk_d/2 + spk_clear <= cavity - stop_band, "Lautsprecher ragt in den Ring");
+
+// 6. Die Aufnahme steht auf freiem Boden, nicht auf Elektronik
+assert(ped_y0 >= pcb_y0 + pcb_h, "Aufnahme steht auf der Hauptplatine");
+assert(ped_x1 <= bat_x0 - 0.5, "Aufnahme steht im Akkufach");
+// Echte Rechteck-Kreis-Distanz, nicht nur die vier Ecken: ein Kreis
+// kann eine Kante schneiden, ohne eine Ecke zu enthalten.
+assert(rect_dist(spk_cx, spk_cy, ped_x0, ped_y0, ped_x1, ped_y1)
+       >= seat_ro + 0.1,
+       str("Aufnahme schneidet den Lautsprechersitz, Abstand ",
+           rect_dist(spk_cx, spk_cy, ped_x0, ped_y0, ped_x1, ped_y1)));
+// und der Taster sitzt wirklich darueber
+assert(cx > ped_x0 + 1.0 && cx < ped_x1 - 1.0 &&
+       cy > ped_y0 + 1.0 && cy < ped_y1 - 1.0,
+       "der Taster steht nicht ueber der Aufnahme");
+
+// 7. Durchbrueche liegen in der geraden Wand, nicht in der Eckrundung
+assert(usb_x_c - usb_funnel_w/2 > corner_r + 1.0, "USB-Oeffnung in der Eckrundung");
+assert(psw_x_c + psw_cut_w/2 < cavity - corner_r - 1.0, "Schalter in der Eckrundung");
+assert(usb_z_c + usb_cut_h/2 < stop_z - 1.0, "USB-Oeffnung reicht in den Ring");
+// Der Anschlagring steht 12,85 mm hoch unmittelbar hinter diesen
+// Durchbruechen. Ohne Durchlass versperrt er Buchse und Schalter
+// vollstaendig. Der Durchlass endet unterhalb der Ringoberkante, damit
+// die Anschlagflaeche umlaufend geschlossen bleibt.
+port_tunnel_z  = max(usb_z_c + usb_cut_h/2, psw_z_c + psw_cut_h/2) + 0.5;
+assert(port_tunnel_z < stop_z - 3.0,
+       str("kein Platz fuer den Durchlass im Ring: ", port_tunnel_z));
+assert(grille_ring_n*(grille_hole_d + 2.0) + grille_hole_d/2 < spk_d/2,
+       "Schallloecher liegen ausserhalb der Membran");
+assert(spk_cx - spk_d/2 - spk_clear >= stop_band + 0.3, "Lautsprecher zu nah am Ring");
+
+// Der HALTERING ist 1,5 mm breiter als der Lautsprecher. Die Packungs-
+// suche hatte nur die Membran gegen die Bauteile geprueft, nicht den
+// Ring — er schnitt 0,7 mm in die Nordkante der Hauptplatine.
+assert(rect_dist(spk_cx, spk_cy, pcb_x0 - pcb_clear, pcb_y0 - pcb_clear,
+                 pcb_x0 + pcb_w + pcb_clear, pcb_y0 + pcb_h + pcb_clear)
+       >= seat_ro + 0.1,
+       str("Lautsprecher-Haltering schneidet die Hauptplatine, Abstand ",
+           rect_dist(spk_cx, spk_cy, pcb_x0 - pcb_clear, pcb_y0 - pcb_clear,
+                     pcb_x0 + pcb_w + pcb_clear, pcb_y0 + pcb_h + pcb_clear),
+           " gebraucht ", seat_ro));
+assert(rect_dist(spk_cx, spk_cy, bat_x0 - bat_clear, bat_y0 - bat_clear,
+                 bat_x0 + bat_w + bat_clear, bat_y0 + bat_l + bat_clear)
+       >= seat_ro + 0.1, "Lautsprecher-Haltering schneidet das Akkufach");
+
+echo(str("Aussenmass      ", housing, " x ", housing, " x ", plate_front_z, " mm"));
+echo(str("Kavitaet        ", cavity, ", Wand ", wall, ", Deckel ", lid_t));
+echo(str("Tastenweg       ", travel_stop, " mm bis zum Ring"));
+echo(str("Taster braucht  ", sw_need, " mm   bekommt gekippt ", sw_have_tilt,
+         "   gerade ", sw_have_flat));
+echo(str("Karte           ", card_w, " mm nominal, zulaessig ",
+         card_h_min, " bis ", card_h_max));
+echo(str("Fenster         ", window_w, "   Prisma ", prism_w,
+         "   Ueberdeckung ", retain));

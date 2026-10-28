@@ -1,3 +1,9 @@
+> **ABGELÖST am 2026-10-28 durch [ADR 002](adr-002-architektur.md).**
+> Die hier beschriebene Geometrie — Blende, auf Schrauben schwimmende
+> Platte, Brücke über der Elektronik — existiert nicht mehr. Dieses
+> Dokument bleibt als Protokoll stehen, weil die Nachträge festhalten,
+> welcher Fehler wann gefunden wurde. Als Bauanleitung ist es ungültig.
+
 # ADR-001: Architektur des Mini Voice Button
 
 Status: angenommen (2026-10-26). Ein Entwurf, schlicht gehalten; hier die

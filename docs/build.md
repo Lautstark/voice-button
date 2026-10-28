@@ -1,125 +1,70 @@
-# Bauanleitung
+# Stückliste und Montage
 
-## Stückliste (pro Gerät)
+## Stückliste
 
-| Menge | Teil | Anmerkung |
+### Gedruckt
+| Teil | Datei |
+|---|---|
+| Frontgehäuse | `stl/front_housing.stl` |
+| Taste | `stl/button.stl` |
+| Rückdeckel | `stl/rear_lid.stl` |
+
+### Gekauft
+| Teil | Menge | Anmerkung |
+|---|---:|---|
+| Soundmodul diymore, ASIN B0HC2YW72V, 16 MB | 1 | Platine 27 × 29 mm, mit Lautsprecher, Akku und Tasterplatine |
+| M2 × 8 Blechschraube, **Linsen- oder Zylinderkopf** | 4 | kein Senkkopf: der würde sich in die Senkung ziehen und den Deckel spreizen |
+| Moosgummi oder EVA, 4 mm, mittelfest | 1 Stück 8 × 8 mm | Druckstück auf der Tastenrückseite |
+| Spülschwamm, weich, offenzellig | 1 Streifen ca. 2,4 × 5 × 250 mm | Rückstellung, auf die Stufe am Anschlagring |
+| weiche Unterlage unter den Akku | 1 Stück 20 × 30 × 1 mm | Rest vom Schwamm genügt |
+| Sekundenkleber oder Heißkleber | wenig | Tasterplatine, Pad, Lautsprecher |
+| Laminierte Symbolkarte | nach Bedarf | 40 × 40 mm, zulässig 39,3–40,7 mm |
+| Selbstklebende Möbelpuffer, ca. 2 mm | 4, optional | Der Lautsprecher strahlt nach hinten ab. Liegt das Gerät flach auf dem Tisch, dämpft die Tischplatte den Ton. Vier Puffer an den Ecken der Rückseite halten die Schalllöcher frei. In der Hand oder am Band gehalten braucht es sie nicht. |
+
+**Keine Unterlegscheiben.** Keine Schraube durch ein bewegliches Teil.
+
+## Montage
+
+Die Reihenfolge ist nicht beliebig — die Tasterplatine überlappt die
+Hauptplatine und muss deshalb **zuletzt** aufgeklebt werden.
+
+1. **Druckstück ankleben.** Das 8 × 8 × 4 mm Moosgummi in die flache
+   Tasche mittig auf der Rückseite der Taste kleben.
+2. **Taste einlegen.** Frontgehäuse mit der Vorderseite nach unten auf
+   den Tisch. Die Taste von hinten einlegen, bis ihr Flansch auf dem
+   Konus sitzt. Sie steht dann 1,5 mm aus dem Fenster heraus.
+3. **Rückstellstreifen einlegen.** Der Anschlagring hat an seiner
+   Innenseite eine umlaufende Stufe. Den Schwammstreifen dort hineinlegen,
+   Stoß in einer Ecke, und in jeder Ecke mit einem Tropfen Kleber
+   sichern — die Stufe ist nach innen offen, damit die Anschlagfläche
+   außen massiv bleiben kann.
+4. **Lautsprecher einsetzen** (Deckel), in den Haltering, Membran nach
+   unten zu den Schalllöchern. Mit wenig Kleber am Rand sichern.
+5. **Akku einlegen.** Unterlage ins Fach, Zelle darauf.
+6. **Hauptplatine einlegen**, zwischen die vier Winkel, Portkante nach
+   Süden. Sie liegt vollflächig auf.
+7. **Verkabeln:** Lautsprecher und Akku an die Platine, Kabel der
+   Tasterplatine anstecken. Jetzt, solange alles zugänglich ist.
+8. **Tasterplatine aufkleben**, mittig auf den Block neben der
+   Hauptplatine. Der Taster muss über dem Block stehen, nicht über der
+   Überhangseite.
+9. **Deckel aufsetzen** und mit vier M2 × 8 von hinten verschrauben.
+   Handfest; die Schrauben schneiden ihr Gewinde selbst.
+10. **Karte einsetzen:** schräg unter die obere Lippe schieben,
+    loslassen.
+
+## Vor dem ersten Zusammenbau messen
+
+Diese vier Werte sind Annahmen. Weichen sie ab, ändert sich der Entwurf:
+
+| Maß | in `config.scad` | Folge bei Abweichung |
 |---|---|---|
-| 1 | diymore Soundmodul-Set (PCB, LiPo 402030, Lautsprecher, Taster-Breakout, USB-Kabel) | Amazon B0HC2YW72V, 2er-Set |
-| 1 | `rear_shell`, `front_plate`, `bridge` | Druck, ePLA-Matte Lilac |
-| 3 | M2 × 8 **Linsen- oder Zylinderkopf**, selbstschneidend | Platte. **Kein Senkkopf** — der würde sich in die Aussparung ziehen und die Platte festklemmen |
-| 3 | **Unterlegscheibe Ø ≈ 8 mm** (Karosseriescheibe M2/M2,5) | hält die Platte; siehe Kasten unten |
-| 2 | M2 × 6 selbstschneidend | Tasterbrücke |
-| 2 | weicher offenzelliger Schaum 8 × 8 × ~6 mm | Rückstellfedern — siehe Kasten |
-| 1 | dünne Schaumscheibe 20 × 30 × ~1 mm | unter den Akku (geht aus demselben Schwamm) |
-| 1 | doppelseitiges Klebeband | Schaumpads und Akkuscheibe fixieren |
-| 4 | selbstklebende Möbelpuffer (optional) | hinten aufkleben, damit anliegender Stoff das Gitter nicht abdichtet |
-| 1 | laminierte METACOM-Karte 39,3–40,7 mm quadratisch | selbst laminieren |
-| 1 | Schlüsselring oder kleiner Karabiner | Öse Ø 5,5 |
+| Lautsprecher Ø und Tiefe | `spk_d`, `spk_depth` | bestimmt die Gerätegröße; kleiner heißt kleiner |
+| Lage von USB-C und Schalter entlang der Platinenkante | `usb_x_c`, `psw_x_c` | Durchbrüche sitzen falsch — **Gehäuse zuletzt drucken** |
+| Höhe des Tasterstempels über seiner Platine | `sw_h` | verschiebt die Luft über dem Taster |
+| Dicke des Druckstücks | `pad_t` | gleicht die Summe der obigen aus |
 
-> **Warum Unterlegscheiben nötig sind.** Die Platte schwimmt auf drei
-> Schrauben: Jede wird auf einen Dom der Schale festgezogen, der durch eine
-> Aussparung der Platte ragt. Der Kopf steht also auf dem Dom und klemmt die
-> Platte nicht. Damit sie trotzdem gehalten wird, muss etwas den Rand der
-> Aussparung überlappen — und ein M2-Linsenkopf hat nur 3,8 mm, während ein
-> Dom mit tragfähiger Wand um das Kernloch mindestens 4,4 mm braucht. Der
-> Kopf allein ist also immer kleiner als das Loch, das er halten soll. Eine
-> 8-mm-Scheibe löst das für ein paar Cent.
-
-## Stufe A — Messen (Hardware da, Koffer auf)
-
-In `scad/config.scad` nachtragen (alles ist `[MEASURE]` markiert):
-
-1. Lautsprecher: Außen-Ø, Gesamttiefe, Rand-Tiefe, Magnet-Ø (`spk_*`).
-2. PCB: Breite × Höhe, Lage von USB-C und Schiebeschalter entlang der
-   Kante (`usb_y_c`, `psw_y_c`, Höhen), höchstes Bauteil (`pcb_comp_h`).
-3. Breakout: Länge × Breite, Tasterhöhe, Versatz des Tasters zur
-   Steckerseite (`bo_*`, `sw_h`, `sw_off_y`).
-   **Zur Platinenlage:** Sie wird um 180° gedreht eingebaut, damit der
-   Schiebeschalter am Süd- und nicht am Nordende der Ostkante sitzt.
-   Andersherum läge sein Durchbruch in der Eckrundung und würde die
-   Außenwand aufschneiden — `check_wall_solid` meldet das.
-4. Akku nachmessen (`bat_*`) — 402030 angenommen.
-
-Dann `scad/render_all.sh` und `scad/check_fit.sh` laufen lassen; die
-Asserts in `config.scad` melden, wenn der Stapel nicht mehr aufgeht.
-
-## Stufen B–D — Testdrucke
-
-1. **`front_plate`** (~9 g, ca. 45 min) — **kein Testteil, das Echtteil.**
-   Seine Geometrie hängt an keiner der noch offenen `[MEASURE]`-Größen:
-   mit auf Anschlag verstellten Werten für Taster, Lautsprecher, Akku und
-   Breakout kommt dieselbe Bounding Box und dasselbe Volumen heraus. Passt
-   die Karte, bleibt das Teil im fertigen Gerät.
-   Rücken aufs Bett, Rahmen nach oben, keine Stützen.
-
-   Karte oben unter die Lippe schieben, loslassen. Schütteln, kopfüber
-   halten, mit dem Daumen wieder hochschieben und herauskippen.
-   Karte 39,3–40,7 mm in **beiden** Richtungen schneiden.
-   Klemmt oben → `card_ch_h` hoch (die 3-mm-Lippe hängt durch);
-   rutscht zu leicht heraus → `lip_bottom` hoch (`lip_top` mitziehen, sonst
-   schrumpft das Toleranzfenster); Ecken stehen hoch → `card_corner_r` runter.
-
-   Gleich mitdrucken lohnt sich: **`bezel`** (~6 g) ist aus demselben Grund
-   ein Echtteil. Zusammen zeigen die beiden, ob die Platte mit 0,3 mm Spiel
-   im Blendenkragen läuft, ohne zu klemmen — die eine Passung, die sonst
-   erst ganz am Schluss auffällt. Blende mit dem Gesicht aufs Bett.
-
-   `test_card` gibt es weiterhin, falls nur der Kartensitz interessiert;
-   es spart aber nur ~1 g gegenüber der echten Platte.
-
-2. **`test_pcb_coupon` / `test_speaker_coupon`**: Modul, Akku und
-   Lautsprecher probeliegen; USB-Kabel durch die Öffnung stecken,
-   Schalter mit dem Fingernagel schalten.
-3. **`press_rig` + `bridge` + `front_plate` + `bezel`**: Breakout in die
-   Brückentasche (**von Norden** flach einschieben bis zum Südanschlag),
-   Brücke mit 2 × M2×6 verschrauben, Schaumpads auf die markierten Felder
-   kleben,
-   Platte einlegen, Blende mit 3 × M2×10 von hinten anziehen.
-   **Testprotokoll:** je 20 × drücken — Mitte, alle 4 Ecken, alle 4
-   Kantenmitten, mit Fingerspitze und flacher Hand. Jeder Druck muss
-   klicken und auslösen (am angeschlossenen Modul hörbar). Kein Hängen,
-   Platte kommt immer zurück. Wenn Ecken nicht auslösen: weichere Pads,
-   dann `travel_stop` +0,4; wenn zu leichtgängig/klapprig: dickere Pads.
-
-## Stufe E/F — Endmontage
-
-1. Rückschale drucken, Grate an Seat-Ring und Taschen entfernen.
-2. Lautsprecher mit Membran nach **hinten** in den Sitzring (Kabel durch
-   die Aussparung Richtung Nordost).
-3. PCB mit Bauteilen nach **oben** in die Tasche, USB-C zur Ostwand und
-   den **Schiebeschalter nach unten (Süden)** — das ist die gedrehte Lage,
-   für die die Durchbrüche ausgelegt sind. Prüfen: Stecker findet durch die
-   Trichteröffnung in die Buchse, Schalter mit dem Fingernagel erreichbar.
-4. Dünnes EVA-Pad auf Sockel und Lautsprecherrand, Akku darauf. Er liegt
-   westlich auf dem Lautsprecherrand und östlich auf dem massiven Sockel —
-   das Pad gleicht den 0,3-mm-Absatz aus. Kabel durch den Schlitz der
-   Nordwand zum PCB.
-5. Breakout **von Norden** flach in die Brückentasche schieben, bis es am
-   Südanschlag sitzt — von oben einlegen geht nicht, da spannt der
-   Querriegel darüber. Die Anschlusskabel laufen durch denselben Schlitz
-   heraus. Niedergehalten wird die Platine vom Querriegel und vom Balken
-   über dem Schlitz; Klemmschraube und Haltelippen gibt es nicht mehr.
-   Brücke über Lautsprecher/PCB schrauben;
-   Kabel unter der Brücke führen, nichts klemmt, nichts liegt auf dem
-   Magneten auf.
-6. Schaumpads auf die Brücke kleben — **zwischen** die Versteifungsrippen,
-   nicht darauf, sonst sitzen sie 2,2 mm zu hoch. Platte einlegen
-   (Aussparung zur Ostwand), Blende auflegen, 3 × M2×10 von hinten.
-7. Funktionstest (Stufe-D-Protokoll), dann Karte einsetzen — die geht ohne
-   Werkzeug rein und raus.
-
-## Bespielen
-
-Modul einschalten, per USB-C an den Rechner, als Laufwerk öffnen:
-**genau eine** MP3 drauf, `CONFIG.TXT` unangetastet lassen (Modus 0 =
-jeder Druck spielt/unterbricht den einen Titel). Lautstärke über die
-Modustasten des Moduls vor dem Zusammenbau einstellen.
-
-## Stufe G — Abnahme vor der Übergabe
-
-- Zugtest Öse (kräftig am Ring ziehen), Falltest aus Tischhöhe.
-- Keine zugänglichen Öffnungen außer USB/Schalter (beide vertieft).
-- Schalter ist mit Kinderfingern nicht schaltbar, mit Erwachsenennagel ja.
-- Lautstärke am hängenden Gerät gegen Stoff prüfen (die Mulde um das
-  Gitter hält anliegenden Stoff davon ab, es abzudichten).
-- Nach den ersten Tagen Schrauben nachziehen (PLA setzt sich).
+**Die einfachste Korrektur:** Taste einlegen, Tasterplatine lose auf den
+Block legen, den Abstand zwischen Tasterstempel und Tastenrückseite
+messen und das Druckstück so dick wählen, dass es 0,3 mm Luft lässt.
+Dafür ist das Pad da.

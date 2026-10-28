@@ -1,114 +1,106 @@
 // =====================================================================
-// Lautstark Mini Voice Button — assembly views and component mockups
+// Baugruppe: Huellkoerper der nicht gedruckten Teile + Darstellungen
 // =====================================================================
-// The mockups are DIMENSIONAL ENVELOPES of the diymore kit parts, for
-// clearance checking and illustration only.
+// NICHT modelliert, und das ist eine bewusste Luecke:
+//   Steckergehaeuse und Litzen (Durchmesser, Biegeradien, Zugentlastung),
+//   Loetstellen, Klebstoffdicken, Kabelbaum zwischen den Baugruppen.
+// Die Kabelfuehrung ist deshalb NICHT nachgewiesen — siehe REVIEW_HANDOFF.
 
 include <config.scad>
 use <lib.scad>
 use <parts.scad>
 
-// re-derive the two positions assembly needs from parts.scad's layout
-asm_bo_cx = cavity_w/2;
-asm_bo_cy = cavity_h/2 + sw_y_shift - sw_off_y;
+module mock_speaker()
+    translate([spk_cx, spk_cy, bay_z + seat_eps]) cylinder(d = spk_d, h = spk_depth);
 
-module mock_speaker() {
-    color("silver") translate([spk_cx, spk_cy, 0]) union() {
-        cylinder(d = spk_d, h = spk_rim_depth);                 // frame
-        cylinder(d = spk_magnet_d, h = spk_depth);              // magnet (front)
-    }
-}
-
-module mock_battery() {
-    color("lightsteelblue")
-        translate([bat_x0, bat_y0, bat_z + bat_pad_t]) cube([bat_l, bat_w, bat_t]);
-}
+module mock_battery()
+    translate([bat_x0, bat_y0, bat_z + seat_eps]) cube([bat_w, bat_l, bat_t]);
 
 module mock_pcb() {
-    translate([pcb_x0, pcb_y0, pcb_z]) {
-        color([0.45, 0.25, 0.55]) cube([pcb_w, pcb_h, pcb_t]);  // purple board
-        // USB-C body reaching the east edge
-        color("silver") translate([pcb_w - 7, usb_y_c - pcb_y0 - 4.45, pcb_t])
-            cube([7.5, 8.9, 3.2]);
-        // power slide switch
-        color("dimgray") translate([pcb_w - 5.5, psw_y_c - pcb_y0 - 3, pcb_t])
-            cube([6, 6, 2.8]);
-        // a chip
-        color("dimgray") translate([8, 8, pcb_t]) cube([7, 7, 1.2]);
-    }
+    translate([pcb_x0, pcb_y0, pcb_z + seat_eps]) cube([pcb_w, pcb_h, pcb_t]);
+    translate([pcb_x0 + 2, pcb_y0 + 2, pcb_top + seat_eps])
+        cube([pcb_w - 4, pcb_h - 4, pcb_comp_h]);
 }
 
 module mock_breakout() {
-    translate([asm_bo_cx, asm_bo_cy, bridge_top]) {
-        color([0.2, 0.55, 0.3]) translate([-bo_w/2, -bo_l/2, 0]) cube([bo_w, bo_l, bo_t]);
-        color("black") translate([-sw_size/2, sw_off_y - sw_size/2, bo_t])
-            cube([sw_size, sw_size, sw_h]);
+    translate([bo_x0, bo_y0, bo_z + seat_eps]) cube([bo_w, bo_l, bo_t]);
+    translate([cx - sw_size/2, cy - sw_size/2, bo_top + seat_eps]) cube([sw_size, sw_size, sw_h]);
+}
+
+module mock_pad()
+    translate([cx - pad_w/2, cy - pad_w/2, plate_under_z + pad_seat_d - pad_t])
+        cube([pad_w, pad_w, pad_t]);
+
+module mock_foam() {
+    difference() {
+        translate([cx, cy, foam_groove_z])
+            rbox_c(foam_out - 0.2, foam_t, max(0.5, corner_ri - 0.15 - stop_face));
+        translate([cx, cy, foam_groove_z - 1])
+            rbox_c(foam_in + 0.2, foam_t + 2, 0.5);
     }
 }
 
-module mock_foam_pads() {
-    color([0.4, 0.4, 0.4, 0.6]) for (fx = [8, 38.5])
-        translate([fx, 27, bridge_top]) cube([foam_w, foam_w, foam_t]);
-}
+module mock_card(lift = 0)
+    translate([cx - card_w/2, cy - card_ch_l/2 + card_clear + lift, card_bed_z])
+        rbox(card_w, card_w, card_t, 0.5);
 
-module mock_card() {
-    color([0.95, 0.6, 0.15])
-        translate([card_seat_x, card_seat_y, card_bed_z + 0.02])  // +0.02: keeps the
-            // preview from z-fighting with the recess floor it rests on
-            cube([card_w, card_w, card_t]);
-}
-
-// The card pushed up under the top lip, where its bottom edge has cleared
-// the bottom lip and it can be laid in flat or tipped back out.
-module mock_card_lifted() {
-    color([0.95, 0.6, 0.15])
-        translate([card_seat_x, card_seat_y + card_lift_max, card_bed_z + 0.02])
-            cube([card_w, card_w, card_t]);
-}
-
-// Schraubenkoepfe als Huellkoerper. Sie fehlten in allen Kollisions-
-// modellen, deshalb blieb unbemerkt, dass der Klemmschraubenkopf in die
-// Frontplatte ragt.
-// Unterlegscheiben auf den Domen — sie halten die Platte.
-module mock_washers() {
-    color("silver") for (p = post_positions)
-        translate([p[0], p[1], boss_top_z]) cylinder(d = washer_d, h = washer_t);
-}
-module mock_screw_heads() {
-    color("silver") {
-        for (p = post_positions)
-            translate([p[0], p[1], boss_top_z + washer_t])
-                cylinder(d = screw_head_d, h = screw_head_h);
-        // Brueckenschrauben
-        for (p = [bridge_scr_w, bridge_scr_e])
-            translate([p[0], p[1], bridge_z + bridge_t + 1.6 - 0.6])
-                cylinder(d = screw_head_d + 0.6, h = screw_head_h);
+module mock_screws()
+    for (p = screw_pos) translate([p[0], p[1], 0]) {
+        cylinder(d = screw_head_d, h = screw_head_h);
+        translate([0, 0, screw_head_h])
+            cylinder(d = screw_pilot_d + 0.4, h = screw_len);
     }
+
+module mock_electronics() {
+    mock_speaker(); mock_battery(); mock_pcb(); mock_breakout();
 }
 
-// e = explode distance multiplier (0 = assembled)
+// --- Bewegungen der Taste ---------------------------------------------
+module button_pressed(d) translate([0, 0, -d]) button();
+
+// Kippen bis zum Anschlag. Drehpunkt ist der gegenueberliegende
+// Konuskontakt am Flanschrand, in der Hoehe der Tastenrueckseite.
+//
+// Zwei Dinge, die beim ersten Versuch falsch waren:
+//  - der Drehsinn war invertiert; die Taste wurde in den Konus hinein
+//    statt aus ihm heraus gedreht (220 mm3 "Ueberschneidung")
+//  - eine reine Drehung um die Kontaktlinie schiebt den oberen Teil der
+//    Taste um h*tan(ang) zum Drehpunkt hin und damit in den Konus. In
+//    Wirklichkeit rutscht die Taste dabei ein Stueck die 45-Grad-Flaeche
+//    hinunter. Dieses Gleiten gehoert ins Modell, sonst prueft man eine
+//    Bewegung, die das Teil gar nicht ausfuehrt.
+module button_tilt(dx, dy) {
+    n  = sqrt(dx*dx + dy*dy);
+    ux = dx/n; uy = dy/n;
+    span = (abs(dx) > 0 && abs(dy) > 0) ? flange_w*sqrt(2) : flange_w;
+    ang   = atan2(travel_stop, span);
+    slide = (plate_front_z - plate_under_z) * travel_stop/span;
+    px = cx - ux*span/2;
+    py = cy - uy*span/2;
+    translate([ux*slide, uy*slide, 0])
+        translate([px, py, plate_under_z])
+            rotate(a = ang, v = [-uy, ux, 0])
+                translate([-px, -py, -plate_under_z]) button();
+}
+
+// --- Darstellungen ----------------------------------------------------
+// Die Explosionsabstaende muessen groesser sein als die Teile hoch
+// sind, sonst steckt die Taste beim Auseinanderziehen noch im Gehaeuse.
 module assembly(e = 0) {
-    color([0.72, 0.6, 0.85]) rear_shell();
-    translate([0, 0, 1.0*e]) { mock_speaker(); }
-    translate([0, 0, 1.6*e]) { mock_battery(); mock_pcb(); }
-    translate([0, 0, 2.4*e]) color([0.78, 0.68, 0.9]) bridge();
-    translate([0, 0, 3.0*e]) { mock_breakout(); }
-    translate([0, 0, 3.6*e]) mock_foam_pads();
-    translate([0, 0, 4.4*e]) color([0.65, 0.5, 0.8]) front_plate();
-    translate([0, 0, 5.2*e]) mock_card();
-    translate([0, 0, 6.2*e]) color([0.72, 0.6, 0.85]) bezel();
+    color([0.80, 0.72, 0.92]) translate([0, 0, e*34]) front_housing();
+    color([0.90, 0.90, 0.95]) translate([0, 0, e*26]) mock_card();
+    color([0.62, 0.50, 0.78]) translate([0, 0, e*18]) button();
+    color([0.55, 0.55, 0.60]) translate([0, 0, e*18]) mock_pad();
+    color([0.95, 0.90, 0.55]) translate([0, 0, e*9])  mock_foam();
+    color([0.35, 0.60, 0.35]) mock_electronics();
+    color([0.75, 0.75, 0.80]) translate([0, 0, -e*14]) rear_lid();
+    color([0.40, 0.40, 0.45]) translate([0, 0, -e*26]) mock_screws();
 }
 
-module cross_section_y() {       // section plane y = cy (through the switch)
+module section(axis = 0, e = 0) {
     difference() {
-        assembly(0);
-        translate([-60, cavity_h/2, -30]) cube([250, 150, 80]);
-    }
-}
-
-module cross_section_x() {       // section plane x = cx (switch + loop)
-    difference() {
-        assembly(0);
-        translate([cavity_w/2, -80, -30]) cube([150, 280, 80]);
+        assembly(e);
+        if (axis == 0) translate([-10, cy, -10]) cube([housing + 20, housing, 60]);
+        else           translate([cx, -10, -10]) cube([housing, housing + 20, 60]);
     }
 }

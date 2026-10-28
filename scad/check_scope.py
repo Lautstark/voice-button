@@ -1,49 +1,45 @@
 #!/usr/bin/env python3
-"""Sucht stille use<>-Lecks.
+"""Sucht Variablen, die ein per `use <>` eingebundenes Modul liest,
+ohne sie als Parameter zu bekommen. OpenSCAD meldet das nicht: die
+Variable ist dann undef, der Koerper verschwindet lautlos, und ein
+Check meldet "leer" als PASS. Genau so sind beim Vorgaenger drei
+Fehler durchgerutscht, zuletzt corner_r in lib.scad."""
+import re, sys, os
 
-OpenSCAD importiert mit `use <datei.scad>` Module, aber KEINE Variablen.
-Eine Variable aus einer per use eingebundenen Datei ist deshalb undef, und
-undef-Koordinaten rendern lautlos NICHTS. Ein Check, der daraufhin "leer"
-meldet, sieht aus wie ein bestandener Test. Genau so sind hier dreimal
-echte Fehler durchgerutscht: eine 0,6-mm-Membran in den Schraubenkanaelen,
-der Kartenweg und die Eckfasen.
-"""
-import re, sys, pathlib
+CFG = "config.scad"
+# Dateien, die per `use` eingebunden werden und deshalb KEINE
+# config-Variablen sehen duerfen
+USED = ["lib.scad"]
 
-d = pathlib.Path(__file__).parent
+def names(path):
+    out = set()
+    for m in re.finditer(r'^\s*([A-Za-z_]\w*)\s*=', open(path).read(), re.M):
+        out.add(m.group(1))
+    return out
 
-def top_vars(p):
-    return set(re.findall(r'^([a-z_][a-z0-9_]*)\s*=', p.read_text(), re.M))
+def params(src):
+    """alle Modul-/Funktionsparameter und lokalen Zuweisungen je Datei"""
+    out = set()
+    for m in re.finditer(r'(?:module|function)\s+\w+\s*\(([^)]*)\)', src):
+        for p in m.group(1).split(','):
+            p = p.split('=')[0].strip()
+            if re.fullmatch(r'[A-Za-z_]\w*', p): out.add(p)
+    for m in re.finditer(r'^\s*([A-Za-z_]\w*)\s*=', src, re.M): out.add(m.group(1))
+    for m in re.finditer(r'for\s*\(\s*([A-Za-z_]\w*)\s*=', src): out.add(m.group(1))
+    return out
 
-def code_only(p):
-    t = re.sub(r'/\*.*?\*/', '', p.read_text(), flags=re.S)
-    return '\n'.join(l.split('//')[0] for l in t.split('\n'))
-
-def used_in(p):
-    return set(re.findall(r'\b([a-z_][a-z0-9_]*)\b', code_only(p)))
-
-def params_and_locals(p):
-    t = code_only(p); s = set()
-    for m in re.finditer(r'module\s+\w+\s*\(([^)]*)\)', t):
-        for a in m.group(1).split(','):
-            a = a.split('=')[0].strip()
-            if a: s.add(a)
-    s |= set(re.findall(r'^\s*([a-z_][a-z0-9_]*)\s*=', t, re.M))
-    return s
-
-fail = 0
-for f in d.glob('*.scad'):
-    txt = f.read_text()
-    for used_file in re.findall(r'^\s*use\s*<([^>]+)>', txt, re.M):
-        src = d / used_file
-        if not src.exists():
-            print(f"FAIL {f.name}: use <{used_file}> existiert nicht"); fail = 1; continue
-        leaked = (top_vars(src) & used_in(f)) - params_and_locals(f) - top_vars(f)
-        # Was config.scad per include liefert, ist in Ordnung
-        if (d / 'config.scad').exists():
-            leaked -= top_vars(d / 'config.scad')
-        if leaked:
-            print(f"FAIL {f.name}: liest {sorted(leaked)} aus use <{used_file}> -> undef")
-            fail = 1
-print("Scope-Check: keine use<>-Lecks" if not fail else "Scope-Check: LECKS GEFUNDEN")
-sys.exit(fail)
+cfg = names(CFG)
+bad = []
+for f in USED:
+    if not os.path.exists(f): continue
+    src = open(f).read()
+    src = re.sub(r'//[^\n]*', '', src)
+    local = params(src) | {"true","false","undef","PI","$fn","$fa","$fs"}
+    for ident in set(re.findall(r'\b([A-Za-z_]\w*)\b', src)):
+        if ident in cfg and ident not in local:
+            bad.append("%s liest %s aus %s" % (f, ident, CFG))
+if bad:
+    print("Scope-Check: LECK")
+    for b in sorted(bad): print("   ", b)
+    sys.exit(1)
+print("Scope-Check: keine use<>-Lecks")

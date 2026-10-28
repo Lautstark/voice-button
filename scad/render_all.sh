@@ -1,27 +1,31 @@
 #!/bin/bash
-# Render documentation views and export STLs.
-set -e
+# Exportiert alle Endbauteile in Drucklage und erzeugt die Ansichten.
+# Es gibt keine Testteile und keine Coupons: gedruckt wird nur, was im
+# fertigen Geraet verbaut wird.
 cd "$(dirname "$0")"
-R=../renders
-S=../stl
-V="--imgsize 1400,1050 --colorscheme Tomorrow --viewall --autocenter"
+SC="${SCAD:-openscad}"
+mkdir -p ../stl ../render
+rc=0
 
-render() { openscad -D "part=\"$1\"" --camera 0,0,0,$2,$3,$4,300 $V -o "$R/$5.png" main.scad 2>/dev/null; echo "render $5"; }
-
-render assembly   25 0 325 view_iso
-render assembly    0 0   0 view_front
-render assembly  180 0   0 view_rear
-render assembly   90 0  90 view_side_east
-render exploded   65 0 325 view_exploded
-render section_y  90 0 180 view_section_y
-render section_x  90 0 270 view_section_x
-render rear_shell 35 0 325 part_rear_shell
-render front_plate 35 0 325 part_front_plate
-render front_plate 215 0 35 part_front_plate_back
-render bridge     35 0 325 part_bridge
-render test_card  35 0 325 part_test_card
-
-for p in rear_shell front_plate bridge test_card test_pcb_coupon test_speaker_coupon press_rig; do
-  openscad -D "part=\"$p\"" -o "$S/$p.stl" main.scad 2>"$S/$p.log" && echo "stl $p ok" || echo "stl $p FAILED"
-  grep -iE "warning|error" "$S/$p.log" | grep -v "fontconfig" | head -5 || true
+for p in front_housing button rear_lid; do
+  if "$SC" -D "part=\"part_$p\"" -D '$fn=72' -o "../stl/$p.stl" main.scad 2>"/tmp/ex_$p.log"; then
+    echo "stl $p ok"
+  else
+    echo "stl $p FEHLER"; sed -n '1,4p' "/tmp/ex_$p.log"; rc=1
+  fi
 done
+
+# Jede Ansicht braucht ihre eigene Kamera, sonst sind "iso" und "front"
+# dasselbe Bild. Format: tx,ty,tz,rx,ry,rz,dist
+render_view() {
+  if "$SC" -D "part=\"$1\"" --camera="38,38,11,$2" --imgsize=1400,1050 \
+       --colorscheme=Tomorrow -o "../render/$1.png" main.scad 2>/dev/null; then
+    echo "png $1 ok"
+  else echo "png $1 FEHLER"; rc=1; fi
+}
+render_view view_iso        "55,0,25,230"
+render_view view_front      "0,0,0,200"
+render_view view_exploded   "62,0,30,420"
+render_view view_section_x  "90,0,90,210"
+render_view view_section_y  "90,0,0,210"
+exit $rc

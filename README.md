@@ -1,103 +1,65 @@
 # Lautstark Mini Voice Button
 
-Ein kleiner, 3D-gedruckter AAC-Sprachtaster zum Anhängen — an die
-Süßigkeitentasche, den Rucksack oder die Jacke. Ein Druck irgendwo auf die
-Vorderseite spielt eine Aufnahme ab („Süßes oder Saures!", „Danke!", …).
-Vorne steckt eine laminierte METACOM-Karte (40 × 40 mm), die sich ohne
-Werkzeug wechseln lässt. Mehrere identische Geräte lassen sich aus denselben
-Teilen bauen.
+Ein kleiner Sprachtaster zum Selberdrucken. Die ganze Symbolfläche ist
+die Taste; ein Druck spielt eine Aufnahme ab. Die laminierte Karte
+dahinter lässt sich ohne Werkzeug wechseln, am fertig montierten Gerät.
 
-**Status: Prototyp.** Die Geometrie ist parametrisch aufgebaut, in Software
-geprüft (Rendering, paarweise Kollisions- und Eingriffschecks) und auf die
-Angaben des Amazon-Listings ausgelegt — aber noch nicht gegen die echte
-Hardware gemessen. Erst Koffer auf, messen, Testteile drucken (siehe
-[docs/build.md](docs/build.md)), dann das Gehäuse.
+Gebaut für ein dreieinhalbjähriges Kind, das nicht spricht.
 
-## Hardware
+> **Vorläufig.** Das Soundmodul liegt noch nicht vor. Vier Maße sind
+> Annahmen, nicht Messungen — welche, und was sie ändern, steht in
+> [REVIEW_HANDOFF.md](REVIEW_HANDOFF.md). Gedruckt werden kann der
+> Rückdeckel und die Taste; **das Frontgehäuse erst nach dem Messen
+> der Portlagen.**
 
-| Komponente | Annahme (aus dem Listing) | Status |
-|---|---|---|
-| Audiomodul | diymore „Button controlled – 16 MB", ASIN B0HC2YW72V, PCB 27 × 29 mm, USB-C + Schiebeschalter an einer Kante | **[MEASURE]** Kantenpositionen von USB-C/Schalter |
-| Akku | LiPo 402030, 3,7 V 200 mAh, 30 × 20 × 4 mm | Hülle + 1 mm Quellraum eingeplant |
-| Lautsprecher | rund, 8 Ω 0,5 W, Ø ≈ 29 mm, ~5,5 mm tief | **[MEASURE]** Ø, Tiefe, Magnet-Ø |
-| Taster | 12 × 12-mm-Taktiltaster auf grünem Breakout mit JST-Kabel | **[MEASURE]** Breakout-Maße, Tasterhöhe |
+| | |
+|---|---|
+| Außenmaß | 76 × 76 × 22,4 mm |
+| Druckteile | drei, alle ohne Stützen |
+| Befestigung | vier M2 × 8, von hinten |
+| Karte | 40 × 40 mm, zulässig 39,3–40,7 mm |
+| Tastenweg | 2,0 mm bis zum Anschlag |
 
-**Nur die 16-MB-Button-Variante kaufen (B0HC2YW72V).** Die günstigere
-8-MB-Button-Variante (B0HC2BQD1P, 12,99 €) ist eine andere, größere grüne
-Platine (Kit 62 × 70 mm statt 50 × 60, Akku 502030 = 5 mm dick statt 4,
-Mikro/Record-Taste onboard, kein 3-µA-Standby, keine 9 Modi beworben) —
-sie passt **nicht** in dieses Gehäuse. Speicher wäre kein Problem (eine
-kurze Ansage braucht < 0,1 MB), die Mechanik schon.
+## Aufbau
 
-Wichtig fürs Bespielen: Im Standardmodus (0) schaltet jeder Tastendruck zum
-*nächsten* Titel. Pro Gerät also **genau eine MP3** auf das Modul kopieren
-(CONFIG.TXT nicht löschen), dann sagt jeder Druck dasselbe.
+Drei Teile, und jedes hat genau eine Aufgabe.
 
-## Gehäuse
+**Frontgehäuse** — die Außenhaut. Ein umlaufender 45-Grad-Konus hält die
+Taste nach vorn fest; die Wand nimmt die Anschlagkräfte auf und trägt
+die vier Gewinde.
 
-- Außen ca. **61 × 61 × 20 mm** (plus Öse), Kantenradius 7 mm, matt lila
-  (eSUN ePLA-Matte Lilac).
-- Die ganze Vorderseite ist eine starre, schwimmend geführte Taste; die
-  Karte wird oben unter eine Lippe geschoben und fällt in ihre Mulde —
-  werkzeugfrei, ohne Kleben, ohne Biegen ([docs/mechanism.md](docs/mechanism.md)).
-- USB-C-Laden und Ein/Aus ohne Öffnen des Gehäuses (rechte Seite, vertieft).
-- Rückseite plan mit Lautsprechergitter; gegen anliegenden Stoff vier
-  selbstklebende Möbelpuffer (eine gedruckte Mulde wäre eine 37-mm-Brücke).
-- Drei Druckteile. Die Frontplatte schwimmt auf drei M2-Schrauben, die auf
-  Dome der Schale gezogen werden; Unterlegscheiben halten sie. Eine Blende
-  gibt es nicht mehr.
-- Gedrucktes Gewicht ≈ 40 g massiv gerechnet (mit 25 % Infill eher 30 g),
-  Gerät komplett ≈ 60 g.
+**Taste** — Platte mit Flansch und Kartenmulde, von hinten eingelegt.
+Sie kann nach vorn nicht heraus, und **keine Schraube geht durch sie
+hindurch**.
 
-## Dateien
+**Rückdeckel** — trägt Lautsprecher, Akku, Hauptplatine und die Aufnahme
+der Tasterplatine, dazu den umlaufenden Anschlagring.
 
-- `scad/config.scad` — alle Parameter, inkl. `[MEASURE]`-Markierungen und
-  Stack-up-Asserts. Nach dem Messen hier anpassen, alles andere folgt.
-- `scad/parts.scad` — Rückschale, Frontplatte, Brücke, Testteile.
-- `scad/assembly.scad` — Baugruppe, Explosion, Schnitte, Komponenten-Mockups.
-- `scad/main.scad` — Teil wählen: `openscad -D 'part="rear_shell"' …`
-- `scad/render_all.sh` — alle Ansichten (`renders/`) und STLs (`stl/`).
-- `scad/check_fit.sh` — Kollisions-, Eingriffs- und Einschlussprüfungen
-  (muss grün sein). Prüft zuerst seine eigenen Messwerkzeuge, scheitert bei
-  Renderfehlern und bei vertippten Checknamen.
-- `scad/check_scope.py` — sucht `use <>`-Lecks: Variablen aus per `use`
-  eingebundenen Dateien sind `undef`, rendern lautlos nichts und lassen
-  Checks grün aussehen. Dieser Fehler hat hier dreimal zugeschlagen.
-- `docs/` — [Mechanik](docs/mechanism.md), [Bauanleitung](docs/build.md),
-  [Architektur-Entscheidung](docs/adr-001-architecture.md).
+Warum es so und nicht anders aussieht — besonders, warum das Gerät
+76 statt 61 mm breit ist und warum das Druckstück weich sein muss —
+steht in [docs/adr-002-architektur.md](docs/adr-002-architektur.md).
 
-## Druck (eSUN ePLA-Matte, Ender 3 V2)
+## Weiterlesen
 
-- Düse 0,4 mm, Schicht 0,2 mm, Düse **215–225 °C**, Bett **50 °C** (Matte-PLA
-  will es eher kühl und langsam: ≤ 40 mm/s Perimeter).
-- **Oberflächenmuster auf „monoton"/„monotonic" stellen**, nicht
-  konzentrisch. Die Rahmenstege sind nur 2,2 mm breit; mit konzentrischer
-  Deckschicht zieht der Slicer dort Rillen statt einer geschlossenen Fläche.
-- Fluss 102–105 % und trockenes Filament. Matte-PLA wirkt von Natur aus
-  körnig, sichtbare **Lücken** zwischen den Bahnen sind aber Unterextrusion.
-- Der einzige nennenswerte Überhang ist die obere Kartenlippe: 3,0 mm tief
-  über 40,8 mm Breite. Darunter sind 1,3 mm frei (Mulde 0,9 + Entlastung
-  0,4), die Lippe darf also durchhängen, ohne die Karte zu klemmen.
-- 3 Wände, 25 % Gyroid, **keine Stützen** — alle Teile liegen flach:
-  Rückschale auf dem Rücken, Frontplatte auf dem Rücken (Schienen oben),
-  Brücke flach (Tasche oben).
-- Bridging aktiv lassen (Akkuschale überbrückt den Lautsprecherrand intern).
-- Matte-PLA ist spröder als normales PLA: Öse nicht untersintern — bei
-  Bedarf `loop_t`/`loop_od` in `config.scad` erhöhen.
+| | |
+|---|---|
+| [docs/mechanism.md](docs/mechanism.md) | wie die Betätigung rechnet, alle neun Druckfälle |
+| [docs/build.md](docs/build.md) | Stückliste und Montagefolge |
+| [docs/print.md](docs/print.md) | Drucken, kritische Stellen |
+| [REVIEW_HANDOFF.md](REVIEW_HANDOFF.md) | offene Messungen, Annahmen, Grenzen |
+| [docs/adr-001-architecture.md](docs/adr-001-architecture.md) | der abgelöste Vorgänger, als Protokoll |
 
-## Reihenfolge
+## Selber bauen
 
-1. Kompletten Satz drucken — Druckliste in [docs/print.md](docs/print.md).
-   Frontplatte ist Echtteil; Rückschale und Brücke sind Passprobe, bis
-   das Modul vermessen ist.
-2. Hardware ankommt → messen, `config.scad` aktualisieren,
-   `test_pcb_coupon` + `test_speaker_coupon` drucken → Modul einlegen.
-3. `press_rig` + `front_plate` + `bezel` + `bridge` drucken → Taster
-   einbauen, Mitte- und **Ecken**-Drücke testen.
-4. Erst dann `rear_shell` drucken und final montieren
-   ([docs/build.md](docs/build.md)).
+```bash
+scad/render_all.sh     # STLs nach stl/, Ansichten nach render/
+scad/check_fit.sh      # Geometrieprüfungen
+scad/check_negative.sh # baut absichtlich Fehler ein und verlangt ein FAIL
+python3 scad/kinematics.py   # Betätigung unabhängig nachgerechnet
+```
 
-Sicherheits­hinweis: DIY-Prototyp für den beaufsichtigten Gebrauch. Akku
-vollständig eingeschlossen, keine Kleinteile außen, keine Schnur — aber
-keine Spielzeugnorm-Prüfung. Vor der Übergabe Sichtprüfung und Zugtest an
-Öse und Frontplatte.
+Gebraucht wird OpenSCAD 2021.01 oder neuer und Python 3.
+
+Alle Maße stehen in `scad/config.scad`, getrennt nach `[GEMESSEN]`,
+`[ANNAHME]` und abgeleitet. Nichts anderes von Hand ändern — der Rest
+rechnet sich daraus.

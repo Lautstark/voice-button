@@ -1,166 +1,260 @@
 // =====================================================================
-// Lautstark Mini Voice Button — part selector / print orientation
+// Teileauswahl und Geometriepruefungen
 // =====================================================================
-// Render a part:    openscad -D 'part="rear_shell"' -o ../stl/rear_shell.stl main.scad
-// Parts:  rear_shell | front_plate | bezel | bridge
-//         test_card | test_pcb_coupon | test_speaker_coupon | press_rig
-//         assembly | exploded | section_y | section_x
-// Printable parts are emitted in their PRINT orientation (flat on z=0).
+// openscad -D 'part="part_button"' -o button.stl main.scad
+//
+// Die check_* Teile sind Pruefkoerper, keine Bauteile. Ihre Auswertung
+// steht in check_fit.sh. Ein unbekannter Name loest bewusst ein assert
+// aus, damit ein Tippfehler nicht als leeres PASS durchgeht.
 
 include <config.scad>
+use <lib.scad>
 use <parts.scad>
 use <assembly.scad>
 
-part = "assembly";
+part = "view_iso";
 
-if (part == "rear_shell")
-    translate([0, 0, wall_back + foot_h]) rear_shell();          // back face down
-else if (part == "press_rig")
-    translate([0, 0, wall_back + foot_h]) press_rig();
-else if (part == "front_plate")
-    translate([0, 0, -plate_under_z]) front_plate();             // back face down, rails up
-else if (part == "bridge")
-    translate([0, 0, -bridge_z]) bridge();                       // flat, pocket up
-else if (part == "test_card")
-    translate([0, 0, -(plate_front_z - 1.8)]) test_card();
-else if (part == "test_pcb_coupon")
-    translate([0, 0, wall_back + foot_h]) test_pcb_coupon();
-else if (part == "test_speaker_coupon")
-    translate([0, 0, wall_back + foot_h]) test_speaker_coupon();
-else if (part == "assembly")
-    assembly(0);
-else if (part == "exploded")
-    assembly(6);
-else if (part == "section_y")
-    cross_section_y();
-else if (part == "section_x")
-    cross_section_x();
-// ------------------------------------------------------------------
-// Interference checks: each must export EMPTY geometry (face contact
-// is allowed, shared volume is a design error).
-else if (part == "check_shell_bridge")   intersection() { rear_shell(); bridge(); }
-else if (part == "check_shell_plate")    intersection() { rear_shell(); front_plate(); }
-else if (part == "check_plate_bridge")   intersection() { front_plate(); bridge(); }
-// Pressed to the CENTRE stop (the pocket walls), everything must still be
-// clear — that is the deepest the plate may go on a straight press.
-else if (part == "check_plate_pressed")  intersection() {
-    translate([0, 0, -(plate_under_z - center_stop_z)]) front_plate();
-    union() { rear_shell(); bridge(); mock_battery(); mock_pcb(); }
-}
-// ...and pressed further it MUST run into the bridge, not into the switch.
-// Without this the plate drives a bottomed-out tactile switch into the
-// breakout under a child's full hand force.
-else if (part == "check_centre_stop") intersection() {
-    translate([0, 0, -(plate_under_z - center_stop_z) - 0.2]) front_plate();
-    bridge();
-}
-// The card must lie free in its recess: expect EMPTY.
-else if (part == "check_card_seated") intersection() { test_card(); mock_card(); }
-// ...and it must lie free with the device fully assembled, which is the
-// check whose absence let a holder ship that could not be loaded at all.
-else if (part == "check_card_insert_assembled") intersection() {
-    union() { rear_shell(); front_plate(); }
-    union() { mock_card(); mock_card_lifted(); }
-}
-// Lifted out of its recess, the card MUST run into both lips: that is the
-// whole retention. Expect two patches, top and bottom.
-else if (part == "check_card_retained") intersection() {
-    test_card();
-    translate([0, 0, card_ch_h - card_t + 0.1]) mock_card();
-}
-// Pushed up under the top lip it must lie free — this is the proof it can
-// be laid in flat, i.e. that nothing has to bend.
-else if (part == "check_card_lifted") intersection() {
-    test_card(); mock_card_lifted();
-}
-// Das Sichtfenster ueber der Karte muss bis vor die Blendenstirn frei
-// sein. Faengt eine verschlossene Mulde, einen zu tiefen Lippenueberhang
-// und jede Blende, die ueber die Karte greift. Erwartet: LEER.
-// Selbsttests der Messwerkzeuge: eine Sonde, die aus undef-Koordinaten
-// entsteht, rendert nichts und wuerde jeden Einschluss-Check gruen melden.
-else if (part == "selftest_wall_probes")
-    difference() { translate([-wall, -wall, 0]) wall_band(); wall_openings(); }
-
-// Schaumsitze muessen frei von den Schraubenkopfsitzen bleiben, sonst
-// steht das Pad schief auf einem Schraubenkopf. Erwartet: LEER.
-// Einlegeweg der Platine, mit TASTER — senkrecht von oben in die Tasche.
-// Der frueere Check fuhr nur einen 1,2-mm-Quader und haette nicht bemerkt,
-// dass der aufgeloetete Taster an einem Riegel haengenbleibt.
-else if (part == "check_breakout_path") intersection() {
-    bridge();
-    minkowski() {
-        mock_breakout();
-        cylinder(d = 0.01, h = wall_top_z + 4 - bridge_top);
+// --- Hilfskoerper -----------------------------------------------------
+module everything_but_rim() {
+    // alles, was die Taste beim Kippen NICHT beruehren darf
+    front_housing();
+    mock_electronics();
+    intersection() {
+        rear_lid();
+        translate([cx, cy, -1]) rbox_c(rim_in - 0.2, 60, 1.0);
     }
 }
-else if (part == "check_bridge_seats") intersection() {
-    union() for (fs = foam_seats)
-        translate([fs[0], fs[1], bridge_top]) cube([foam_w + 1, foam_w + 1, 0.4]);
-    union() for (p = [bridge_scr_w, bridge_scr_e])
-        translate([p[0], p[1], bridge_top - 0.8]) cylinder(d = 4.4, h = 2);
-}
-// Jedes Merkmal muss nach allen Booleans noch im Material liegen.
-// Das Oesenloch muss durchgehen. Es war ein Sackloch, weil die Oese in die
-// Rueckebene wanderte und der Lochschneider bei -1 stehen blieb.
-else if (part == "check_loop_hole_open") intersection() {
-    rear_shell();
-    translate([cavity_w/2, cavity_h + wall + loop_rise, -wall_back - 0.5])
-        cylinder(d = loop_id - 0.4, h = loop_t + wall_back + 1);
-}
-else if (part == "check_features_shell") difference() {
-    feature_probes_shell(); rear_shell();
-}
-else if (part == "check_features_bridge") difference() {
-    feature_probes_bridge(); bridge();
-}
-else if (part == "selftest_feature_probes")
-    union() { feature_probes_shell(); feature_probes_bridge(); }
-// Die Platte muss von vorn in die Wanne fallen koennen: ihr Weg von der
-// Ruhelage bis ueber die Waende hinaus darf nirgends an die Schale stossen.
-else if (part == "check_plate_drop_in") intersection() {
-    rear_shell();
-    minkowski() {
-        front_plate();
-        cylinder(d = 0.01, h = wall_top_z + 4 - plate_under_z);
+
+// Einbauweg der Taste: sie kommt in reiner +z-Bewegung von hinten.
+// KEIN hull() — die konvexe Huelle wuerde die 45-Grad-Fase auffuellen
+// und dieses erfundene Material am Konus anstossen lassen. Stattdessen
+// diskrete Stellungen. Dass dazwischen nichts passieren kann, folgt aus
+// der Geometrie: Kavitaet und Taste verjuengen sich beide nach vorn mit
+// genau 45 Grad, und die Taste ist durchweg 2*plate_clear schmaler.
+
+module lid_sweep() {
+    hull() {
+        union() { lid_rim(); lid_features(); }
+        translate([0, 0, -20]) union() { lid_rim(); lid_features(); }
     }
 }
-// Angehoben muss die Platte an die Scheiben stossen — das ist ihre
-// einzige Sicherung nach vorn.
-else if (part == "check_plate_retained") intersection() {
-    mock_washers();
-    translate([0, 0, 0.4]) front_plate();
+
+// Dichtes Band mitten durch die Aussenwand. Vier Ecksonden haben hier
+// schon einmal 842 mm3 fehlende Wand uebersehen — ein Band kann das nicht.
+module wall_band() {
+    // Zwei Fehler, die dieser Koerper beim ersten Versuch hatte:
+    //  - er begann bei z=0, das Gehaeuse aber erst bei bay_z; der Check
+    //    verglich 3 mm Luft mit Material und meldete 3141 mm3 "fehlende Wand"
+    //  - er lief durch die Durchbrueche hindurch; die sind gewollt und
+    //    muessen deshalb abgezogen werden
+    difference() {
+        translate([0, 0, bay_z + 0.5])
+            linear_extrude(height = house_front_z - bay_z - 1.5)
+                difference() {
+                    offset(r = -0.6) translate([cx - housing/2, cy - housing/2])
+                        rrect(housing, housing, corner_r);
+                    offset(r = 0.6) translate([cx - cavity/2, cy - cavity/2])
+                        rrect(cavity, cavity, corner_ri);
+                }
+        minkowski() { housing_ports(); cube(1.6, center = true); }
+        // auch die vier Kernloecher sind gewollte Hohlraeume
+        for (p = screw_pos)
+            translate([p[0], p[1], bay_z - 1])
+                cylinder(d = screw_pilot_d + 1.2, h = screw_depth + 2);
+    }
 }
-else if (part == "check_card_front_open") intersection() {
-    translate([card_seat_x + 1, card_seat_y + lip_bottom + 0.5, card_bed_z + card_t])
-        cube([card_w - 2,
-              card_w - lip_bottom - card_top_engage - 1.0,
-              bezel_front_z + 2 - (card_bed_z + card_t)]);
-    union() { front_plate(); bezel(); rear_shell(); }
+
+// Merkmalssonden: kleine Wuerfel MITTEN im Material jedes Merkmals.
+// Sie belegen, dass ein Merkmal nach ALLEN booleschen Schritten noch da
+// ist. Genau das hat beim Vorgaenger einen Querriegel entlarvt, der in
+// der Union entstand und von einem spaeteren Schnitt wieder verschwand.
+probe = 0.6;
+module probe_at(x, y, z) translate([x - probe/2, y - probe/2, z - probe/2])
+    cube([probe, probe, probe]);
+
+module probes_lid() {
+    probe_at((ped_x0 + ped_x1)/2, (ped_y0 + ped_y1)/2, bay_z + (ped_top - bay_z)/2);
+    // Suedsonde NICHT auf cx: dort liegt der Durchlass fuer den
+    // Schiebeschalter, die Sonde saesse im Hohlraum.
+    probe_at(cavity - 12.0, 0.15 + stop_band/2, bay_z + 1.0);  // Ring Sued
+    probe_at(cx, cavity - 0.15 - stop_band/2, bay_z + 1.0);   // Ring Nord
+    probe_at(0.15 + stop_band/2, cy, bay_z + 1.0);            // Ring West
+    probe_at(cavity - 0.15 - stop_band/2, cy, bay_z + 1.0);   // Ring Ost
+    probe_at(spk_cx + (spk_d + spk_clear*2 + 1.5)/2, spk_cy, bay_z + spk_seat_h/2);
+    probe_at(pcb_x0 + pcb_w/2, pcb_y0 + pcb_h/2, bay_z + pcb_standoff/2);
+    probe_at(cx, cy, lid_t/2 - 0.0);                          // Deckelboden
 }
-// Jede Wandsonde muss vollstaendig im Material liegen. Erwartet: LEER.
-else if (part == "check_wall_solid") difference() {
-    difference() { translate([-wall, -wall, 0]) wall_band(); wall_openings(); }
-    rear_shell();
+
+module probes_housing() {
+    probe_at(cx, -wall/2, (bay_z + house_front_z)/2);         // Suedwand
+    probe_at(cx, cavity + wall/2, (bay_z + house_front_z)/2); // Nordwand
+    probe_at(-wall/2, cy, (bay_z + house_front_z)/2);         // Westwand
+    probe_at(cavity + wall/2, cy, (bay_z + house_front_z)/2); // Ostwand
+    probe_at(cx, cy - window_w/2 - retain/2, house_front_z - 0.6); // Haltering
+    probe_at(cx + window_w/2 + retain/2, cy, house_front_z - 0.6);
 }
-// Schraubenkoepfe gegen die ruhende Frontplatte.
-else if (part == "check_screw_heads") intersection() {
-    mock_screw_heads();
-    front_plate();
+
+module probes_button() {
+    probe_at(cx, cy, plate_under_z + plate_t/2);
+    probe_at(cx, cy - card_ch_l/2 + lip_bottom/2, plate_front_z - rail_lip_t/2);
+    probe_at(cx, cy + card_ch_l/2 - lip_top/2, plate_front_z - rail_lip_t/2);
+    probe_at(cx - prism_w/2 + rail_wall/2, cy, plate_front_z - 0.6);
 }
-else if (part == "section_card") difference() {
-    union() { test_card(); mock_card(); }
-    translate([-10, -10, 0]) cube([cavity_w/2 + 10, 100, 60]);
-}
-else if (part == "x_mock_speaker_rear_shell") intersection() { mock_speaker(); rear_shell(); }
-else if (part == "x_mock_speaker_bridge") intersection() { mock_speaker(); bridge(); }
-else if (part == "x_mock_battery_rear_shell") intersection() { mock_battery(); rear_shell(); }
-else if (part == "x_mock_battery_bridge") intersection() { mock_battery(); bridge(); }
-else if (part == "x_mock_pcb_rear_shell") intersection() { mock_pcb(); rear_shell(); }
-else if (part == "x_mock_pcb_bridge") intersection() { mock_pcb(); bridge(); }
-else if (part == "x_mock_breakout_rear_shell") intersection() { mock_breakout(); rear_shell(); }
-else if (part == "x_mock_breakout_bridge") intersection() { mock_breakout(); bridge(); }
-else if (part == "check_mocks") intersection() {
-    union() { mock_speaker(); mock_battery(); mock_pcb(); mock_breakout(); }
-    union() { rear_shell(); bridge(); front_plate(); bezel(); }
-}
+
+// --- Auswahl ----------------------------------------------------------
+if (part == "view_iso")        assembly();
+else if (part == "view_exploded") assembly(1);
+else if (part == "view_front") assembly();
+else if (part == "view_section_y") section(0);
+else if (part == "view_section_x") section(1);
+
+// Bauteile in Drucklage
+else if (part == "part_front_housing") translate([0, 0, -bay_z]) front_housing();
+else if (part == "part_button")        translate([0, 0, -plate_under_z]) button();
+else if (part == "part_rear_lid")      rear_lid();
+
+// --- Selbsttests der Messwerkzeuge (muessen GREIFEN) -------------------
+else if (part == "selftest_wall_band")
+    intersection() { wall_band(); front_housing(); }
+else if (part == "selftest_probes")
+    intersection() { union() { probes_lid(); probes_housing(); probes_button(); }
+                     union() { rear_lid(); front_housing(); button(); } }
+
+// --- Teile gegeneinander (muessen FREI sein) ---------------------------
+else if (part == "check_housing_button")
+    intersection() { front_housing(); button(); }
+else if (part == "check_housing_button_pressed")
+    intersection() { front_housing(); button_pressed(travel_stop); }
+else if (part == "check_housing_lid")
+    intersection() { front_housing(); rear_lid(); }
+else if (part == "check_lid_button")
+    intersection() { rear_lid(); button(); }
+else if (part == "check_insert_12")
+    intersection() { front_housing(); button_pressed(12); }
+else if (part == "check_insert_6")
+    intersection() { front_housing(); button_pressed(6); }
+else if (part == "check_insert_2")
+    intersection() { front_housing(); button_pressed(2); }
+else if (part == "check_insert_05")
+    intersection() { front_housing(); button_pressed(0.5); }
+else if (part == "check_lid_insert")
+    intersection() { front_housing(); lid_sweep(); }
+else if (part == "check_mocks_printed")
+    intersection() { union() { rear_lid(); front_housing(); }
+                     union() { mock_electronics(); mock_foam(); } }
+else if (part == "check_mocks_button")
+    // ohne den Schaumstreifen: dessen 0,4 mm Vorspannung ist gewollt und
+    // wird von check_foam_preloaded getrennt nachgewiesen
+    intersection() { button(); mock_electronics(); }
+else if (part == "check_mocks_button_pressed")
+    intersection() { button_pressed(travel_stop); mock_electronics(); }
+else if (part == "check_screw_fits")
+    // Der Schaft muss ganz im Kernloch liegen. Ist das Kernloch zu kurz,
+    // steht hier Material im Weg und die Schraube klemmt nie.
+    intersection() {
+        for (p = screw_pos) translate([p[0], p[1], screw_head_h])
+            cylinder(d = screw_pilot_d - 0.3, h = screw_len);
+        union() { front_housing(); rear_lid(); }
+    }
+else if (part == "check_lid_inner_pressed")
+    // gerade durchgedrueckt: ausser dem Anschlagring darf die Taste
+    // nichts im Deckel beruehren
+    intersection() {
+        button_pressed(travel_stop);
+        intersection() {
+            rear_lid();
+            translate([cx, cy, -1]) rbox_c(rim_in - 0.2, 60, 1.0);
+        }
+    }
+else if (part == "check_port_tunnel_open")
+    // Der Korridor zu den Ports muss MATERIALFREI sein. Also die
+    // Verschneidung pruefen, nicht die Differenz — eine Differenz ist
+    // hier gerade am gesunden Modell am groessten.
+    intersection() {
+        union() {
+            translate([usb_x_c - usb_cut_w/2, 0.1, usb_z_c - usb_cut_h/2])
+                cube([usb_cut_w, stop_band, usb_cut_h]);
+            translate([psw_x_c - psw_cut_w/2, 0.1, psw_z_c - psw_cut_h/2])
+                cube([psw_cut_w, stop_band, psw_cut_h]);
+        }
+        union() { rear_lid(); front_housing(); }
+    }
+else if (part == "check_screws_clear")
+    intersection() { mock_screws(); union() { button(); mock_electronics(); } }
+
+// --- Halten und Anschlag (muessen GREIFEN) -----------------------------
+else if (part == "check_button_retained")
+    intersection() { front_housing(); translate([0, 0, 0.6]) button(); }
+else if (part == "check_stop_engages")
+    intersection() { rear_lid(); button_pressed(travel_stop + 0.15); }
+else if (part == "check_pad_reaches")
+    // Taster um die Luft angehoben: dann MUSS das Pad ihn beruehren
+    intersection() { mock_pad(); translate([0, 0, act_gap + 0.05]) mock_breakout(); }
+else if (part == "check_foam_preloaded")
+    intersection() { mock_foam(); button(); }
+
+// --- Kippen: acht Richtungen ------------------------------------------
+else if (part == "check_tilt_n")  intersection() { everything_but_rim(); button_tilt(0, 1); }
+else if (part == "check_tilt_s")  intersection() { everything_but_rim(); button_tilt(0, -1); }
+else if (part == "check_tilt_e")  intersection() { everything_but_rim(); button_tilt(1, 0); }
+else if (part == "check_tilt_w")  intersection() { everything_but_rim(); button_tilt(-1, 0); }
+else if (part == "check_tilt_ne") intersection() { everything_but_rim(); button_tilt(1, 1); }
+else if (part == "check_tilt_nw") intersection() { everything_but_rim(); button_tilt(-1, 1); }
+else if (part == "check_tilt_se") intersection() { everything_but_rim(); button_tilt(1, -1); }
+else if (part == "check_tilt_sw") intersection() { everything_but_rim(); button_tilt(-1, -1); }
+
+// --- Karte -------------------------------------------------------------
+else if (part == "check_card_seated")
+    intersection() { button(); mock_card(); }
+else if (part == "check_card_lifted")
+    intersection() { button(); mock_card(card_lift_max); }
+else if (part == "check_card_insert_assembled")
+    intersection() { union() { front_housing(); rear_lid(); }
+                     hull() { mock_card(); mock_card(card_lift_max); } }
+else if (part == "check_card_window_open")
+    // Der Raum vor der sitzenden Karte muss materialfrei sein, sonst
+    // kommt man nicht an sie heran. Verschneidung, nicht Differenz.
+    intersection() {
+        translate([cx - card_w/2 + 1, cy - card_ch_l/2 + lip_bottom + 1,
+                   card_bed_z + card_t])
+            cube([card_w - 2, card_ch_l - lip_bottom - lip_top - 2,
+                  house_front_z + 6 - card_bed_z - card_t]);
+        union() { button(); front_housing(); }
+    }
+else if (part == "check_card_retained")
+    // die obere Lippe muss die sitzende Karte ueberdecken
+    intersection() {
+        button();
+        translate([cx - card_w/2, cy + card_ch_l/2 - lip_top, card_bed_z])
+            cube([card_w, lip_top, card_t + card_ch_h]);
+    }
+
+// --- Gehaeuse: Material da, Bohrungen offen ----------------------------
+else if (part == "check_wall_solid")
+    difference() { wall_band(); front_housing(); }
+else if (part == "check_features_lid")
+    difference() { probes_lid(); rear_lid(); }
+else if (part == "check_features_housing")
+    difference() { probes_housing(); front_housing(); }
+else if (part == "check_features_button")
+    difference() { probes_button(); button(); }
+else if (part == "check_screw_bores_open")
+    // Kernloch muss frei sein: Verschneidung mit dem Teil MUSS leer sein
+    intersection() {
+        front_housing();
+        for (p = screw_pos) translate([p[0], p[1], bay_z + 0.2])
+            cylinder(d = screw_pilot_d - 0.3, h = screw_depth - 0.6);
+    }
+else if (part == "check_loop_hole_open")
+    // dto. fuer die Oese
+    intersection() {
+        front_housing();
+        translate([cx, cavity + wall + loop_out - loop_w/2, bay_z - 1])
+            cylinder(d = loop_hole_d - 0.4, h = loop_t + 2);
+    }
+else if (part == "check_foam_fits")
+    // Der Streifen muss in die Nut passen. Faende er keine Nut vor,
+    // waere hier der volle Ringquerschnitt als Ueberschneidung zu sehen.
+    intersection() { rear_lid(); mock_foam(); }
+
 else assert(false, str("unbekannter Teilname: ", part));

@@ -1,64 +1,52 @@
-// Small geometry helpers for the Lautstark Mini Voice Button.
+// =====================================================================
+// Geometriehelfer
+// =====================================================================
+// REGEL: Kein Modul hier liest eine Variable aus config.scad. Alles
+// kommt als Parameter. `use <lib.scad>` importiert nur Module, keine
+// Variablen — eine fremde Variable waere hier undef, der Koerper
+// verschwindet lautlos und der Check meldet "leer" als PASS.
+// check_scope.py erzwingt das.
 
-// Rounded-corner rectangle, SW corner at origin.
+EPS = 0.01;
+
 module rrect(w, h, r) {
-    offset(r = r) offset(r = -r) square([w, h]);
+    assert(is_num(w) && is_num(h) && is_num(r), "rrect: undefinierte Parameter");
+    assert(r >= 0 && 2*r <= min(w, h) + 1e-9, "rrect: Radius zu gross");
+    if (r < 1e-6) square([w, h]);
+    else offset(r = r) offset(r = -r) square([w, h]);
 }
 
-// Rounded box, SW corner at origin, extruded +z from z=0.
-module rbox(w, h, d, r) {
-    linear_extrude(height = d) rrect(w, h, r);
+module rbox(w, h, t, r) {
+    assert(is_num(t) && t > 0, "rbox: Hoehe undefiniert");
+    linear_extrude(height = t) rrect(w, h, r);
 }
 
-// Rounded box centered in x/y at the given point.
-module rbox_c(cxp, cyp, w, h, d, r) {
-    translate([cxp - w/2, cyp - h/2, 0]) rbox(w, h, d, r);
-}
+// Gerundetes Quadrat, um (0,0) zentriert
+module rsq_c(w, r) { translate([-w/2, -w/2]) rrect(w, w, r); }
 
-// Teardrop-ish hanging ring lying flat (hole axis = z).
-module flat_ring(od, id, t) {
-    linear_extrude(height = t)
-        difference() { circle(d = od); circle(d = id); }
-}
+// Zentrierter Quader mit gerundeten Ecken
+module rbox_c(w, t, r) { linear_extrude(height = t) rsq_c(w, r); }
 
-// Chamfered cylinder (for feet / domes).
-module dome_foot(d, h) {
-    cylinder(d1 = d, d2 = d - 2*h, h = h);
-}
-
-// A wall-mounted stop rib: box with a 45° chamfered top edge facing the cavity.
-module stop_rib(w, depth, h) {
-    // runs along x, protrudes +y by `depth`, height h, origin at SW bottom
-    cube([w, depth, h]);
-}
-
-// Eckfreistellung: entfernt alles jenseits einer Linie, die senkrecht auf
-// der Eckdiagonale steht und corner_wall_min von der Aussenhaut entfernt
-// liegt. (ax,ay) ist der Mittelpunkt der Eckrundung, (dx,dy) zeigt nach
-// aussen. So bleibt die Restwand per Konstruktion erhalten, statt von der
-// Groesse eines Dreiecks abzuhaengen.
-// R wird UEBERGEBEN, nicht aus config gelesen: lib.scad wird per use<>
-// eingebunden und sieht dessen Variablen nicht. Lautlos undef war hier
-// schon dreimal die Ursache fuer still durchgerutschte Fehler, deshalb
-// der assert.
-module corner_relief(ax, ay, dx, dy, z0, h, R) {
-    assert(is_num(R) && is_num(ax) && is_num(z0),
-           "corner_relief: undefinierte Parameter — kommt config.scad an?");
-    ux = dx/sqrt(2);  uy = dy/sqrt(2);
-    px = ax + ux*R;   py = ay + uy*R;
-    vx = -uy;         vy = ux;
-    L = 25;
-    // BEGRENZT auf den eigenen Eckquadranten. Die Halbebene allein ist ein
-    // 50 x 25 mm grosses Rechteck und hat die halbe Ostwand und ein
-    // Brueckenauflager mit entfernt, ohne dass ein Check anschlug.
-    B = corner_r + 6;
-    intersection() {
-        translate([0, 0, z0]) linear_extrude(h)
-            polygon([[px + vx*L,        py + vy*L],
-                     [px - vx*L,        py - vy*L],
-                     [px - vx*L - ux*L, py - vy*L - uy*L],
-                     [px + vx*L - ux*L, py + vy*L - uy*L]]);
-        translate([min(ax, ax + dx*B), min(ay, ay + dy*B), z0 - 1])
-            cube([B, B, h + 2]);
+// 45-Grad-Frustum aus gerundeten Quadraten: unten w0, oben w1,
+// Hoehe (w0-w1)/2 bzw. (w1-w0)/2. Der Eckradius wandert mit, deshalb
+// ist die Mantelflaeche ueberall genau 45 Grad. hull() interpoliert
+// linear und ist damit exakt, nicht treppenfoermig.
+module cone45(w0, w1, r0, z0) {
+    assert(is_num(w0) && is_num(w1) && is_num(r0) && is_num(z0),
+           "cone45: undefinierte Parameter");
+    h = abs(w0 - w1)/2;
+    assert(h > 1e-6, "cone45: keine Hoehe");
+    r1 = max(0.2, r0 - (w0 - w1)/2);
+    hull() {
+        translate([0, 0, z0])     linear_extrude(height = EPS) rsq_c(w0, min(r0, w0/2 - 0.01));
+        translate([0, 0, z0 + h]) linear_extrude(height = EPS) rsq_c(w1, min(r1, w1/2 - 0.01));
     }
+}
+
+// Lochkreis um (0,0)
+module hole_ring(d, n, r_ring, h, z0) {
+    assert(is_num(d) && is_num(n) && is_num(r_ring) && is_num(h),
+           "hole_ring: undefinierte Parameter");
+    for (i = [0 : n-1])
+        rotate([0, 0, 360*i/n]) translate([r_ring, 0, z0]) cylinder(d = d, h = h);
 }

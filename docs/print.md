@@ -73,11 +73,6 @@ die Fläche, die den Sitz bildet. Wird sie gequetscht, wird der Flansch
 breiter und die Taste klemmt in der Kavität: erste Schicht nicht
 überdrücken, Z-Offset sauber einstellen.
 
-**Durchbrüche in der Südwand.** Über jeder Öffnung steht eine Brücke von
-10,2 mm (USB-C) bzw. 6,0 mm (Schieber) Spannweite. Unkritisch, die
-Unterseite ist keine Funktionsfläche. Dazwischen bleiben 1,7 mm Wand
-stehen — nicht nacharbeiten, das ist tragendes Material.
-
 **Lautsprechertasche (Deckel).** Eine flachbodige Vertiefung von 2,5 mm
 in den ersten Schichten; darunter bleiben 1,5 mm Deckelmaterial, durch
 die die Schalllöcher gehen. Kein Überhang, aber **dünn**: diese 1,5 mm
@@ -85,11 +80,15 @@ sind sieben bis acht Schichten, perforiert von 37 Löchern Ø 2,2 mm.
 Nicht im Lastpfad — den trägt der Anschlagring am Rand —, aber beim
 Entfernen von Stützstrukturen oder beim Entgraten vorsichtig sein.
 
-**Steckertasche und Schaltermulde (Gehäuse).** Zwei Vertiefungen in der
-Südwand, 3,2 bzw. 2,5 mm tief. Hinter der Steckertasche bleiben nur
-**1,3 mm Wand** stehen, durchbrochen vom eigentlichen Loch — dort nicht
-nacharbeiten und beim Entgraten vorsichtig sein. Tragend ist die Stelle
-nicht, den Lastpfad trägt der Anschlagring am Rand.
+**Steckerkanal (Gehäuse).** Ein durchgehendes Loch von 13,6 × 8,1 mm
+durch die ganze Südwand, darüber eine Brücke von voller Wandstärke über
+13,6 mm Spannweite. Unkritisch. Der Kanal setzt sich im Deckel als
+Durchlass durch den Anschlagring fort; beide müssen fluchten, sonst
+kommt der Stecker nicht durch.
+
+**Schaltermulde (Gehäuse).** 9,0 × 7,4 mm, 2,5 mm tief, dahinter ein
+Durchbruch von 7,0 × 5,0. Zwischen Kanal und Mulde bleiben 1,7 mm Wand
+stehen — nicht nacharbeiten.
 
 **Anschlagfläche und Stufe (Deckel).** Außen bleibt eine 2,05 mm breite,
 massive Anschlagfläche stehen, die bis zum Deckelboden durchgeht — das

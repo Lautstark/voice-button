@@ -87,6 +87,7 @@ for c in check_housing_button check_housing_button_pressed check_housing_lid \
 echo "— Lautsprecher und Anschluesse —"
 must_be_empty check_grille_open
 must_be_clear check_usb_plug_fits
+must_be_clear check_usb_insert_path
 must_be_clear check_switch_tool_fits
 
 echo "— Halten, Anschlag, Rueckstellung —"

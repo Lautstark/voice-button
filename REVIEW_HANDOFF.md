@@ -93,19 +93,17 @@ platine) und die unterstellte Kabelreichweite von 14 mm.
 | Kavität | 84,0 | aus der Packung gerechnet |
 | Wand / Deckel | 4,5 / 4,0 | gewählt; Deckel 4,0 wegen der Tasche |
 | Klebebandstärke | 0,2 | **[ANNAHME]**, hebt jedes geklebte Bauteil |
-| Steckertasche | 13,6 × 8,1, 3,2 tief | Wand + Platinenkante − Einsteckweg |
-| Restwand dahinter | 1,3 | nicht tragend |
-| Schaltermulde | 9,0 × 8,0, 2,5 tief | mit Stift bedienbar, nicht mit dem Finger |
+| Schaltermulde | 9,0 × 7,4, 2,5 tief | Durchbruch 7,0 × 5,0, Büroklammer |
 | Flansch der Taste | 83,4 | Kavität − 2 × 0,3 Spiel |
 | Fenster | 79,8 | Flansch − 2 × 1,8 Überdeckung |
 | sichtbare Druckfläche | 79,0 | Fenster − 2 × 0,4 |
 | Lautsprechertasche | Ø 36,8, 2,5 tief | Ø 36 gemessen + 0,8 Spiel |
 | Material unter der Tasche | 1,5 | Deckel 4,0 − Tasche 2,5 |
-| Korboberkante | 7,5 | Tasche 1,5 + 6,0 gemessen |
-| Haltenase, Luft darüber | 0,2 | Halten ≠ Klemmen |
-| Tasterplatine, Unterkante | 7,8 | Korboberkante + 0,3 |
-| Tasterstempel, Oberkante | 13,0 | gemessen 4,0 über der Platine |
-| Anschlagring, Oberkante | 14,9 | Tastenrückseite − 2,0 |
+| Korboberkante | 7,7 | Tasche 1,5 + Klebeband 0,2 + 6,0 |
+| Tasterplatine, Unterkante | 8,0 | Korboberkante + 0,3 |
+| Tasterstempel, Oberkante | 13,2 | gemessen 4,0 über der Platine |
+| Anschlagring, Oberkante | 15,5 | Tastenrückseite − 2,0 |
+| Steckerkanal | 13,6 × 8,1, 9,7 tief | Griff + 0,3/Seite, bis zur Buchsenstirn |
 | Konus | 2,2 hoch | 45°, beide Seiten überhangfrei |
 | Tastenweg bis Anschlag | 2,0 | gewählt |
 | Luft über dem Taster | 0,30 | gewählt |
@@ -226,12 +224,14 @@ sie prüfen sollten:
 - `check_grille_open` benutzte `lid_grille()` selbst als Prüfkörper.
   Schaltet man die Löcher ab, verschwindet mit ihnen der Prüfkörper.
 
-Behoben: die freien Richtungen stehen als eigene Liste `spk_free_a` in
-`config.scad`, vier Asserts halten sie mit `spk_lip_a` und `spk_tab_a`
-zusammen, und der Löcher-Prüfkörper ist aus denselben Maßzahlen neu
-gebaut, aber unabhängig vom geprüften Modul. Ein zwölfter Negativtest
-hält die Lücke zu: wer `spk_free_a` leert, muss an einem Assert
-scheitern statt an einem leeren Prüfkörper.
+Behoben wurde das damals über eine eigene Liste `spk_free_a` plus
+Abdeckungs-Asserts. **Diese Konstruktion gibt es nicht mehr:** mit der
+Klebebandmontage sind die Haltenasen samt Listen und ihren Checks
+entfallen (ADR 002, Nachtrag 2026-10-29). Was bleibt, ist der
+Löcher-Prüfkörper — und auch der ist, wie ein späterer Review gezeigt
+hat, noch aus `grille_hole_d` abgeleitet und würde mit dem Loch
+schrumpfen. Der Halt des Lautsprechers hat derzeit **gar keinen**
+Check; er hängt an Tasche und Klebeband.
 
 **Das ist die Fehlerklasse, auf die ein Review hier zuerst schauen
 sollte** — sie hat in diesem Projekt jetzt dreimal zugeschlagen (drei
@@ -295,7 +295,8 @@ Die Bauteilmaße sind gemessen. Was bleibt, liefert kein Messschieber:
 | Platinendicke, höchstes Bauteil | `pcb_t`, `pcb_comp_h` | Höhenstapel; 1,2 und 3,3 mm geschätzt |
 | Höhe des Schieberkörpers | `psw_cut_h` | 4,2 mm geschätzt; nur die Breite ist gemessen |
 | Tasterkörper | `sw_size` | 6 × 6 abgeleitet aus der Platinenbreite, nicht gemessen |
-| Steckermaße | `usb_insert`, `usb_grip_w/h`, `usb_proud` | Standardwerte für USB-C: 6,5 mm Einsteckweg, 13,0 × 7,5 mm Griff, Buchse bündig mit der Platinenkante. Ein dickeres Kabel passt nicht in die Tasche. |
+| **Griffmaß des Ladekabels** | `usb_grip_w`, `usb_grip_h` | 13,0 × 7,5 mm angenommen. **Das ist das Maß, das den Kanalquerschnitt bestimmt** — ein dickeres Kabel passt nicht. Mit der Schieblehre am Kabel direkt hinter dem Metallteil zu messen. |
+| Steckergeometrie | `usb_shell_l`, `usb_proud`, `usb_gap_seated` | Standardwerte: 6,5 mm Metall, Buchse bündig, kein Spalt im gesteckten Zustand. Alle drei machen den Kanal nur flacher, nie tiefer — die 9,7 mm sind der ungünstigste Fall. |
 | Höhe des Schieberkörpers | `psw_cut_h` | 5,0 angenommen; nur die Breite ist gemessen |
 | Lage der beiden JST-Buchsen | — | vom Foto abgelesen. Bindet die Packung nicht (mit 25 mm Reichweite dasselbe Maß), bestimmt aber, wie das Kabel liegt. |
 
@@ -367,7 +368,7 @@ wird auch nicht gebraucht: Das nachgiebige Druckstück begrenzt, was beim
 ## Stand
 
 ```
-65e344f  Review von 5d55b20: fuenf Befunde behoben, Ladestecker erreicht die Buchse
+(wird beim Commit eingetragen)
 ```
 
 Prüfbar mit:

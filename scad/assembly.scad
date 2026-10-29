@@ -12,7 +12,8 @@ use <parts.scad>
 
 // Der Korb liegt in der Tasche, nicht auf dem Boden.
 module mock_speaker()
-    translate([spk_cx, spk_cy, spk_z0 + seat_eps]) cylinder(d = spk_d, h = spk_depth);
+    translate([spk_cx, spk_cy, spk_z0 + tape_t + seat_eps])
+        cylinder(d = spk_d, h = spk_depth);
 
 // 28 mm in x, 20 mm in y — die Buchse zeigt nach Norden zur Platine.
 module mock_battery()
@@ -63,23 +64,29 @@ function card_y0() = cy - card_ch_l/2 + card_clear;
 // Ein echter USB-C-Stecker in voll eingestecktem Zustand: Metallteil
 // in der Buchse, Griff davor. Damit wird geprueft, was ein freier
 // Korridor NICHT beweist — dass das Kabel wirklich hineingeht.
-module mock_usb_plug() {
-    translate([usb_x_c - usb_shell_w/2, pcb_y0 - usb_insert,
+// Voll gesteckt: die Metallhuelse reicht von der Griffstirn aus
+// usb_shell_l weit nach innen, also IN die Buchse hinein — nicht nur
+// bis an deren Oeffnung.
+module mock_usb_plug(back = 0) {
+    translate([usb_x_c - usb_shell_w/2, usb_grip_y - back,
                usb_z_c - usb_shell_h/2])
-        cube([usb_shell_w, usb_insert, usb_shell_h]);
+        cube([usb_shell_w, usb_shell_l, usb_shell_h]);
     // mit Eckrundung: ein Stecker hat keine scharfen Kanten, und mit
     // scharfen Ecken meldet der Check die vier Zwickel der runden
     // Tasche als Kollision.
-    translate([usb_x_c, pcb_y0 - usb_insert, usb_z_c])
+    translate([usb_x_c, usb_grip_y - back, usb_z_c])
         rotate([90, 0, 0]) linear_extrude(25)
             translate([-usb_grip_w/2, -usb_grip_h/2])
                 rrect(usb_grip_w, usb_grip_h, usb_grip_r);
 }
 
 // Stift oder Bueroklammer, bis an den Schieber.
+// Das Werkzeug muss NEBEN den Schieber kommen, sonst kann es ihn nicht
+// verschieben. Deshalb beide Endlagen, nicht die Mitte.
 module mock_switch_tool()
-    translate([psw_x_c, pcb_y0, psw_z_c]) rotate([90, 0, 0])
-        cylinder(d = psw_tool_d, h = 30);
+    for (dx = [-1, 1])
+        translate([psw_x_c + dx*(4.0 + psw_tool_d)/2, pcb_y0, psw_z_c])
+            rotate([90, 0, 0]) cylinder(d = psw_tool_d, h = 30);
 
 module mock_screws()
     for (p = screw_pos) translate([p[0], p[1], 0]) {

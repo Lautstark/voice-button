@@ -61,12 +61,13 @@ run "Kartenfenster zu" parts.scad \
 run "Kartenmulde zu lang" config.scad \
     's|^card_ch_l      = card_w + (card_spare_min + card_spare_max)/2;|card_ch_l = card_w + (card_spare_min + card_spare_max)/2 + 3.0;|' \
     check_card_retained_top leer
-# Anschlagring entfernt: die Taste faellt bis auf die Elektronik
-# Steckertasche zu flach: der Griff des Kabels stoesst an der Wand an,
-# bevor der Stecker sitzt. Genau dieser Fehler steckte im Entwurf, und
-# ein freier Korridor hat ihn nicht gezeigt — erst ein Steckermodell.
-run "Steckertasche zu flach" config.scad \
-    's|^usb_pocket_d   = (wall + pcb_y0 - usb_proud) - usb_insert;|usb_pocket_d = 0.6;|' \
+# Steckerkanal endet in der Wand statt an der Buchse: der Griff stoesst
+# an, bevor der Stecker sitzt. Genau dieser Fehler steckte im Entwurf,
+# und ein freier Korridor hat ihn nicht gezeigt — erst ein Steckermodell
+# in der WIRKLICH gesteckten Lage. Die Mutation sitzt in parts.scad,
+# damit sie am assert vorbeikommt.
+run "Steckerkanal zu kurz" parts.scad \
+    's|cube(\[usb_pocket_w, usb_grip_y + 1, usb_pocket_h\])|cube([usb_pocket_w, 1.6, usb_pocket_h])|' \
     check_usb_plug_fits ueberschneidung
 # Schaltermulde zu: an den Schieber kommt kein Stift mehr.
 run "Schalteroeffnung zu" parts.scad \
@@ -76,6 +77,7 @@ run "Schalteroeffnung zu" parts.scad \
 run "Schallloecher zu" parts.scad \
     's|^module lid_grille() {|module lid_grille() { if (true) {} else|' \
     check_grille_open ueberschneidung
+# Anschlagring entfernt: die Taste faellt bis auf die Elektronik
 run "Anschlagring weg" parts.scad \
     's|^module lid_rim() {|module lid_rim() { if (true) {} else|' \
     check_stop_engages leer

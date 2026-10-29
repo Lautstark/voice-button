@@ -87,13 +87,21 @@ am fertigen Teil prüft:
 
 Beides geht am geschlossenen Gerät durch die Südwand.
 
-**Laden:** Die Öffnung hat außen eine Tasche, in die der Griff des
-Kabels 3,2 mm einfährt — ohne sie erreicht der Stecker die Buchse
-nicht. Sie ist für Griffmaße **bis 13,0 × 7,5 mm** ausgelegt. Ein
-besonders dickes Kabel passt nicht; dann ein schlankeres nehmen.
+**Laden:** Ein Stecker sitzt erst, wenn sein Kunststoffgriff bis an die
+Buchsenstirn kommt — und die liegt 9,7 mm hinter der Außenfläche, hinter
+Wand *und* Anschlagring. Der Durchbruch hat deshalb auf ganzer Länge
+Griffmaß: **13,6 × 8,1 mm, 9,7 mm tief**. Ausgelegt für Griffe **bis
+13,0 × 7,5 mm**; ein dickeres Kabel passt nicht, dann ein schlankeres
+nehmen.
 
-**Ein-Aus:** Der Schieber sitzt 9,7 mm hinter der Außenfläche, erreichbar
-mit **Stift, Büroklammer oder Fingernagel**, nicht mit der Fingerkuppe.
+Das ist ein durchgehendes Loch, hinter dem die Platine liegt. Ein
+Kleinkind kommt mit der Fingerkuppe hinein. Wer das nicht will, klebt
+einen Gummistopfen hinein oder lädt bei abgenommenem Deckel.
+
+**Ein-Aus:** Der Schieber sitzt 9,7 mm hinter der Außenfläche. Zum
+*Verschieben* muss das Werkzeug **neben** ihn — dafür bleiben neben dem
+4,0 mm breiten Schieber in der 7,0-mm-Öffnung 1,5 mm je Seite. Eine
+**Büroklammer** geht, ein 2,5-mm-Stift nicht.
 Das ist Absicht: ein Kind, das das Gerät versehentlich ausschaltet, hat
 ein Gerät, das „kaputt" ist und bei dem niemand weiß, warum.
 

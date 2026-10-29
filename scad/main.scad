@@ -184,8 +184,11 @@ else if (part == "check_port_tunnel_open")
     // hier gerade am gesunden Modell am groessten.
     intersection() {
         union() {
-            translate([usb_x_c - usb_cut_w/2, 0.1, usb_z_c - usb_cut_h/2])
-                cube([usb_cut_w, stop_band, usb_cut_h]);
+            // 0,2 mm schlanker als der Kanal: deckungsgleiche Flaechen
+            // ergeben sonst einen entarteten Koerper statt einer Pruefung.
+            translate([usb_x_c - usb_pocket_w/2 + 0.1, 0.1,
+                       usb_z_c - usb_pocket_h/2 + 0.1])
+                cube([usb_pocket_w - 0.2, stop_band, usb_pocket_h - 0.2]);
             translate([psw_x_c - psw_cut_w/2, 0.1, psw_z_c - psw_cut_h/2])
                 cube([psw_cut_w, stop_band, psw_cut_h]);
         }
@@ -195,6 +198,19 @@ else if (part == "check_port_tunnel_open")
 else if (part == "check_usb_plug_fits")
     intersection() {
         mock_usb_plug();
+        union() { front_housing(); rear_lid(); }
+    }
+// Nicht nur die Endlage: der ganze Einfuehrweg muss frei sein.
+// KEIN hull() — die konvexe Huelle ueber zwei Steckerlagen fuellt den
+// Raum zwischen dem breiten Griff aussen und der schmalen Huelse innen
+// und erfindet damit Material, das der Stecker nie einnimmt. Sie meldete
+// 6,63 mm3 gegen die Platinenauflage, wo in Wirklichkeit nur die Huelse
+// vorbeilaeuft. Stattdessen diskrete Stellungen; dazwischen kann nichts
+// passieren, weil der Stecker sich rein in -y bewegt und sein Querschnitt
+// dabei gleich bleibt.
+else if (part == "check_usb_insert_path")
+    intersection() {
+        union() { for (b = [0, 1, 2, 3, 4, 6, 8, 12]) mock_usb_plug(b); }
         union() { front_housing(); rear_lid(); }
     }
 else if (part == "check_switch_tool_fits")

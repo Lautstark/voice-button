@@ -37,7 +37,11 @@ pcb_w          = 28.0;  // [GEMESSEN] Messschieber, Portkante (x)
 pcb_h          = 30.0;  // [GEMESSEN] Messschieber, hochkant (y)
 pcb_t          = 1.2;   // [ANNAHME]
 pcb_comp_h     = 3.3;   // [ANNAHME] hoechstes Bauteil auf der Oberseite
-pcb_standoff   = 0.8;   // gedruckte Auflage, haelt die Loetseite frei
+// 1,2 statt 0,8: die Auflage hebt die Platine und mit ihr Buchse und
+// Schieber so weit an, dass deren Durchbrueche vollstaendig ueber der
+// Deckelfuge bleiben. Mit 0,8 reichte die Steckertasche 0,15 mm unter
+// das Gehaeuse und schnitt dessen erste Druckschicht auf.
+pcb_standoff   = 1.2;   // gedruckte Auflage unter der Platine
 // Hauptplatine, Akku und Lautsprecher werden GEKLEBT, nicht geklemmt —
 // sie liegen dem Modul mit doppelseitigem Klebeband bei. Das erspart
 // Haltewinkel und Fachwaende, und erst dadurch darf die Platine nahe
@@ -340,23 +344,33 @@ seat_eps       = 0.05;
 usb_x_c        = pcb_x0 + 10.0;      // [GEMESSEN] Buchse 5..15 mm
                                      // ab der Ecke, also Mitte 10,0
 usb_z_c        = pcb_top + 1.7;      // 7.7
-usb_cut_w      = 10.2;
-usb_cut_h      = 4.6;
 // STECKERTASCHE. Ein Trichter von 1,2 mm reicht nicht: die Platinen-
 // kante liegt hinter Wand und Anschlagring, und ein USB-C-Stecker
 // steckt nur rund 6,5 mm ein, danach beginnt der Griff. Ohne Tasche
 // stoesst der Griff an der Wand an, bevor der Stecker sitzt — das
 // Geraet waere nicht ladbar. Die Tasche holt den Griff so weit ins
 // Gehaeuse, wie die Wand es zulaesst.
-usb_insert     = 6.5;   // [ANNAHME] Einsteckweg des Metallteils
+// VIER GROESSEN, GETRENNT. Vorher steckte alles in einer Zahl, und das
+// Steckermodell endete mit der Metallspitze genau an der Buchsen-
+// oeffnung — das ist die NICHT gesteckte Lage, Eingriff null. Ein
+// Millimeter weiter hinein kollidierte der Griff mit dem Gehaeuse.
 usb_shell_w    = 8.3;   // [ANNAHME] Metallteil des Steckers
 usb_shell_h    = 2.6;
-usb_grip_w     = 13.0;  // [ANNAHME] Griffmass eines Standardkabels
+usb_shell_l    = 6.5;   // [ANNAHME] Laenge des Metallteils
+usb_grip_w     = 13.0;  // [ANNAHME] Griff des Kabels
 usb_grip_h     = 7.5;
-usb_proud      = 0.0;   // [ANNAHME] Buchse steht nicht ueber die Kante;
-                        // steht sie vor, wird es nur besser
 usb_grip_r     = 1.0;   // [ANNAHME] Eckrundung des Griffs
-usb_pocket_d   = (wall + pcb_y0 - usb_proud) - usb_insert;
+usb_proud      = 0.0;   // [ANNAHME] Buchsenstirn vor der Platinenkante
+// DIES IST DAS MASS, DAS GEMESSEN WERDEN MUSS: Kabel in das Modul
+// stecken und den Abstand zwischen der Stirn des Kunststoffgriffs und
+// der Platinenkante messen. Null heisst: der Griff liegt an der Buchse
+// an und muss bis auf die Platinenkante hineinkommen.
+usb_gap_seated = 0.0;   // [ANNAHME, zu messen]
+usb_socket_y   = pcb_y0 - usb_proud;              // Buchsenstirn
+usb_grip_y     = usb_socket_y - usb_gap_seated;   // Griffstirn, gesteckt
+// So tief muss der Kanal von der Aussenflaeche aus sein. Bei 9,7 mm
+// geht er durch die ganze Wand UND durch den Anschlagring.
+usb_channel_d  = wall + usb_grip_y;
 usb_pocket_w   = usb_grip_w + 0.6;   // 0,3 Spiel je Seite
 usb_pocket_h   = usb_grip_h + 0.6;
 psw_x_c        = pcb_x0 + 23.0;      // [GEMESSEN] Schieber 21..25 mm
@@ -366,12 +380,15 @@ psw_z_c        = pcb_top + 1.4;
 // Fingerkuppe ist er nicht erreichbar und soll es auch nicht sein: ein
 // Kind, das das Geraet versehentlich ausschaltet, hat ein Geraet, das
 // "kaputt" ist. Mit Fingernagel, Stift oder Bueroklammer geht es.
-psw_cut_w      = 6.0;                // Schieber ist 4,0 breit
+psw_tool_d     = 1.2;   // [ANNAHME] Bueroklammer; ein 2,5-mm-Stift
+                        // passt nicht neben den Schieber
+// Breit genug, dass ein Werkzeug NEBEN dem 4,0 mm breiten Schieber
+// Platz hat — sonst ist er zwar erreichbar, aber nicht zu schieben.
+psw_cut_w      = 4.0 + 2*(psw_tool_d + 0.3);
 psw_cut_h      = 5.0;
 psw_recess_w   = 9.0;                // Griffmulde aussen
-psw_recess_h   = 8.0;
+psw_recess_h   = 7.4;   // bleibt ueber der Deckelfuge
 psw_recess_d   = 2.5;
-psw_tool_d     = 2.5;   // [ANNAHME] Stift- oder Bueroklammerspitze
 
 // ---------------------------------------------------------------------
 // VERSCHRAUBUNG
@@ -424,8 +441,11 @@ assert(sw_have_tilt > sw_need + 0.15,
        str("Eckendruck loest nicht aus: ", sw_have_tilt, " statt ", sw_need));
 assert(sw_have_flat > sw_need,
        "gerader Druck loest nicht aus");
-assert(pad_t > sw_have_flat - act_gap - sw_travel + 1.0,
-       "Pad zu duenn: der Ueberhub bei geradem Druck staucht es zu stark");
+// sw_have_flat = travel_stop - act_gap enthaelt act_gap bereits; der
+// zweite Abzug war ein Fehler und machte den Assert um 0,3 mm zu lax.
+assert(pad_t > sw_have_flat - sw_travel + 1.0,
+       str("Pad zu duenn: der Ueberhub bei geradem Druck staucht es zu ",
+           "stark — gebraucht mehr als ", sw_have_flat - sw_travel + 1.0));
 
 // 2. Die Taste laeuft frei und wird gehalten
 assert(stop_z > bat_env + 0.4, "Anschlagring tiefer als der Akku samt Schwellreserve");
@@ -500,12 +520,17 @@ assert(spk_floor >= min_wall + 0.4,
        str("zu wenig Deckelmaterial unter dem Lautsprecher: ", spk_floor));
 // Der Ladestecker muss die Buchse erreichen. Das ist der Punkt, an dem
 // der Entwurf vorher funktionsuntuechtig war.
-assert(usb_pocket_d > 0,
-       str("Steckertasche negativ — Platine zu nah an der Wand: ", usb_pocket_d));
-assert(wall - usb_pocket_d >= 1.2,
-       str("hinter der Steckertasche bleibt zu wenig Wand: ", wall - usb_pocket_d));
-assert(usb_grip_w > usb_cut_w && usb_grip_h > usb_cut_h,
-       "Griffmass kleiner als der Durchbruch — dann braucht es keine Tasche");
+assert(usb_channel_d > wall,
+       str("Der Steckerkanal endet in der Wand statt an der Buchse: ",
+           usb_channel_d));
+// Die Durchbrueche muessen ueber der Deckelfuge bleiben, sonst schneiden
+// sie die erste Druckschicht des Gehaeuses auf.
+assert(usb_z_c - usb_pocket_h/2 >= bay_z + 0.2,
+       str("Steckerkanal reicht unter die Deckelfuge: ",
+           usb_z_c - usb_pocket_h/2));
+assert(psw_z_c - psw_recess_h/2 >= bay_z + 0.2,
+       str("Schaltermulde reicht unter die Deckelfuge: ",
+           psw_z_c - psw_recess_h/2));
 // Die beiden Mulden duerfen nicht zusammenlaufen.
 assert((psw_x_c - psw_recess_w/2) - (usb_x_c + usb_pocket_w/2) >= load_wall,
        str("zu wenig Wand zwischen Steckertasche und Schaltermulde: ",
@@ -568,13 +593,15 @@ assert(psw_x_c + psw_recess_w/2 < cavity - corner_r - 1.0, "Schaltermulde in der
 // Die beiden Durchbrueche in einer Wand duerfen nicht zusammenlaufen:
 // dazwischen muss tragendes Wandmaterial stehen bleiben.
 
-assert(usb_z_c + usb_cut_h/2 < stop_z - 1.0, "USB-Oeffnung reicht in den Ring");
-assert(psw_z_c + psw_cut_h/2 < stop_z - 1.0, "Schalteroeffnung reicht in den Ring");
+assert(usb_z_c + usb_pocket_h/2 < stop_z - 1.0, "Steckerkanal reicht in die Anschlagflaeche");
+assert(psw_z_c + psw_recess_h/2 < stop_z - 1.0, "Schaltermulde reicht in die Anschlagflaeche");
 // Der Anschlagring steht 12,85 mm hoch unmittelbar hinter diesen
 // Durchbruechen. Ohne Durchlass versperrt er Buchse und Schalter
 // vollstaendig. Der Durchlass endet unterhalb der Ringoberkante, damit
 // die Anschlagflaeche umlaufend geschlossen bleibt.
-port_tunnel_z  = max(usb_z_c + usb_cut_h/2, psw_z_c + psw_cut_h/2) + 0.5;
+// Der Durchlass im Ring IST jetzt der Steckerkanal — er muss den Griff
+// durchlassen, nicht nur die Metallhuelse.
+port_tunnel_z  = max(usb_z_c + usb_pocket_h/2, psw_z_c + psw_cut_h/2);
 assert(port_tunnel_z < stop_z - 3.0,
        str("kein Platz fuer den Durchlass im Ring: ", port_tunnel_z));
 assert(grille_ring_n*(grille_hole_d + 2.0) + grille_hole_d/2 < spk_d/2,

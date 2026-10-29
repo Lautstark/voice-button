@@ -40,14 +40,12 @@ module housing_void() {
 // Beide Durchbrueche liegen in der SUEDWAND: USB-C bei 10 mm und der
 // ON-OFF-Schieber bei 23 mm der 28-mm-Platinenkante, gemessen am Bauteil.
 module housing_ports() {
-    // --- Suedwand: USB-C, mit Einfuehrtrichter aussen
+    // --- Suedwand: USB-C. Der Kanal hat ueberall Griffmass und geht
+    // durch die ganze Wand — ein Stecker ist erst gesteckt, wenn sein
+    // Griff bis an die Buchse kommt. Den Rest des Weges bis zur
+    // Platinenkante macht der Durchlass im Anschlagring (lid_port_tunnels).
     translate([usb_x_c, -wall - 1, usb_z_c])
         rotate([-90, 0, 0]) linear_extrude(wall + 2)
-            translate([-usb_cut_w/2, -usb_cut_h/2]) rrect(usb_cut_w, usb_cut_h, 1.0);
-    // Steckertasche: holt den Griff des Kabels so weit ins Gehaeuse,
-    // dass das Metallteil die Buchse erreicht.
-    translate([usb_x_c, -wall - 0.01, usb_z_c])
-        rotate([-90, 0, 0]) linear_extrude(usb_pocket_d + 0.01)
             translate([-usb_pocket_w/2, -usb_pocket_h/2])
                 rrect(usb_pocket_w, usb_pocket_h, 1.5);
     // --- Suedwand: Schiebeschalter, mit flacher Griffmulde aussen
@@ -175,7 +173,7 @@ module lid_features() {
     // Die Auflage hat genau den Umriss der Platine: ihre Kante ist der
     // Anschlag beim Aufkleben, mehr braucht es nicht. Winkel standen
     // 1,2 mm weiter aussen und haetten den Ladestecker unmoeglich
-    // gemacht — siehe usb_pocket_d.
+    // gemacht — siehe usb_channel_d.
     translate([pcb_x0 - pcb_clear, pcb_y0 - pcb_clear, bay_z])
         cube([pcb_w + 2*pcb_clear, pcb_h + 2*pcb_clear, pcb_standoff]);
     // Akkufach: West- und Nordwand. Nach Sueden begrenzt die Platinen-
@@ -195,8 +193,9 @@ module lid_features() {
 // unterhalb der Ringoberkante: oben bleibt die Anschlagflaeche
 // umlaufend geschlossen, gedruckt wird darueber eine Bruecke.
 module lid_port_tunnels() {
-    translate([usb_x_c - usb_cut_w/2 - 0.5, -1, bay_z - 1])
-        cube([usb_cut_w + 1.0, stop_band + 2, port_tunnel_z - bay_z + 1]);
+    // Griffmass, bis zur Buchsenstirn
+    translate([usb_x_c - usb_pocket_w/2, -1, usb_z_c - usb_pocket_h/2])
+        cube([usb_pocket_w, usb_grip_y + 1, usb_pocket_h]);
     translate([psw_x_c - psw_cut_w/2 - 0.5, -1, bay_z - 1])
         cube([psw_cut_w + 1.0, stop_band + 2, port_tunnel_z - bay_z + 1]);
 }

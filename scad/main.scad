@@ -82,8 +82,13 @@ module probes_lid() {
     probe_at(cavity - 0.15 - stop_band/2, cy, bay_z + 1.0);   // Ring Ost
     // Material unter der Lautsprechertasche
     probe_at(spk_cx + spk_pocket_r - 1.0, spk_cy, spk_floor/2);
-    probe_at(pcb_x0 + pcb_w/2, pcb_y0 + pcb_h/2, bay_z + pcb_standoff/2);
     probe_at(cx, cy, lid_t/2 - 0.0);                          // Deckelboden
+    // Akkufachwaende — ohne diese Sonden koennen sie spurlos
+    // verschwinden, ohne dass eine Pruefung anders ausgeht.
+    probe_at(bat_x0 - bat_clear - bat_wall_t/2,
+             bat_y0 + bat_ey/2 - bat_clear, bay_z + 1.0);
+    probe_at(bat_x0 + bat_ex/2 - bat_clear,
+             bat_y0 - bat_clear + bat_ey + bat_wall_t/2, bay_z + 1.0);
 }
 
 module probes_housing() {
@@ -93,6 +98,13 @@ module probes_housing() {
     probe_at(cavity + wall/2, cy, (bay_z + house_front_z)/2); // Ostwand
     probe_at(cx, cy - window_w/2 - retain/2, house_front_z - 0.6); // Haltering
     probe_at(cx + window_w/2 + retain/2, cy, house_front_z - 0.6);
+    // Die Oese. Sie ist das einzige Befestigungsmerkmal und war bisher
+    // von keiner einzigen Pruefung beruehrt. Zwei Sonden: eine im
+    // Steg zur Wand, eine im Ring neben dem Loch. Die erste Fassung
+    // sass im Loch statt im Material — der Check hat das gemeldet.
+    probe_at(cx, cavity + wall - 1.0, bay_z + loop_t/2);
+    probe_at(cx + (loop_hole_d + loop_w)/4,
+             cavity + wall + loop_out - loop_w/2, bay_z + loop_t/2);
 }
 
 module probes_button() {
@@ -236,6 +248,26 @@ else if (part == "check_grille_open")
                             cylinder(d = grille_hole_d - 0.4, h = spk_floor - 0.1);
         }
     }
+// Die Beine des Tasters muessen frei stehen. Nur sie: fuer die
+// Hauptplatine ist eine Loetseitenkollision nicht belegt, und ein
+// Pruefkoerper fuer eine erfundene Geometrie prueft nichts.
+else if (part == "check_pins_clear")
+    intersection() { rear_lid(); mock_breakout(); }
+// Nichts auf dem Deckel darf hoeher sein als die Anschlagflaeche. Ein um
+// 1,3 mm zu hoher Ring wuerde den Tastenweg auf 0,7 mm kuerzen und das
+// Geraet nie ausloesen lassen — und keine Pruefung merkte es, weil alle
+// anderen nur fragen, ob der Ring IRGENDWO greift.
+else if (part == "check_stop_face_height")
+    intersection() {
+        rear_lid();
+        translate([-wall - 1, -wall - 1, stop_z + 0.05])
+            cube([housing + 2, housing + 2, 20]);
+    }
+// Beweist, dass button_tilt() die Taste ueberhaupt bewegt. Ohne das
+// bestehen die acht Kippruefungen auch dann, wenn der Kippwinkel ein
+// Zehntel betraegt oder null ist.
+else if (part == "selftest_tilt")
+    difference() { button(); button_tilt(1, 0); }
 else if (part == "check_screws_clear")
     intersection() { mock_screws(); union() { button(); mock_electronics(); } }
 

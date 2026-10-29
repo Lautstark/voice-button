@@ -109,8 +109,8 @@ platine) und die unterstellte Kabelreichweite von 14 mm.
 | Luft über dem Taster | 0,30 | gewählt |
 | Druckstück | 4,0 | **[ANNAHME]** |
 | Rückstellstreifen | 2,4 × 5,0, 0,4 vorgespannt | **[ANNAHME]** |
-| Karte | 64, zulässig 63,275–64,725 | gewählt |
-| Rand um die Kartenmulde | 7,1 | (Prisma − Mulde)/2 |
+| Karte | 40, zulässig 39,275–40,725 | gewählt |
+| Rand um die Kartenmulde | 19,1 | (Prisma − Mulde)/2 |
 
 ## 4. Ergebnisse mit nachvollziehbarer Rechnung
 
@@ -283,6 +283,44 @@ Projekt. Sie ist der wichtigste Prüfpunkt für ein Review.
 | Das Steckermodell hatte scharfe Ecken, die Tasche ist rund — 6,33 mm³ Eckzwickel | `check_usb_plug_fits`; Tasche hat jetzt 0,3 mm Spiel je Seite |
 | Der behauptete „Rückfall" der Tasterplatine über den Lautsprecher trägt nicht: 1,5 mm Eckenüberdeckung, 0,66 mm³ | neuer Check lag knapp über der Schwelle; **Behauptung zurückgezogen** statt den Check zu beschönigen |
 
+## 4e. Drei unabhaengige Reviews von 6b4e80c
+
+Drei Reviewer auf getrennte Fragen: Funktion, Pruefungen, Druck und
+Montage. Behoben wurde, was das Geraet nicht funktionieren liesse:
+
+| Befund | nachgeprueft | behoben |
+|---|---|---|
+| Steckermodell endete an der Buchsenoeffnung, Eingriff null | ✓ | vier Groessen getrennt, Kanal mit Griffmass bis zur Buchsenstirn |
+| Platinenauflage lag unter der Loetseite | **nicht belegt** | Auflage bleibt; zwei Anschlagnasen daneben ergaenzt |
+| Aufnahme unter den Tasterbeinen | plausibel, nicht belegt | Freistellung `pin_relief` als billige Versicherung |
+| Beide Aussenmulden schnitten die erste Druckschicht | ✓ 3,85 < 4,0 | Platine hoeher, zwei asserts |
+| Schalter erreichbar, aber nicht verschiebbar | ✓ 1,0 mm je Seite | Oeffnung aus dem Werkzeugmass, Modell neben dem Schieber |
+| Kartenlippen 64,8 mm ueber Luft | ✓ gemessen, 49,29 / 0,044 mm³ | Karte zurueck auf 40 mm |
+| Zu hoher Anschlagring faellt niemandem auf | ✓ | `check_stop_face_height` + Negativtest |
+| Kippmodell koennte stillstehen | ✓ | `selftest_tilt` + Negativtest |
+| Oese und Akkufach ohne jede Pruefung | ✓ | drei Sonden |
+| Kein Check sieht ein zu kleines Spiel | ✓ | elf Untergrenzen-asserts |
+| Pad-Assert zog `act_gap` doppelt ab | ✓ | behoben |
+| `mock_speaker` ohne Bandstaerke | ✓ | behoben |
+
+**Zurueckgewiesen:** der Befund, die Platinenauflage liege unter der
+Loetseite und die Platine wippe darauf. Die Unterseite dieser Platine
+ist nirgends abgebildet — weder der Reviewer noch ich haben sie gesehen;
+der Hersteller klebt dort Band auf, was gegen eine hoeckrige Flaeche
+spricht. Vor allem aber kann eine geklebte Platine nicht wippen, und auf
+ihr lastet nichts: der Taster steht auf eigener Aufnahme auf freiem
+Boden. Ich hatte den Befund zuerst uebernommen und die Auflage durch
+1,5-mm-Schaumband ersetzt; das ist zurueckgenommen.
+
+**Nicht behoben**, bewusst: mehrere Pruefkoerper sind weiterhin aus dem
+Parameter abgeleitet, den sie pruefen (`check_grille_open` aus
+`grille_hole_d`, die Schraubenchecks aus `screw_pilot_d`/`screw_len`,
+`check_card_window_open` aus `lip_top`). Dagegen stehen jetzt
+Untergrenzen-asserts, die den jeweiligen Parameter einklammern — das
+ist eine zweite Verteidigungslinie, kein Ersatz. `check_pad_reaches`
+und `check_foam_preloaded` sind rechnerisch Identitaeten und koennen
+nicht scheitern; sie bleiben als Dokumentation stehen.
+
 ## 5. Offene Messungen
 
 Die Bauteilmaße sind gemessen. Was bleibt, liefert kein Messschieber:
@@ -337,12 +375,15 @@ wird auch nicht gebraucht: Das nachgiebige Druckstück begrenzt, was beim
    werden. Das ist bewusst so: eine Packungssuche in OpenSCAD wäre
    weder lesbar noch nachvollziehbar. Die Suche selbst ist reproduzier-
    bar beschrieben in ADR 002.
-2. **Die 64-mm-Karte ist weicher als eine 40-mm-Karte.** Sie wird oben
-   und unten von je einer Lippe gehalten und liegt seitlich in der
-   Mulde; nach vorn durch das Fenster kann sie in der Mitte leicht
-   ausbeulen. Bei 0,6 mm Laminat und ohne Last ist das kosmetisch, aber
-   es ist der Preis für das große Symbol. Dickeres Laminat hilft,
-   `card_t` ist der Parameter.
+2. **Die Karte kann sich bei Vollanschlag selbst freigeben.** Das
+   Laengsspiel ist konstruktiv `lip_bottom + 0,15`, also immer 0,15 mm
+   groesser als die untere Lippe tief ist — schiebt sich die Karte ganz
+   nach Norden, liegt ihre Suedkante frei und sie kann ueber die obere
+   Lippe als Drehpunkt aus dem Fenster kippen. Das ist dem Mechanismus
+   eigen: zum Einlegen MUSS man die Karte weiter anheben, als die untere
+   Lippe tief ist. Mit dem Geraet nach vorn gekippt und geschuettelt
+   kann die Karte herausfallen. Ein anderer Haltemechanismus waere ein
+   Architekturwechsel.
 3. **Der Lautsprecher hängt an seinem Klebeband.** Seitlich hält ihn
    die 2,5 mm tiefe Tasche, nach oben nur das Band. Löst es sich, kann
    der Korb klappern; heraus kann er nicht, das Gehäuse ist zu. Ein

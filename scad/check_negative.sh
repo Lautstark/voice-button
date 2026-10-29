@@ -77,6 +77,24 @@ run "Schalteroeffnung zu" parts.scad \
 run "Schallloecher zu" parts.scad \
     's|^module lid_grille() {|module lid_grille() { if (true) {} else|' \
     check_grille_open ueberschneidung
+# Anschlagring 1,3 mm zu hoch: stop_z und alle asserts bleiben heil, der
+# Tastenweg schrumpft aber von 2,0 auf 0,7 mm und das Geraet loest nie
+# aus. Bis zu diesem Test hat das keine Pruefung gemerkt — alle fragten
+# nur, ob der Ring IRGENDWO greift, und ein zu hoher greift mehr.
+run "Anschlagring zu hoch" config.scad \
+    's|^rim_h          = stop_z - bay_z;|rim_h = stop_z - bay_z + 1.3;|' \
+    check_stop_face_height ueberschneidung
+# Freistellung unter dem Taster zugebaut: seine Loetbeine stossen auf.
+run "Tasterbeine stossen auf" parts.scad \
+    's|ped_top - pin_relief\])|ped_top + 5])|' \
+    check_pins_clear ueberschneidung
+# Kippmodell bewegt die Taste nicht mehr: dann bestehen die acht
+# Kippruefungen auch an einem kaputten Modell.
+# Beide Terme muessen weg: mit ang = 0 allein schiebt das Modell die
+# Taste immer noch seitlich, ist also kein Nichtstun.
+run "Kippmodell steht still" assembly.scad \
+    's|ang   = atan2(travel_stop, span);|ang = 0;|; s|slide = (plate_front_z - plate_under_z) \* travel_stop/span;|slide = 0;|' \
+    selftest_tilt leer
 # Anschlagring entfernt: die Taste faellt bis auf die Elektronik
 run "Anschlagring weg" parts.scad \
     's|^module lid_rim() {|module lid_rim() { if (true) {} else|' \

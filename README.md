@@ -18,7 +18,7 @@ Gebaut für ein dreieinhalbjähriges Kind, das nicht spricht.
 | Außenmaß | 93 × 93 × 21,9 mm |
 | Druckteile | drei, alle ohne Stützen |
 | Befestigung | vier M2 × 10, von hinten |
-| Karte | 64 × 64 mm, zulässig 63,3–64,7 mm |
+| Karte | 40 × 40 mm, zulässig 39,3–40,7 mm |
 | Druckfläche | 79 × 79 mm |
 | Tastenweg | 2,0 mm bis zum Anschlag |
 

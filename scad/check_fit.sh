@@ -77,6 +77,7 @@ python3 -I check_scope.py || fail=1
 echo "— Selbsttest der Messwerkzeuge —"
 must_engage selftest_wall_band
 must_engage selftest_probes
+must_engage selftest_tilt
 
 echo "— Teile gegeneinander —"
 for c in check_housing_button check_housing_button_pressed check_housing_lid \
@@ -116,5 +117,6 @@ must_be_empty check_features_button
 must_be_empty check_screw_bores_open
 must_be_empty check_screw_fits
 must_be_empty check_loop_hole_open
+must_be_empty check_stop_face_height
 
 exit $fail

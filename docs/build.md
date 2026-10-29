@@ -17,9 +17,9 @@
 | Moosgummi oder EVA, 4 mm, mittelfest | 1 Stück 8 × 8 mm | Druckstück auf der Tastenrückseite |
 | Spülschwamm, weich, offenzellig | 1 Streifen ca. 2,4 × 5 × 300 mm | Rückstellung, auf die Stufe am Anschlagring |
 | weiche Unterlage unter den Akku | 1 Stück 20 × 28 × 1 mm | Rest vom Schwamm genügt |
-| Doppelseitiges Klebeband, dünn (ca. 0,2 mm) | wenig | Liegt dem Modul bei. Hauptplatine, Akku und Lautsprecher werden damit geklebt — es gibt für sie keine Klemmhalterungen mehr. Dickeres Schaumband geht auch, dann aber `tape_t` in `config.scad` anpassen: es hebt den Lautsprecher und mit ihm die ganze Taste. |
+| Doppelseitiges Klebeband, dünn (ca. 0,2 mm) | wenig | Liegt dem Modul bei; Hauptplatine, Akku und Lautsprecher werden damit geklebt. Dickeres Schaumband geht auch, dann `tape_t` in `config.scad` anpassen — es hebt den Lautsprecher und mit ihm die ganze Taste. |
 | Sekundenkleber oder Heißkleber | wenig | Nur für die Tasterplatine, das Pad und den Stoß des Schwammstreifens. |
-| Laminierte Symbolkarte | nach Bedarf | 64 × 64 mm, zulässig 63,3–64,7 mm |
+| Laminierte Symbolkarte | nach Bedarf | 40 × 40 mm, zulässig 39,3–40,7 mm |
 | Selbstklebende Möbelpuffer, **3 mm** | 4 | Der Lautsprecher strahlt nach hinten ab. Liegt das Gerät flach auf dem Tisch, dämpft die Tischplatte den Ton. Vier Puffer halten die Schalllöcher frei — **nicht in die Ecken**, dort sitzen die Schrauben, sondern mittig auf den vier Kanten der Rückseite. Sie sind jetzt nicht mehr optional: die vier Schraubenköpfe stehen 1,4 mm vor, das Gerät soll auf den Puffern stehen und nicht auf ihnen. |
 
 **Keine Unterlegscheiben.** Keine Schraube durch ein bewegliches Teil.
@@ -53,11 +53,11 @@ wird, solange alles zugänglich ist.
    Das Fach ist nach Osten offen — dort kommt man mit dem Finger an die
    Zelle.
 6. **Hauptplatine aufkleben**, auf die rechteckige Auflage, Portkante
-   (USB-C und Schieber) nach Süden. Die Auflage hat genau den
-   Platinenumriss; ihre Kante ist der Anschlag. **Hier genau
-   ausrichten**: es gibt keine Haltewinkel mehr, und die Platine steht
-   so dicht an der Südwand, dass ein Millimeter Versatz den Ladestecker
-   nicht mehr in die Buchse lässt.
+   (USB-C und Schieber) nach Süden. Im Norden und Osten steht je eine
+   Anschlagnase: Platine in diese beiden Nasen schieben, dann sitzt sie
+   richtig. **Ein Millimeter zu weit nach Norden und der Ladestecker
+   erreicht die Buchse nicht mehr** — deshalb vor dem Andrücken trocken
+   auflegen und den Stecker probehalber durchstecken.
 7. **Verkabeln:** Lautsprecher und Akku an die Platine, Kabel der
    Tasterplatine anstecken. Jetzt, solange alles zugänglich ist. Beide
    Kabel sind nur 20 mm lang und reichen genau bis zu ihrem Nachbarn —

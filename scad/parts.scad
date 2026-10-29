@@ -170,12 +170,15 @@ module lid_features() {
     // Die Auflage ist wichtig: sie nimmt die Betaetigungskraft auf, die
     // ueber die Tasterplatine daneben eingeleitet wird, ohne dass die
     // Hauptplatine sich durchbiegen kann.
-    // Die Auflage hat genau den Umriss der Platine: ihre Kante ist der
-    // Anschlag beim Aufkleben, mehr braucht es nicht. Winkel standen
-    // 1,2 mm weiter aussen und haetten den Ladestecker unmoeglich
-    // gemacht — siehe usb_channel_d.
+    // Vollflaechige Auflage plus zwei Anschlagnasen im Norden und Osten.
     translate([pcb_x0 - pcb_clear, pcb_y0 - pcb_clear, bay_z])
         cube([pcb_w + 2*pcb_clear, pcb_h + 2*pcb_clear, pcb_standoff]);
+    translate([pcb_x0 + pcb_w/2 - pcb_nose_l/2,
+               pcb_y0 + pcb_h + pcb_clear, bay_z])
+        cube([pcb_nose_l, pcb_nose_t, pcb_nose_h]);
+    translate([pcb_x0 + pcb_w + pcb_clear,
+               pcb_y0 + pcb_h/2 - pcb_nose_l/2, bay_z])
+        cube([pcb_nose_t, pcb_nose_l, pcb_nose_h]);
     // Akkufach: West- und Nordwand. Nach Sueden begrenzt die Platinen-
     // auflage, nach Osten der freie Boden — dort kommt man mit dem
     // Finger an die Zelle, um sie beim Zusammenbau einzulegen.
@@ -184,9 +187,16 @@ module lid_features() {
     translate([bat_x0 - bat_clear - bat_wall_t,
                bat_y0 - bat_clear + bat_ey, bay_z])
         cube([bat_ex + 2*bat_wall_t, bat_wall_t, bat_t + bat_pad_t]);
-    // Aufnahme der Tasterplatine: massiver Block auf freiem Boden
-    translate([ped_x0, ped_y0, bay_z])
-        cube([ped_x1 - ped_x0, ped_y1 - ped_y0, ped_top - bay_z]);
+    // Aufnahme der Tasterplatine: Block auf freiem Boden, oben mit einer
+    // Freistellung unter dem Taster — dessen Beine stehen nach unten
+    // heraus. Die Platine liegt ringsum auf dem stehengebliebenen Rand.
+    difference() {
+        translate([ped_x0, ped_y0, bay_z])
+            cube([ped_x1 - ped_x0, ped_y1 - ped_y0, ped_top - bay_z]);
+        translate([cx - (sw_size + 0.6)/2, cy - (sw_size + 0.6)/2,
+                   ped_top - pin_relief])
+            cube([sw_size + 0.6, sw_size + 0.6, pin_relief + 1]);
+    }
 }
 
 // Durchlass im Anschlagring hinter den Durchbruechen. Er endet

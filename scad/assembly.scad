@@ -28,7 +28,12 @@ module mock_pcb() {
 module mock_breakout() {
     translate([bo_x0, bo_y0, bo_z + seat_eps]) cube([bo_w, bo_l, bo_t]);
     translate([cx - sw_size/2, cy - sw_size/2, bo_top + seat_eps]) cube([sw_size, sw_size, sw_h]);
+    // Die vier Loetbeine des Tasters, nach unten durch die Platine.
+    for (dx = [-1, 1]) for (dy = [-1, 1])
+        translate([cx + dx*sw_size/3, cy + dy*sw_size/3, bo_z - pin_relief])
+            cylinder(d = pin_d, h = pin_relief + bo_t);
 }
+
 
 // Das Pad klebt auf der ebenen Rueckseite, nicht mehr in einer Tasche.
 module mock_pad()

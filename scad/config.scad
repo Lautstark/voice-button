@@ -37,11 +37,32 @@ pcb_w          = 28.0;  // [GEMESSEN] Messschieber, Portkante (x)
 pcb_h          = 30.0;  // [GEMESSEN] Messschieber, hochkant (y)
 pcb_t          = 1.2;   // [ANNAHME]
 pcb_comp_h     = 3.3;   // [ANNAHME] hoechstes Bauteil auf der Oberseite
-// 1,2 statt 0,8: die Auflage hebt die Platine und mit ihr Buchse und
-// Schieber so weit an, dass deren Durchbrueche vollstaendig ueber der
-// Deckelfuge bleiben. Mit 0,8 reichte die Steckertasche 0,15 mm unter
-// das Gehaeuse und schnitt dessen erste Druckschicht auf.
+// Die Platine liegt vollflaechig auf einer gedruckten Auflage und klebt
+// darauf. 1,2 mm, weil das zusammen mit Band und Platinendicke Buchse
+// und Schieber so weit anhebt, dass ihre Durchbrueche ueber der
+// Deckelfuge bleiben — mit 0,8 schnitt der Steckerkanal die erste
+// Druckschicht des Gehaeuses an.
+//
+// Ein Review hielt diese Auflage fuer einen Fehler, weil sie unter der
+// Loetseite laege. Das ist nicht belegt: die Unterseite dieser Platine
+// ist nirgends abgebildet, und der Hersteller klebt dort Band auf, was
+// gegen eine hoeckrige Flaeche spricht. Ausserdem kann eine GEKLEBTE
+// Platine nicht wippen, und auf ihr lastet nichts — der Taster steht
+// auf eigener Aufnahme. Die Auflage bleibt.
 pcb_standoff   = 1.2;   // gedruckte Auflage unter der Platine
+// Zwei Anschlagnasen NEBEN der Platine, nach Norden und Osten. Sie
+// stehen nicht unter ihr, beruehren also keine Loetseite, und sie
+// liegen auf den Seiten, die den Ladestecker nicht betreffen. Ohne sie
+// gibt es beim Aufkleben keinen Anschlag — und der Steckerweg hat null
+// Reserve nach Norden.
+pcb_nose_t     = 1.2;
+pcb_nose_h     = 2.5;
+pcb_nose_l     = 6.0;
+// Fuer die Tasterplatine bleibt die Freistellung: dort steht ein
+// 6x6-Taster, und DURCH DIESE Platine laeuft die Betaetigungskraft
+// wirklich. Billige Versicherung, falls seine Beine herausstehen.
+pin_relief     = 1.2;   // [ANNAHME] Ueberstand der Loetbeine nach unten
+pin_d          = 1.0;   // [ANNAHME] Dicke eines Loetbeins
 // Hauptplatine, Akku und Lautsprecher werden GEKLEBT, nicht geklemmt —
 // sie liegen dem Modul mit doppelseitigem Klebeband bei. Das erspart
 // Haltewinkel und Fachwaende, und erst dadurch darf die Platine nahe
@@ -279,13 +300,15 @@ win_z0         = house_cone_z0 + (cavity - window_w)/2;  // 19.05 — Konusende
 // loslassen, sie faellt auf die untere. Kein Klebeband, kein Werkzeug,
 // kein Schnapphaken. Breite der nutzbaren Kartenhoehe:
 // lip_top - lip_bottom - 0.75 — deshalb ist lip_top gross.
-// Die Karte ist KEIN gefundenes Mass, sondern eine Entscheidung: sie
-// wird selbst laminiert und zugeschnitten, also richtet sie sich nach
-// der Taste und nicht umgekehrt. Bei 79 mm Druckflaeche und 40-mm-Karte
-// blieben 19 mm leerer Rand je Seite — fuer ein dreieinhalbjaehriges
-// Kind zaehlt das Symbol, nicht der Rahmen. 64 mm lassen 7,1 mm Rand
-// fuer die beiden Lippen und den Rahmen stehen.
-card_w         = 64.0;  // gewaehlt, quadratisch
+// Die Karte ist eine Entscheidung, kein gefundenes Mass. 64 mm waren
+// versucht und zurueckgenommen: die beiden Haltelippen sind in Drucklage
+// Bruecken ueber die ganze Muldenbreite, und bei 64,8 mm Spannweite ist
+// die untere mit 0,8 mm Breite (zwei Bahnen) nicht mehr zuverlaessig
+// druckbar. Gemessen: Schicht bei Druck-z 3,30 enthaelt 49,29 mm3, eine
+// Schicht tiefer 0,044 — die Lippen haengen auf voller Laenge in der
+// Luft. Bei 40 mm sind es 40,8 mm Spannweite, und das ist die Geometrie,
+// die in Architektur A am Druck erprobt war.
+card_w         = 40.0;  // gewaehlt, quadratisch
 
 card_clear     = 0.4;
 card_corner_r  = 0.5;
@@ -371,8 +394,8 @@ usb_grip_y     = usb_socket_y - usb_gap_seated;   // Griffstirn, gesteckt
 // So tief muss der Kanal von der Aussenflaeche aus sein. Bei 9,7 mm
 // geht er durch die ganze Wand UND durch den Anschlagring.
 usb_channel_d  = wall + usb_grip_y;
-usb_pocket_w   = usb_grip_w + 0.6;   // 0,3 Spiel je Seite
-usb_pocket_h   = usb_grip_h + 0.6;
+usb_pocket_w   = usb_grip_w + 0.4;   // 0,2 Spiel je Seite
+usb_pocket_h   = usb_grip_h + 0.4;
 psw_x_c        = pcb_x0 + 23.0;      // [GEMESSEN] Schieber 21..25 mm
                                      // ab der Ecke, also Mitte 23,0
 psw_z_c        = pcb_top + 1.4;
@@ -435,6 +458,30 @@ function rect_dist(px, py, x0, y0, x1, y1) =
 // ---------------------------------------------------------------------
 // Jede dieser Zeilen hat schon einmal einen Fehler gefunden. Sie ersetzen
 // keine Messung an der Hardware und keinen Festigkeitsnachweis.
+
+// 0. Untergrenzen. Alle Pruefungen fragen "keine Ueberschneidung" und
+//    werden deshalb GRUENER, wenn ein Spiel schrumpft, nie roeter. Was
+//    kein Volumencheck sehen kann, muss hier stehen.
+assert(plate_clear >= 0.2 && plate_clear <= 0.6,
+       str("Tastenspiel unplausibel: ", plate_clear));
+assert(seat_clear >= 0.3, str("Prismenspiel zu klein: ", seat_clear));
+assert(card_clear >= 0.2, str("Kartenspiel zu klein: ", card_clear));
+assert(pcb_clear >= 0.2 && bat_clear >= 0.2 && spk_clear >= 0.3,
+       "ein Bauteilspiel ist zu klein");
+assert(act_gap >= 0.2 && act_gap <= 0.5,
+       str("Luft ueber dem Taster unplausibel: ", act_gap));
+assert(screw_pilot_d >= 1.5 && screw_pilot_d <= 1.8,
+       str("Kernloch passt nicht zu M2: ", screw_pilot_d));
+assert(screw_in_wall >= 4.0,
+       str("zu wenig Gewinde in der Wand: ", screw_in_wall));
+assert(grille_hole_d >= 1.5, str("Schallloecher zu klein: ", grille_hole_d));
+assert(loop_hole_d >= 3.0 && loop_t >= 3.0 && loop_w >= 6.0,
+       "Oese zu schwach oder Loch zu klein fuer ein Band");
+assert(pin_relief >= 0.8, str("zu wenig Freistellung fuer Loetbeine: ", pin_relief));
+assert(pcb_nose_t >= 1.0 && pcb_nose_h > pcb_standoff + pcb_t,
+       "Anschlagnasen zu schwach oder niedriger als die Platine");
+assert(ped_top - pin_relief > bay_z + 1.0,
+       "Freistellung schneidet die Aufnahme bis auf den Boden durch");
 
 // 1. Betaetigung in allen Richtungen
 assert(sw_have_tilt > sw_need + 0.15,

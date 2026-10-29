@@ -79,7 +79,7 @@ Die Mulde ist 1,7 mm höher als die Karte, mit je einer Lippe oben
 (3,0 mm) und unten (0,8 mm). Karte schräg unter die obere Lippe
 schieben, loslassen — sie fällt auf die untere und bleibt dort.
 
-Die nutzbare Kartenhöhe ist deshalb **63,3 bis 64,7 mm**: ein Fenster
+Die nutzbare Kartenhöhe ist deshalb **39,3 bis 40,7 mm**: ein Fenster
 von 1,45 mm, mit der Schere zu treffen. Es hängt nur an den beiden
 Lippen, nicht an der Kartengröße — eine größere Karte wird dadurch
 nicht schwerer zuzuschneiden. Unter der oberen Lippe senkt sich der Muldenboden um 0,6 mm

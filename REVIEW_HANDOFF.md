@@ -368,7 +368,7 @@ wird auch nicht gebraucht: Das nachgiebige Druckstück begrenzt, was beim
 ## Stand
 
 ```
-(wird beim Commit eingetragen)
+b4a10d7  Steckerzugang vollstaendig gesteckt modelliert, Pad-Assert, Lautsprecher-Mock
 ```
 
 Prüfbar mit:

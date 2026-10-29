@@ -44,18 +44,22 @@ module housing_ports() {
     translate([usb_x_c, -wall - 1, usb_z_c])
         rotate([-90, 0, 0]) linear_extrude(wall + 2)
             translate([-usb_cut_w/2, -usb_cut_h/2]) rrect(usb_cut_w, usb_cut_h, 1.0);
+    // Steckertasche: holt den Griff des Kabels so weit ins Gehaeuse,
+    // dass das Metallteil die Buchse erreicht.
     translate([usb_x_c, -wall - 0.01, usb_z_c])
-        rotate([-90, 0, 0]) linear_extrude(usb_funnel_d + 0.01)
-            translate([-usb_funnel_w/2, -usb_funnel_h/2])
-                rrect(usb_funnel_w, usb_funnel_h, 1.5);
+        rotate([-90, 0, 0]) linear_extrude(usb_pocket_d + 0.01)
+            translate([-usb_pocket_w/2, -usb_pocket_h/2])
+                rrect(usb_pocket_w, usb_pocket_h, 1.5);
     // --- Suedwand: Schiebeschalter, mit flacher Griffmulde aussen
     translate([psw_x_c, -wall - 1, psw_z_c])
         rotate([-90, 0, 0]) linear_extrude(wall + 2)
             translate([-psw_cut_w/2, -psw_cut_h/2]) rrect(psw_cut_w, psw_cut_h, 1.0);
+    // Griffmulde: der Schieber wird mit Stift oder Bueroklammer bedient,
+    // nicht mit dem Finger — siehe config.scad.
     translate([psw_x_c, -wall - 0.01, psw_z_c])
         rotate([-90, 0, 0]) linear_extrude(psw_recess_d + 0.01)
-            translate([-(psw_cut_w + 4)/2, -(psw_cut_h + 4)/2])
-                rrect(psw_cut_w + 4, psw_cut_h + 4, 1.5);
+            translate([-psw_recess_w/2, -psw_recess_h/2])
+                rrect(psw_recess_w, psw_recess_h, 1.5);
 }
 
 module housing_loop() {
@@ -117,9 +121,6 @@ module button() {
     difference() {
         button_body();
         card_recess();
-        // flache Tasche fuer das Druckstueck, damit es beim Kleben sitzt
-        translate([cx - pad_w/2, cy - pad_w/2, plate_under_z - 0.01])
-            rbox(pad_w, pad_w, 0.4, 1.0);
     }
 }
 
@@ -149,53 +150,12 @@ module lid_rim() {
 // Der Lautsprecher liegt in einer TASCHE im Deckel. Gedruckt wird der
 // Deckel mit der Aussenflaeche auf dem Bett, die Tasche ist also eine
 // flachbodige Vertiefung in den ersten Schichten — kein Ueberhang.
-// Gehalten wird der Korb seitlich von der Taschenwand und nach oben von
-// vier einzelnen Nasen; ein umlaufender Ring haette 1,5 mm Rand ringsum
-// gebraucht und das Geraet um 10 mm wachsen lassen.
+// Seitlich haelt sie den Korb; nach oben haelt ihn sein eigenes
+// Klebeband, und als Rueckfall laeuft die Tasterplatine 0,3 mm ueber
+// seinem Rand. Deshalb gibt es hier keine Haltenasen mehr.
 module lid_speaker_pocket() {
     translate([spk_cx, spk_cy, spk_z0])
         cylinder(r = spk_pocket_r, h = spk_recess + 0.01);
-}
-
-module lid_speaker() {
-    for (a = spk_tab_a) {
-        // Ringsektor von der Taschenwand nach aussen, vom Deckelboden
-        // bis ueber die Korboberkante, mit einer Nase nach innen.
-        translate([spk_cx, spk_cy, 0]) rotate([0, 0, a - spk_tab_arc/2])
-            difference() {
-                union() {
-                    // senkrechte Wand auf dem Boden
-                    linear_extrude(has_lip(a) ? spk_lip_z + spk_tab_lip
-                                                       : spk_top)
-                        difference() {
-                            circle(r = spk_tab_ro, $fn = 96);
-                            circle(r = spk_pocket_r, $fn = 96);
-                            translate([-spk_tab_ro - 1, -spk_tab_ro - 1])
-                                square([2*spk_tab_ro + 2, spk_tab_ro + 1]);
-                            rotate([0, 0, spk_tab_arc])
-                                translate([-spk_tab_ro - 1, 0])
-                                    square([2*spk_tab_ro + 2, spk_tab_ro + 1]);
-                        }
-                    // Nase nach innen, oberhalb der Korboberkante —
-                    // nur in den Richtungen aus spk_lip_a
-                    if (has_lip(a))
-                    translate([0, 0, spk_lip_z])
-                        linear_extrude(spk_tab_lip)
-                            difference() {
-                                circle(r = spk_tab_ro, $fn = 96);
-                                circle(r = spk_pocket_r - spk_tab_lip, $fn = 96);
-                                translate([-spk_tab_ro - 1, -spk_tab_ro - 1])
-                                    square([2*spk_tab_ro + 2, spk_tab_ro + 1]);
-                                rotate([0, 0, spk_tab_arc])
-                                    translate([-spk_tab_ro - 1, 0])
-                                        square([2*spk_tab_ro + 2, spk_tab_ro + 1]);
-                            }
-                }
-                // unterhalb des Bodens steht nichts
-                translate([-spk_tab_ro - 2, -spk_tab_ro - 2, -1])
-                    cube([2*spk_tab_ro + 4, 2*spk_tab_ro + 4, bay_z + 1]);
-            }
-    }
 }
 
 module lid_grille() {
@@ -207,31 +167,17 @@ module lid_grille() {
     }
 }
 
-// Vier L-Winkel statt einer geschlossenen Fassung: sie legen die Platine
-// fest, versperren aber weder Stecker noch Kabel.
-module corner_clips(x0, y0, w, h, cl, t, hgt, leg) {
-    // px/py ist die AUSSENECKE des Winkels. Fuer die oestliche bzw.
-    // noerdliche Seite liegt sie um t weiter aussen als die Innenflaeche —
-    // wer das vergisst, baut dort 1,5 mm Spiel statt 0,3 ein.
-    for (i = [0, 1]) for (j = [0, 1]) {
-        px = (i == 0) ? x0 - cl - t : x0 + w + cl;
-        py = (j == 0) ? y0 - cl - t : y0 + h + cl;
-        translate([0, 0, bay_z]) {
-            translate([(i == 0) ? px : px + t - leg, py, 0]) cube([leg, t, hgt]);
-            translate([px, (j == 0) ? py : py + t - leg, 0]) cube([t, leg, hgt]);
-        }
-    }
-}
-
 module lid_features() {
     // Hauptplatine: volle Auflage unter der ganzen Flaeche plus Winkel.
     // Die Auflage ist wichtig: sie nimmt die Betaetigungskraft auf, die
     // ueber die Tasterplatine daneben eingeleitet wird, ohne dass die
     // Hauptplatine sich durchbiegen kann.
+    // Die Auflage hat genau den Umriss der Platine: ihre Kante ist der
+    // Anschlag beim Aufkleben, mehr braucht es nicht. Winkel standen
+    // 1,2 mm weiter aussen und haetten den Ladestecker unmoeglich
+    // gemacht — siehe usb_pocket_d.
     translate([pcb_x0 - pcb_clear, pcb_y0 - pcb_clear, bay_z])
         cube([pcb_w + 2*pcb_clear, pcb_h + 2*pcb_clear, pcb_standoff]);
-    corner_clips(pcb_x0, pcb_y0, pcb_w, pcb_h, pcb_clear, pcb_clip_t,
-                 pcb_standoff + pcb_t + 1.0, pcb_clip_leg);
     // Akkufach: West- und Nordwand. Nach Sueden begrenzt die Platinen-
     // auflage, nach Osten der freie Boden — dort kommt man mit dem
     // Finger an die Zelle, um sie beim Zusammenbau einzulegen.
@@ -243,7 +189,6 @@ module lid_features() {
     // Aufnahme der Tasterplatine: massiver Block auf freiem Boden
     translate([ped_x0, ped_y0, bay_z])
         cube([ped_x1 - ped_x0, ped_y1 - ped_y0, ped_top - bay_z]);
-    lid_speaker();
 }
 
 // Durchlass im Anschlagring hinter den Durchbruechen. Er endet
@@ -264,7 +209,6 @@ module rear_lid() {
         lid_grille();
         for (p = screw_pos) {
             translate([p[0], p[1], -1]) cylinder(d = screw_free_d, h = lid_t + 2);
-            translate([p[0], p[1], -0.01]) cylinder(d = screw_cb_d, h = screw_cb_h);
         }
     }
 }

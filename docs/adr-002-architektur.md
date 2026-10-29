@@ -93,6 +93,33 @@ zuerst, kompakte Abmessungen zuletzt.
 93 statt 61 mm ist damit eine Folge der Hardware, keine Wahl. Dünner
 ist das Gerät trotzdem geworden: 21,3 statt 22,4 mm.
 
+### Nachtrag 2026-10-29: geklebt statt geklemmt
+
+Die Bauteile bringen doppelseitiges Klebeband mit. Das war beim ersten
+Entwurf nicht bekannt, und es ändert zwei Dinge:
+
+**Die Haltewinkel der Hauptplatine entfallen.** Sie standen 1,2 mm
+weiter außen als die Platine. Damit lag deren Portkante 10,9 mm hinter
+der Außenfläche — ein USB-C-Stecker steckt aber nur rund 6,5 mm ein,
+danach beginnt der Griff. Der hätte an der Wand angestanden, bevor der
+Stecker sitzt: **das Gerät wäre nicht ladbar gewesen.** Ohne Winkel sind
+es 9,7 mm, und die restlichen 3,2 mm holt eine Tasche in der Außenwand.
+Dass es hinter dieser Tasche noch 1,3 mm Wand gibt, ist knapp, aber die
+Stelle trägt nichts — den Lastpfad trägt der Anschlagring am Rand.
+
+**Die Haltenasen am Lautsprecher entfallen.** Vier Nasen mit 0,8 mm
+Überdeckung hätten den starren Metallkorb gar nicht hineingelassen; die
+Antwort darauf wären zwei Nasen und ein schräges Einsetzen gewesen. Mit
+Klebeband stellt sich die Frage nicht. Gehalten wird der Korb seitlich
+von seiner Tasche, nach oben vom Band. Das ist weniger als vorher, und
+es ist ehrlicher: der frühere „Rückfall" über die Tasterplatine war
+nachgemessen eine Eckenüberdeckung von 1,5 mm und 0,66 mm³ — kein
+Niederhalter.
+
+Kleiner wird das Gerät dadurch **nicht**. Die Packung bleibt bei 84, denn
+der Engpass ist nicht die Platine, sondern das Paar Lautsprecherkorb und
+Tasteraufnahme in der Mitte. Nachgerechnet mit und ohne Winkel.
+
 ## Was damit entfällt
 
 Blende, Führungskragen, Brücke über der Elektronik, Querriegel,

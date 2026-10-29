@@ -29,8 +29,9 @@ module mock_breakout() {
     translate([cx - sw_size/2, cy - sw_size/2, bo_top + seat_eps]) cube([sw_size, sw_size, sw_h]);
 }
 
+// Das Pad klebt auf der ebenen Rueckseite, nicht mehr in einer Tasche.
 module mock_pad()
-    translate([cx - pad_w/2, cy - pad_w/2, plate_under_z + pad_seat_d - pad_t])
+    translate([cx - pad_w/2, cy - pad_w/2, plate_under_z - pad_t])
         cube([pad_w, pad_w, pad_t]);
 
 module mock_foam() {
@@ -42,15 +43,49 @@ module mock_foam() {
     }
 }
 
-module mock_card(lift = 0)
-    translate([cx - card_w/2, cy - card_ch_l/2 + card_clear + lift, card_bed_z])
+// Die Karte LIEGT auf der unteren Lippe — daher der Bezug auf den
+// Muldengrund. "lift" schiebt sie laengs unter die obere Lippe,
+// "push" drueckt sie nach vorn gegen die Lippen; damit laesst sich
+// der Halt pruefen, ohne den Pruefkoerper aus der Mulde abzuleiten.
+module mock_card(lift = 0, push = 0)
+    translate([cx - card_w/2, cy - card_ch_l/2 + card_clear + lift,
+               card_bed_z + push])
         rbox(card_w, card_w, card_t, 0.5);
+
+// Untere Kante der sitzenden Karte und ihre Mitte — aus der KARTE
+// gerechnet, nicht aus der Mulde.
+function card_y0() = cy - card_ch_l/2 + card_clear;
+
+// Ohne Senkung sitzt der Kopf AUF der Deckelflaeche, also unterhalb
+// z = 0; der Schaft beginnt bei 0. Vorher begann er bei screw_head_h —
+// ein Rest aus der Zeit mit Senkung, und er liess den Schaft 0,41 mm
+// ueber den Grund des Kernlochs hinausstehen.
+// Ein echter USB-C-Stecker in voll eingestecktem Zustand: Metallteil
+// in der Buchse, Griff davor. Damit wird geprueft, was ein freier
+// Korridor NICHT beweist — dass das Kabel wirklich hineingeht.
+module mock_usb_plug() {
+    translate([usb_x_c - usb_shell_w/2, pcb_y0 - usb_insert,
+               usb_z_c - usb_shell_h/2])
+        cube([usb_shell_w, usb_insert, usb_shell_h]);
+    // mit Eckrundung: ein Stecker hat keine scharfen Kanten, und mit
+    // scharfen Ecken meldet der Check die vier Zwickel der runden
+    // Tasche als Kollision.
+    translate([usb_x_c, pcb_y0 - usb_insert, usb_z_c])
+        rotate([90, 0, 0]) linear_extrude(25)
+            translate([-usb_grip_w/2, -usb_grip_h/2])
+                rrect(usb_grip_w, usb_grip_h, usb_grip_r);
+}
+
+// Stift oder Bueroklammer, bis an den Schieber.
+module mock_switch_tool()
+    translate([psw_x_c, pcb_y0, psw_z_c]) rotate([90, 0, 0])
+        cylinder(d = psw_tool_d, h = 30);
 
 module mock_screws()
     for (p = screw_pos) translate([p[0], p[1], 0]) {
-        cylinder(d = screw_head_d, h = screw_head_h);
-        translate([0, 0, screw_head_h])
-            cylinder(d = screw_pilot_d + 0.4, h = screw_len);
+        translate([0, 0, -screw_head_h])
+            cylinder(d = screw_head_d, h = screw_head_h);
+        cylinder(d = screw_pilot_d + 0.4, h = screw_len);
     }
 
 module mock_electronics() {

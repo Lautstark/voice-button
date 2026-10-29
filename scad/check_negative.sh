@@ -54,27 +54,24 @@ run "Haltering fehlt" parts.scad \
 run "Kartenfenster zu" parts.scad \
     's|    translate(\[cx - card_ch_w/2, y0 + lip_bottom, card_bed_z + card_ch_h\])|    if (false) translate([cx - card_ch_w/2, y0 + lip_bottom, card_bed_z + card_ch_h])|' \
     check_card_window_open ueberschneidung
+# Mulde laenger als noetig: die Karte liegt weiter auf der unteren
+# Lippe, aber die obere ueberdeckt sie nicht mehr. Der alte Haltecheck
+# hat das nicht gemerkt, weil sein Pruefkoerper aus der Mulde abgeleitet
+# war und mitwanderte — er meldete unveraendert 115,2 mm3.
+run "Kartenmulde zu lang" config.scad \
+    's|^card_ch_l      = card_w + (card_spare_min + card_spare_max)/2;|card_ch_l = card_w + (card_spare_min + card_spare_max)/2 + 3.0;|' \
+    check_card_retained_top leer
 # Anschlagring entfernt: die Taste faellt bis auf die Elektronik
-# Haltenasen ohne Ueberdeckung: der Korb liegt nur noch in der Tasche
-# und kann herausfallen, sobald das Geraet auf dem Ruecken liegt.
-# An den asserts vorbei: die Listen bleiben stimmig, nur die Geometrie
-# baut die Nase nicht. Haette die Mutation in config.scad gesessen,
-# haetten die Abdeckungs-asserts zuerst zugeschlagen und die
-# Volumenpruefung waere nie dran gekommen — bewiesen waere dann nichts.
-run "Haltenasen ohne Nase" parts.scad \
-    's/if (has_lip(a))/if (false)/' \
-    check_speaker_retained leer
-# Nase ringsum: haelt praechtig — nur kommt der starre Metallkorb dann
-# gar nicht mehr hinein. Halten und Einbaubarkeit sind zwei Dinge.
-run "Nase ringsum" parts.scad \
-    's/if (has_lip(a))/if (true)/; s/has_lip(a) ?/true ?/' \
-    check_speaker_insert_free ueberschneidung
-# Und die Luecke, durch die die beiden Checks oben einmal gefallen sind:
-# wer die Liste der freien Richtungen leert, macht den Pruefkoerper
-# gegenstandslos. Das muss ein assert abfangen, nicht ein leeres PASS.
-run "Freirichtungen geleert" config.scad \
-    's/^spk_free_a     = \[115, 210\];/spk_free_a = [];/' \
-    check_speaker_insert_free renderfehler
+# Steckertasche zu flach: der Griff des Kabels stoesst an der Wand an,
+# bevor der Stecker sitzt. Genau dieser Fehler steckte im Entwurf, und
+# ein freier Korridor hat ihn nicht gezeigt — erst ein Steckermodell.
+run "Steckertasche zu flach" config.scad \
+    's|^usb_pocket_d   = (wall + pcb_y0 - usb_proud) - usb_insert;|usb_pocket_d = 0.6;|' \
+    check_usb_plug_fits ueberschneidung
+# Schaltermulde zu: an den Schieber kommt kein Stift mehr.
+run "Schalteroeffnung zu" parts.scad \
+    's|rrect(psw_cut_w, psw_cut_h, 1.0)|rrect(0.5, 0.5, 0.2)|' \
+    check_switch_tool_fits ueberschneidung
 # Schallloecher vergessen: der Lautsprecher spielt gegen 1,5 mm PLA.
 run "Schallloecher zu" parts.scad \
     's|^module lid_grille() {|module lid_grille() { if (true) {} else|' \

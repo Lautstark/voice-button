@@ -26,7 +26,10 @@ Sichtbar bleibt ein Spalt von 0,4 mm zwischen Taste und Fensterkante.
 ## Drücken
 
 Zwischen Tastenrückseite und Tasterstempel sind 0,3 mm Luft. Darunter
-klebt ein 4 mm dickes Pad aus Moosgummi auf der Tastenrückseite.
+klebt ein 4 mm dickes Pad aus Moosgummi auf der **ebenen** Rückseite der
+Taste — eine Tasche dafür gab es einmal, sie wäre in Drucklage eine
+8-mm-Brücke gewesen, deren Durchhang genau diese 0,3 mm verschoben
+hätte.
 
 Der Weg endet nach 2,0 mm auf dem umlaufenden Anschlagring des Deckels.
 Dieser Ring liegt mit seiner Außenfläche an der Gehäusewand an und kann
@@ -51,8 +54,8 @@ plus 0,25 mm Schaltvorlauf), nachdem die 0,3 mm Luft überwunden sind.
 
 **In allen neun Fällen ist der erste Kontakt der Anschlagring** — nie
 der Akku, die Hauptplatine, die Tasterplatine oder der Lautsprecher.
-Der Ring fängt bei z 14,90 ab; das höchste Bauteil darunter ist der
-Tasterstempel mit 13,00, der Akku samt Schwellreserve kommt auf 11,00.
+Der Ring fängt bei z 15,50 ab; das höchste Bauteil darunter ist der
+Tasterstempel mit 13,20, der Akku samt Schwellreserve kommt auf 11,20.
 `scad/kinematics.py` rechnet das unabhängig von der Geometrie nach,
 `check_tilt_*` prüft dieselben acht Richtungen noch einmal als Volumen.
 

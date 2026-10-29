@@ -8,16 +8,16 @@ Gebaut für ein dreieinhalbjähriges Kind, das nicht spricht.
 
 > **Hardware gemessen (2026-10-28).** Lautsprecher, Akku, Platinen und
 > Portlagen liegen als Messwerte vor; das Gerät ist dadurch von 76 auf
-> 93 mm gewachsen und von 22,4 auf 21,3 mm abgeflacht. Offen sind nur
+> 93 mm gewachsen und von 22,4 auf 21,9 mm abgeflacht. Offen sind nur
 > noch die Kennlinien der beiden Schaumteile und der Schaltvorlauf —
 > alles, was das Druckstück beim Zusammenbau ausgleicht. Siehe
 > [REVIEW_HANDOFF.md](REVIEW_HANDOFF.md).
 
 | | |
 |---|---|
-| Außenmaß | 93 × 93 × 21,3 mm |
+| Außenmaß | 93 × 93 × 21,9 mm |
 | Druckteile | drei, alle ohne Stützen |
-| Befestigung | vier M2 × 8, von hinten |
+| Befestigung | vier M2 × 10, von hinten |
 | Karte | 64 × 64 mm, zulässig 63,3–64,7 mm |
 | Druckfläche | 79 × 79 mm |
 | Tastenweg | 2,0 mm bis zum Anschlag |

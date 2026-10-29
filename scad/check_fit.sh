@@ -84,10 +84,10 @@ for c in check_housing_button check_housing_button_pressed check_housing_lid \
          check_mocks_printed check_mocks_button check_mocks_button_pressed \
          check_screws_clear; do must_be_clear "$c"; done
 
-echo "— Lautsprecher —"
-must_engage   check_speaker_retained
-must_be_empty check_speaker_insert_free
+echo "— Lautsprecher und Anschluesse —"
 must_be_empty check_grille_open
+must_be_clear check_usb_plug_fits
+must_be_clear check_switch_tool_fits
 
 echo "— Halten, Anschlag, Rueckstellung —"
 must_engage check_button_retained
@@ -103,7 +103,8 @@ echo "— Karte —"
 for c in check_card_seated check_card_lifted check_card_insert_assembled; do
   must_be_clear "$c"; done
 must_be_empty check_card_window_open
-must_engage   check_card_retained
+must_engage   check_card_retained_top
+must_engage   check_card_retained_bottom
 
 echo "— Material da, Bohrungen offen —"
 must_be_empty check_wall_solid

@@ -1,7 +1,7 @@
 # REVIEW_HANDOFF
 
 Für einen unabhängigen Review. Stand: 2026-10-29, Architektur B mit
-der vermessenen Hardware.
+der vermessenen Hardware, nach dem Review von 5d55b20.
 Der geprüfte Commit steht unten unter „Stand".
 
 **Urteil des Autors: der Entwurf ist vollständig konstruiert, mit der
@@ -17,7 +17,7 @@ protokolliert, was dabei umfiel.
 
 ## 1. Architektur
 
-Drei Druckteile, vier M2 × 8, zwei Schaumteile. Außen 93 × 93 × 21,3 mm.
+Drei Druckteile, vier M2 × 10, zwei Schaumteile. Außen 93 × 93 × 21,9 mm.
 
 - **Frontgehäuse** — hinten offene Schale. Umlaufender 45-Grad-Konus
   hält die Taste nach vorn. Wand 4,5 mm, trägt die Gewinde in ihren
@@ -92,6 +92,10 @@ platine) und die unterstellte Kabelreichweite von 14 mm.
 |---|---:|---|
 | Kavität | 84,0 | aus der Packung gerechnet |
 | Wand / Deckel | 4,5 / 4,0 | gewählt; Deckel 4,0 wegen der Tasche |
+| Klebebandstärke | 0,2 | **[ANNAHME]**, hebt jedes geklebte Bauteil |
+| Steckertasche | 13,6 × 8,1, 3,2 tief | Wand + Platinenkante − Einsteckweg |
+| Restwand dahinter | 1,3 | nicht tragend |
+| Schaltermulde | 9,0 × 8,0, 2,5 tief | mit Stift bedienbar, nicht mit dem Finger |
 | Flansch der Taste | 83,4 | Kavität − 2 × 0,3 Spiel |
 | Fenster | 79,8 | Flansch − 2 × 1,8 Überdeckung |
 | sichtbare Druckfläche | 79,0 | Fenster − 2 × 0,4 |
@@ -136,15 +140,13 @@ für „Berührung" ist 0,02 mm³; eine Überschneidung von 0,2 × 0,2 × 2,8 mm
 (0,112 mm³), wie sie ein früherer Review fand, fällt damit durch.
 
 `scad/check_negative.sh` — zwölf absichtliche Fehler in temporären
-Kopien; jeder muss von einem bestimmten Check bemerkt werden. Vier davon
-gehören zum Lautsprecher: Haltenasen ohne Überdeckung, Nase ringsum
-(hält prächtig, nur kommt der starre Korb dann nicht mehr hinein),
-vergessene Schalllöcher und das Leeren der Freirichtungsliste.
+Kopien; jeder muss von einem bestimmten Check bemerkt werden. Drei davon
+betreffen die Anschlüsse: zu flache Steckertasche, zugebaute
+Schalteröffnung, vergessene Schalllöcher.
 
-Zwei dieser Mutationen sitzen bewusst in `parts.scad` und nicht in
-`config.scad`: dort hätten die Abdeckungs-Asserts zuerst zugeschlagen
-und die Volumenprüfung wäre nie dran gekommen. Ein Negativtest, den ein
-`assert` abfängt, beweist über den Prüfkörper nichts.
+Mutationen sitzen bewusst dort, wo sie an den Asserts vorbeikommen —
+meist in `parts.scad`. Ein Negativtest, den ein `assert` abfängt,
+beweist über den Prüfkörper nichts.
 
 `scad/check_scope.py` — findet Variablen, die ein per `use <>`
 eingebundenes Modul aus `config.scad` liest. Genau daran sind im
@@ -246,6 +248,41 @@ das sind zwei Anforderungen, nicht eine. Dieselbe Trennung hat die
 Prüfung ein zweites Mal bestätigt: die Nase lag anfangs genau auf der
 Korboberkante und klemmte ihn; sie hat jetzt 0,2 mm Luft.
 
+## 4d. Externes Review von 5d55b20 — nachgeprüft und behoben
+
+Ein unabhängiger Review nannte sechs Punkte. **Fünf davon waren echte
+Befunde**, einer bestätigte eine bereits dokumentierte Grenze. Jeder
+wurde am Code nachgeprüft, nicht übernommen.
+
+| | Befund | nachgeprüft | behoben durch |
+|---|---|---|---|
+| 1 | Senkung lässt 0,15 mm Rand | ✓, und der Assert prüfte nur das Kernloch | Senkung entfällt, Kopf liegt auf, M2 × 10 |
+| 2 | Padtasche brückt 8 mm; 0,4 fest statt `pad_seat_d` | ✓ beides | Tasche ersatzlos gestrichen |
+| 3 | Kartencheck prüft die Karte nicht | ✓ per Mutation | zwei Checks mit der echten Karte |
+| 4 | Kartenstärke verschiebt die Lippendicke | ✓ | `plate_front_z` aus `card_ch_h` + `rail_lip_t` |
+| 5 | Stecker erreicht die Buchse nicht | ✓, der ernsteste Punkt | Steckertasche, Haltewinkel entfallen |
+| 6 | Kraftnachweis fehlt | ✓, stand schon in Abschnitt 6 | unverändert offen |
+
+Zu **1**: der Rand um eine Senkung ist `(corner_r − corner_ri −
+screw_cb_d)/2` und damit vom Außenradius unabhängig — bei 4,5 mm Wand
+und 3,8 mm Kopf immer 0,15 mm. Den Eckring zu verdicken scheitert am
+USB-Durchbruch, der dann in die Eckrundung liefe. Also kein
+Senkungsloch mehr.
+
+Zu **3**: der alte Prüfkörper war ein Quader, dessen Lage aus
+`card_ch_l` kam — aus der Mulde, die er prüfen sollte. Verlängert man
+sie um 3 mm, wandert er mit und meldet unverändert 115,2 mm³. **Das ist
+dieselbe Fehlerklasse wie in 4c**, jetzt zum dritten Mal in diesem
+Projekt. Sie ist der wichtigste Prüfpunkt für ein Review.
+
+### Beim Beheben selbst gefunden
+
+| Befund | wie gefunden |
+|---|---|
+| Ohne Senkung beginnt der Schaft bei z = 0, nicht bei `screw_head_h` — der Prüfkörper ließ ihn 0,41 mm über den Kernlochgrund stehen | `check_screw_fits` schlug nach der Schraubenänderung an |
+| Das Steckermodell hatte scharfe Ecken, die Tasche ist rund — 6,33 mm³ Eckzwickel | `check_usb_plug_fits`; Tasche hat jetzt 0,3 mm Spiel je Seite |
+| Der behauptete „Rückfall" der Tasterplatine über den Lautsprecher trägt nicht: 1,5 mm Eckenüberdeckung, 0,66 mm³ | neuer Check lag knapp über der Schwelle; **Behauptung zurückgezogen** statt den Check zu beschönigen |
+
 ## 5. Offene Messungen
 
 Die Bauteilmaße sind gemessen. Was bleibt, liefert kein Messschieber:
@@ -258,6 +295,8 @@ Die Bauteilmaße sind gemessen. Was bleibt, liefert kein Messschieber:
 | Platinendicke, höchstes Bauteil | `pcb_t`, `pcb_comp_h` | Höhenstapel; 1,2 und 3,3 mm geschätzt |
 | Höhe des Schieberkörpers | `psw_cut_h` | 4,2 mm geschätzt; nur die Breite ist gemessen |
 | Tasterkörper | `sw_size` | 6 × 6 abgeleitet aus der Platinenbreite, nicht gemessen |
+| Steckermaße | `usb_insert`, `usb_grip_w/h`, `usb_proud` | Standardwerte für USB-C: 6,5 mm Einsteckweg, 13,0 × 7,5 mm Griff, Buchse bündig mit der Platinenkante. Ein dickeres Kabel passt nicht in die Tasche. |
+| Höhe des Schieberkörpers | `psw_cut_h` | 5,0 angenommen; nur die Breite ist gemessen |
 | Lage der beiden JST-Buchsen | — | vom Foto abgelesen. Bindet die Packung nicht (mit 25 mm Reichweite dasselbe Maß), bestimmt aber, wie das Kabel liegt. |
 
 Keiner dieser Werte verschiebt eine Außenkante. Die vier Höhenwerte
@@ -303,17 +342,25 @@ wird auch nicht gebraucht: Das nachgiebige Druckstück begrenzt, was beim
    ausbeulen. Bei 0,6 mm Laminat und ohne Last ist das kosmetisch, aber
    es ist der Preis für das große Symbol. Dickeres Laminat hilft,
    `card_t` ist der Parameter.
-3. **Der Lautsprecher hängt an 1,5 mm Deckelmaterial.** Unter der
+3. **Der Lautsprecher hängt an seinem Klebeband.** Seitlich hält ihn
+   die 2,5 mm tiefe Tasche, nach oben nur das Band. Löst es sich, kann
+   der Korb klappern; heraus kann er nicht, das Gehäuse ist zu. Ein
+   gedruckter Niederhalter wäre eine Brücke über einem Bauteil und
+   damit genau das, was diese Architektur vermeidet.
+4. **Der Ladestecker ist auf Standardmaße ausgelegt.** Griff bis
+   13,0 × 7,5 mm, Einsteckweg 6,5 mm. Ein dickes Kabel passt nicht.
+   Das ist am fertigen Teil in zehn Sekunden geprüft und sonst nicht.
+5. **Der Lautsprecher hängt an 1,5 mm Deckelmaterial.** Unter der
    Tasche bleiben 1,5 mm, perforiert von 37 Löchern Ø 2,2 mm. Nicht im
    Lastpfad, den trägt der Anschlagring; aber die dünnste Stelle des
    Geräts.
-4. **Höhenstapel.** Die Summe aus `sw_h`, `bo_t` und `ped_top` bestimmt
+6. **Höhenstapel.** Die Summe aus `sw_h`, `bo_t` und `ped_top` bestimmt
    die Luft über dem Taster. Das Druckstück ist genau dafür da; die
    Korrektur ist, beim Zusammenbau die passende Padstärke zu wählen.
-5. **Rückstellkraft.** Ist der Streifen zu weich, kehrt die Taste
+7. **Rückstellkraft.** Ist der Streifen zu weich, kehrt die Taste
    träge zurück; zu fest, wird sie schwergängig. Ein Streifen anderer
    Dicke ist die Korrektur, `foam_t` der Parameter.
-6. **Selbstschneidende Schrauben in Druckrichtung.** Die Gewinde liegen
+8. **Selbstschneidende Schrauben in Druckrichtung.** Die Gewinde liegen
    in der Stirnfläche der Wand, also quer zu den Schichten. 1,4 mm
    Material rundum. Mehrfaches Öffnen könnte sie ausreißen.
 

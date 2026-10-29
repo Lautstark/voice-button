@@ -38,6 +38,14 @@ pcb_h          = 30.0;  // [GEMESSEN] Messschieber, hochkant (y)
 pcb_t          = 1.2;   // [ANNAHME]
 pcb_comp_h     = 3.3;   // [ANNAHME] hoechstes Bauteil auf der Oberseite
 pcb_standoff   = 0.8;   // gedruckte Auflage, haelt die Loetseite frei
+// Hauptplatine, Akku und Lautsprecher werden GEKLEBT, nicht geklemmt —
+// sie liegen dem Modul mit doppelseitigem Klebeband bei. Das erspart
+// Haltewinkel und Fachwaende, und erst dadurch darf die Platine nahe
+// genug an die Suedwand, dass ein Ladestecker die Buchse erreicht.
+// Die Bandstaerke gehoert in den Hoehenstapel: sie hebt jedes geklebte
+// Bauteil an, beim Lautsprecher also auch die Oberkante, unter der die
+// Tasterplatine hinweglaeuft.
+tape_t         = 0.2;   // [ANNAHME] duennes doppelseitiges Klebeband
 pcb_clear      = 0.3;   // Taschenspiel je Seite
 
 // Akku: Etikett "WYD 502025, 3,7 V 200 mAh". Gemessen ist er 28 mm lang,
@@ -63,14 +71,12 @@ spk_clear      = 0.4;
 // Lautsprecher hinweglaufen, und die drei Spalten nebeneinander
 // (Platine | Tasterplatine | Korb) fallen weg. Das sind 10 mm Kantenmass.
 spk_recess     = 2.5;   // Tiefe der Tasche im Deckel
-spk_tab_n      = 4;     // Haltenasen statt umlaufendem Ring
-spk_tab_t      = 1.5;   // Nasenwandstaerke
-spk_tab_arc    = 26;    // Grad je Nase
-spk_tab_lip    = 0.8;   // Ueberdeckung des Korbrandes nach innen
-// Die Nasen halten den Korb nur beim Zusammenbau in der Tasche. Gehalten
-// ist er am Ende vom geschlossenen Gehaeuse; selbst eine abgebrochene
-// Nase kann ihn nicht herauslassen. Deshalb ist das kein tragender
-// Schnapphaken im Sinne der Anforderung.
+// KEINE Haltenasen mehr. Sie waren die Antwort auf eine Frage, die sich
+// nicht stellt: der Korb bringt sein Klebeband mit. Seitlich haelt ihn
+// die 2,5 mm tiefe Tasche, nach oben das Band, und als Rueckfall laeuft
+// die Tasterplatine 0,3 mm ueber seinem Rand (check_board_over_speaker).
+// Damit entfaellt auch das schraege Einsetzen, das vier uebergreifende
+// Nasen erzwungen haetten.
 grille_hole_d  = 2.2;   // Schallaustritt im Deckel
 grille_ring_n  = 3;     // Lochkreise — die Membran ist gross
 
@@ -133,15 +139,18 @@ bay_z          = lid_t;                  // 3.0 — Boden des Elektronikraums
 // BAUTEILLAGE (Kavitaetskoordinaten, Ergebnis der Packungssuche)
 // ---------------------------------------------------------------------
 stop_band      = 4.6;   // Breite des Anschlagrings; Bauteile bleiben draussen
-// Gedruckte Halteelemente. Sie gehoeren zum Fussabdruck ihres Bauteils —
-// die erste Packungssuche hatte sie uebersehen und Fach an Fach gestellt.
-pcb_clip_t     = 1.2;   // Wandstaerke der Platinenwinkel
-pcb_clip_leg   = 4.0;   // Schenkellaenge
+// Gedrucktes Halteelement. Es gehoert zum Fussabdruck seines Bauteils —
+// die erste Packungssuche hatte das uebersehen und Fach an Fach
+// gestellt. Fuer die Hauptplatine gibt es keins mehr: sie wird geklebt,
+// und die 1,2 mm Winkel haetten den Ladestecker unmoeglich gemacht.
 bat_wall_t     = 1.2;   // Wandstaerke des Akkufachs
-// Hauptplatine SW: USB-C-Kante nach SUEDEN, ON-OFF-Kante nach WESTEN.
-// Die Winkel stehen 1,2 mm weiter aussen und beginnen genau am Ring.
-pcb_x0         = 6.4;
-pcb_y0         = 6.4;
+// Hauptplatine SW, Portkante nach SUEDEN. Ihre Suedkante liegt so nah
+// am Ring wie moeglich (stop_band + Spiel), denn jeder Millimeter dort
+// ist ein Millimeter, den der Ladestecker tiefer greifen muesste.
+// In x steht sie 1,3 mm weiter oestlich als das Packungsoptimum —
+// sonst liefe die Steckertasche in die Eckrundung.
+pcb_x0         = 6.5;
+pcb_y0         = 5.2;
 // Der Akku liegt NORDLICH der Hauptplatine, weil seine Buchse auf deren
 // Nordkante sitzt und das Kabel nur 20 mm lang ist. Die 28-mm-Laenge
 // laeuft in x, die 20-mm-Breite in y — das ist eine Festlegung, keine
@@ -149,63 +158,30 @@ pcb_y0         = 6.4;
 bat_ex         = bat_l + 2*bat_clear;    // Ausdehnung in x
 bat_ey         = bat_w + 2*bat_clear;    // Ausdehnung in y
 bat_x0         = 7.4;   // Akku noerdlich der Platine, Buchse zeigt dorthin
-bat_y0         = 40.4;
-spk_cx         = 59.8;  // Lautsprecher oestlich, Buchse zeigt dorthin
+bat_y0         = 38.4;
+spk_cx         = 59.3;  // Lautsprecher oestlich, Buchse zeigt dorthin
 spk_cy         = 24.3;
 spk_pocket_r   = spk_d/2 + spk_clear;        // 18.4 — Tasche im Deckel
-spk_tab_ro     = spk_pocket_r + spk_tab_t;   // 19.9 — Nasen aussen
-// Vier Richtungen, in denen eine Nase freisteht; jede ist mitsamt ihrer
-// halben Breite frei geprueft. Gleichmaessiger geht es nicht, weil
-// Aufnahme und Akkufach zwei Sektoren belegen.
-spk_tab_a      = [30, 115, 210, 300];
-// Ueberdeckung bekommen nur die beiden OESTLICHEN Nasen. Vier Nasen mit
-// Nase ringsum liessen den starren Metallkorb gar nicht hinein: bei
-// spk_tab_lip 0,8 bleibt in Nasenhoehe nur r 17,6 frei, der Korb hat
-// 18,0. Mit Nasen nur im Osten schiebt man ihn dort darunter und senkt
-// die Westseite ab. Gehalten wird die Westseite danach von der
-// Tasterplatine, die 0,3 mm ueber dem Korbrand hinweglaeuft.
-spk_lip_a      = [30, 300];
-// Und ausgeschrieben, welche Richtungen FREI bleiben muessen. Dass das
-// hier doppelt steht, ist Absicht: ein Pruefkoerper, der seine eigene
-// Form aus spk_lip_a ableitet, verschwindet mitsamt dem Fehler, den er
-// finden soll — genau das haben die Negativtests gemeldet. Die beiden
-// asserts darunter halten die Listen zusammen.
-spk_free_a     = [115, 210];
-// search() ist fuer Zahlen unzuverlaessig, deshalb ausgeschrieben.
-function has_lip(a) = len([for (x = spk_lip_a) if (x == a) 1]) > 0;
-assert(len(spk_lip_a) + len(spk_free_a) == len(spk_tab_a),
-       "spk_lip_a und spk_free_a decken spk_tab_a nicht ab");
-assert(len([for (x = spk_free_a) if (has_lip(x)) 1]) == 0,
-       "eine Richtung steht in spk_lip_a UND spk_free_a");
-assert(len([for (x = spk_lip_a) if (len([for (y = spk_tab_a) if (y == x) 1]) == 0) 1]) == 0
-       && len([for (x = spk_free_a) if (len([for (y = spk_tab_a) if (y == x) 1]) == 0) 1]) == 0,
-       "eine Lippen- oder Freirichtung ist keine Nasenrichtung");
-assert(len(spk_free_a) >= 2, "zu wenige freie Richtungen, um den Korb einzusetzen");
 // Die Tasterplatine liegt NOERDLICH ihrer Mitte (+sw_off_l, nicht -):
 // nur so bleibt unter dem Taster Platz fuer die Aufnahme, ohne dass
 // diese in den Lautsprecherkorb laeuft. Das Vorzeichen war falsch.
 bo_x0          = cx - bo_w/2;            // 38.0
 bo_y0          = cy - bo_l/2 + sw_off_l; // 34.0 — so liegt der Taster mittig
-ped_x0         = 38.2;  // Aufnahme der Tasterplatine, auf freiem Boden
-ped_x1         = 46.2;
-ped_y0         = 38.2;
-ped_y1         = 52.2;
+ped_x0         = 37.7;  // Aufnahme der Tasterplatine, auf freiem Boden
+ped_x1         = 45.7;
+ped_y0         = 37.7;
+ped_y1         = 51.7;
 
 // ---------------------------------------------------------------------
 // HOEHENSTAPEL (alles abgeleitet)
 // ---------------------------------------------------------------------
 spk_z0         = lid_t - spk_recess;                // 1.5 — Taschenboden
 spk_floor      = spk_z0;                            // Material darunter
-spk_top        = spk_z0 + spk_depth;                // 7.5 — Korboberkante
-// Halten und freies Sitzen sind zwei Anforderungen, nicht eine. Lag die
-// Nase genau auf der Korboberkante, klemmte der Korb — die Pruefung hat
-// das gefunden. Er darf 0,2 mm steigen, dann faengt ihn die Nase.
-spk_vert_clear = 0.2;
-spk_lip_z      = spk_top + spk_vert_clear;          // 7.7
-pcb_z          = bay_z + pcb_standoff;              // 3.8
+spk_top        = spk_z0 + tape_t + spk_depth;       // Korboberkante
+pcb_z          = bay_z + pcb_standoff + tape_t;
 pcb_top        = pcb_z + pcb_t;                     // 5.0
 pcb_comp_top   = pcb_top + pcb_comp_h;              // 8.3
-bat_z          = bay_z + bat_pad_t;                 // 4.0
+bat_z          = bay_z + bat_pad_t + tape_t;
 bat_top        = bat_z + bat_t;                     // 8.3
 bat_env        = bat_top + bat_swell;               // 9.3
 // Die Tasterplatine laeuft ueber den eingesenkten Lautsprecher hinweg,
@@ -229,7 +205,13 @@ sw_top         = bo_top + sw_h;                     // 14.1 — Stempeloberkante
 // er faengt die Handkraft ab, und der Ueberhub danach geht ins Pad,
 // nicht in Taster, Platine oder Akku.
 pad_t          = 4.0;   // [ANNAHME] Moosgummi/EVA, auf die Tastenrueckseite geklebt
-pad_seat_d     = 0.4;   // flache Tasche, in der das Pad beim Kleben sitzt
+// KEINE Tasche fuer das Pad mehr. In Drucklage liegt die Tastenrueckseite
+// auf dem Bett, eine 0,4 mm tiefe Tasche darin waere also eine 8-mm-
+// Bruecke in der zweiten Schicht — und ihr Durchhang verschoebe genau
+// die Auflagehoehe des Pads, von der der 0,3-mm-Spalt abhaengt. Das Pad
+// wird stattdessen auf die ebene Rueckseite geklebt. Es ist 8 mm breit
+// und sitzt ueber einem 6-mm-Taster, ein Millimeter Versatz beim Kleben
+// aendert nichts.
 pad_w          = 8.0;   // geklebt, mittig ueber dem Taster
 pad_click      = 0.20;  // [ANNAHME] Stauchung, bis die Schaltkraft steht
 act_gap        = 0.30;  // Luft zwischen Pad und Stempel in Ruhe
@@ -241,9 +223,7 @@ travel_stop    = 2.0;   // Weg bis zum umlaufenden Anschlag.
 // deshalb IMMER die HAELFTE des Anschlagwegs ab, egal wo man drueckt.
 // Gebraucht werden act_gap + pad_click + sw_travel = 0,75 mm.
 
-// Das Pad sitzt 0,4 mm versenkt — das gehoert in den Stapel, sonst waere
-// die Luft ueber dem Taster um genau diesen Betrag groesser als gerechnet.
-plate_under_z  = sw_top + pad_t - pad_seat_d + act_gap;   // 18.00
+plate_under_z  = sw_top + pad_t + act_gap;
 stop_z         = plate_under_z - travel_stop;  // 16.0 — Oberkante Ring
 sw_need        = act_gap + pad_click + sw_travel;   // 0.75 — fuer den Klick
 sw_have_tilt   = travel_stop/2;                     // 1.00 — bei jedem Kippen
@@ -266,10 +246,20 @@ cone_run       = (flange_w - prism_w)/2;       // 2.2 — 45 Grad, druckbar
 flange_r       = corner_ri - plate_clear;      // 3.2
 protrude       = 1.5;   // so weit steht die Taste aus dem Fenster
 
-cone_z0        = plate_under_z;                      // 17.25
+// --- Karte: die drei Werte, an denen die Bauhoehe der Taste haengt ---
+card_t         = 0.6;   // [ANNAHME] Laminatdicke
+rail_lip_t     = 1.1;   // Lippendicke = Deckhaut der Taste
+card_ch_h      = card_t + 0.3;                       // Muldenhoehe
+
+cone_z0        = plate_under_z;
 cone_z1        = cone_z0 + cone_run;                 // 19.45
-card_bed_z     = plate_under_z + plate_t;            // 19.65
-plate_front_z  = plate_under_z + plate_t + 0.9 + 1.1;// 21.65 — Tastenvorderseite
+card_bed_z     = plate_under_z + plate_t;            // 19.3
+// Die Vorderseite der Taste ist der Muldenboden plus Mulde plus Lippe.
+// Vorher standen hier 0,9 und 1,1 als feste Zahlen. Das stimmte nur
+// zufaellig fuer card_t = 0,6: bei 1,0 mm Laminat waere die Deckhaut
+// still auf 0,7 mm geschrumpft, ohne dass es jemand gemerkt haette.
+// card_ch_h und rail_lip_t stehen deshalb jetzt WEITER OBEN.
+plate_front_z  = card_bed_z + card_ch_h + rail_lip_t;
 house_front_z  = plate_front_z - protrude;           // 20.15
 win_z1         = house_front_z;
 // Der Konus des Gehaeuses ist dieselbe 45-Grad-Flaeche, 0,3 mm tiefer:
@@ -292,15 +282,14 @@ win_z0         = house_cone_z0 + (cavity - window_w)/2;  // 19.05 — Konusende
 // Kind zaehlt das Symbol, nicht der Rahmen. 64 mm lassen 7,1 mm Rand
 // fuer die beiden Lippen und den Rahmen stehen.
 card_w         = 64.0;  // gewaehlt, quadratisch
-card_t         = 0.6;   // [ANNAHME] Laminatdicke
+
 card_clear     = 0.4;
 card_corner_r  = 0.5;
 lip_bottom     = 0.8;
 lip_top        = 3.0;
 lip_relief     = 0.6;   // Mulde senkt sich unter der oberen Lippe ab, damit
                         // der 3-mm-Ueberhang durchhaengen darf ohne zu klemmen
-rail_lip_t     = 1.1;   // Lippendicke = Deckhaut der Taste
-card_ch_h      = card_t + 0.3;                       // 0.9
+
 card_spare_min = lip_bottom + 0.15;
 card_spare_max = lip_top - 0.6;
 card_ch_w      = card_w + 2*card_clear;              // 40.8
@@ -353,15 +342,36 @@ usb_x_c        = pcb_x0 + 10.0;      // [GEMESSEN] Buchse 5..15 mm
 usb_z_c        = pcb_top + 1.7;      // 7.7
 usb_cut_w      = 10.2;
 usb_cut_h      = 4.6;
-usb_funnel_w   = 13.5;
-usb_funnel_h   = 8.0;
-usb_funnel_d   = 1.2;
+// STECKERTASCHE. Ein Trichter von 1,2 mm reicht nicht: die Platinen-
+// kante liegt hinter Wand und Anschlagring, und ein USB-C-Stecker
+// steckt nur rund 6,5 mm ein, danach beginnt der Griff. Ohne Tasche
+// stoesst der Griff an der Wand an, bevor der Stecker sitzt — das
+// Geraet waere nicht ladbar. Die Tasche holt den Griff so weit ins
+// Gehaeuse, wie die Wand es zulaesst.
+usb_insert     = 6.5;   // [ANNAHME] Einsteckweg des Metallteils
+usb_shell_w    = 8.3;   // [ANNAHME] Metallteil des Steckers
+usb_shell_h    = 2.6;
+usb_grip_w     = 13.0;  // [ANNAHME] Griffmass eines Standardkabels
+usb_grip_h     = 7.5;
+usb_proud      = 0.0;   // [ANNAHME] Buchse steht nicht ueber die Kante;
+                        // steht sie vor, wird es nur besser
+usb_grip_r     = 1.0;   // [ANNAHME] Eckrundung des Griffs
+usb_pocket_d   = (wall + pcb_y0 - usb_proud) - usb_insert;
+usb_pocket_w   = usb_grip_w + 0.6;   // 0,3 Spiel je Seite
+usb_pocket_h   = usb_grip_h + 0.6;
 psw_x_c        = pcb_x0 + 23.0;      // [GEMESSEN] Schieber 21..25 mm
                                      // ab der Ecke, also Mitte 23,0
-psw_z_c        = pcb_top + 1.4;      // 7.4
-psw_cut_w      = 4.6;                // [GEMESSEN] 4,0 breit + 0,6 Spiel
-psw_cut_h      = 4.2;                // [ANNAHME] Hoehe des Schiebers
-psw_recess_d   = 1.2;
+psw_z_c        = pcb_top + 1.4;
+// Der Schieber liegt rund 9,7 mm hinter der Aussenflaeche. Mit einer
+// Fingerkuppe ist er nicht erreichbar und soll es auch nicht sein: ein
+// Kind, das das Geraet versehentlich ausschaltet, hat ein Geraet, das
+// "kaputt" ist. Mit Fingernagel, Stift oder Bueroklammer geht es.
+psw_cut_w      = 6.0;                // Schieber ist 4,0 breit
+psw_cut_h      = 5.0;
+psw_recess_w   = 9.0;                // Griffmulde aussen
+psw_recess_h   = 8.0;
+psw_recess_d   = 2.5;
+psw_tool_d     = 2.5;   // [ANNAHME] Stift- oder Bueroklammerspitze
 
 // ---------------------------------------------------------------------
 // VERSCHRAUBUNG
@@ -372,14 +382,19 @@ screw_pilot_d  = 1.7;   // Kernloch fuer M2-Blechschraube in PLA
 screw_free_d   = 2.4;
 screw_head_d   = 3.8;
 screw_head_h   = 1.4;
-screw_len      = 8.0;   // Gewindelaenge unter dem Kopf (M2x8)
+// KEINE Senkung. Der Rand um eine Senkung ist (corner_r - corner_ri -
+// screw_cb_d)/2 und damit unabhaengig vom Aussenradius: bei Wand 4,5 und
+// Kopf 3,8 bleiben 0,15 mm stehen, also nichts. Den Eckring dicker zu
+// machen scheitert am USB-Durchbruch, der dann in die Rundung liefe.
+// Also sitzt der Linsenkopf auf der Deckelflaeche. Die Durchgangs-
+// bohrung Ø2,4 laesst 1,05 mm Rand, und die vier Koepfe stehen 1,4 mm
+// vor — deshalb sind die Moebelpuffer in der Stueckliste 3 mm dick.
+screw_len      = 10.0;  // Gewindelaenge unter dem Kopf (M2x10)
 // Was wirklich in der Wand steckt: die Schraubenlaenge minus dem, was
 // im Deckel bleibt. 5,0 mm Kernloch waren zu kurz — die letzten 1,4 mm
 // haetten sich in massives PLA geschnitten statt zu klemmen.
-screw_in_wall  = screw_len - (lid_t - screw_head_h);  // 6.4
-screw_depth    = screw_in_wall + 1.0;                 // 7.4 Kernlochtiefe
-screw_cb_d     = screw_head_d + 0.4;
-screw_cb_h     = screw_head_h + 0.2;
+screw_in_wall  = screw_len - lid_t;                   // 6.0
+screw_depth    = screw_in_wall + 1.0;                 // 7.0 Kernlochtiefe
 // Aussen- und Innenrundung haben denselben Mittelpunkt (corner_ri,
 // corner_ri). Das Eckmaterial ist also ein Kreisring; die Schraube sitzt
 // auf dessen Mittellinie, auf der Diagonale nach aussen.
@@ -440,7 +455,13 @@ assert(screw_depth > screw_in_wall + 0.5,
        "Kernloch flacher als das einlaufende Gewinde");
 assert(bay_z + screw_depth < house_front_z - 2.0,
        "Kernloch durchbricht die Vorderseite");
-assert(lid_t >= screw_cb_h + 1.2, "Deckel zu duenn fuer die Senkung");
+// Der Kopf muss ganz auf dem Deckel stehen, nicht ueber seine Kante.
+assert(scr_r + screw_head_d/2 <= corner_r - 0.2,
+       str("Schraubenkopf steht ueber die Deckelkante: ",
+           corner_r - scr_r - screw_head_d/2));
+assert(scr_r - screw_free_d/2 >= corner_ri + 1.0 &&
+       scr_r + screw_free_d/2 <= corner_r - 1.0,
+       "Durchgangsbohrung zu nah an einer Deckelkante");
 assert(stop_band >= 3.0, "Anschlagring zu schmal");
 assert(corner_ri >= 2.0, "Innenradius zu klein");
 assert(rim_in > prism_w - 2*stop_band + 0.1, "Ring trifft die Taste nicht");
@@ -456,12 +477,12 @@ assert(flange_w/2 > rim_out/2 - stop_face + 0.5,
 //    Die gedruckten Halteelemente gehoeren dazu: der Platinenwinkel
 //    (pcb_clip_t) und die Akkufachwand (bat_wall_t) stehen weiter aussen
 //    als ihr Bauteil. Wer nur die Bauteile prueft, baut sie in den Ring.
-assert(pcb_x0 - pcb_clear - pcb_clip_t >= stop_band - 0.001, "Platinenwinkel im Ring");
-assert(pcb_y0 - pcb_clear - pcb_clip_t >= stop_band - 0.001, "Platinenwinkel im Ring");
-assert(pcb_x0 + pcb_w + pcb_clear + pcb_clip_t <= cavity - stop_band,
-       "Platinenwinkel zu weit oestlich");
-assert(pcb_y0 + pcb_h + pcb_clear + pcb_clip_t <= cavity - stop_band,
-       "Platinenwinkel zu weit noerdlich");
+assert(pcb_x0 - pcb_clear >= stop_band - 0.001, "Hauptplatine im Ring");
+assert(pcb_y0 - pcb_clear >= stop_band - 0.001, "Hauptplatine im Ring");
+assert(pcb_x0 + pcb_w + pcb_clear <= cavity - stop_band,
+       "Hauptplatine zu weit oestlich");
+assert(pcb_y0 + pcb_h + pcb_clear <= cavity - stop_band,
+       "Hauptplatine zu weit noerdlich");
 assert(bat_x0 - bat_clear - bat_wall_t >= stop_band - 0.001, "Akkufach im Ring");
 assert(bat_x0 + bat_ex - bat_clear + bat_wall_t <= cavity - stop_band,
        "Akkufach zu weit oestlich");
@@ -477,12 +498,28 @@ assert(spk_cy + spk_pocket_r <= cavity - stop_band, "Lautsprechertasche unter de
 // Unter der Tasche bleibt Material fuer die Schallloecher stehen.
 assert(spk_floor >= min_wall + 0.4,
        str("zu wenig Deckelmaterial unter dem Lautsprecher: ", spk_floor));
+// Der Ladestecker muss die Buchse erreichen. Das ist der Punkt, an dem
+// der Entwurf vorher funktionsuntuechtig war.
+assert(usb_pocket_d > 0,
+       str("Steckertasche negativ — Platine zu nah an der Wand: ", usb_pocket_d));
+assert(wall - usb_pocket_d >= 1.2,
+       str("hinter der Steckertasche bleibt zu wenig Wand: ", wall - usb_pocket_d));
+assert(usb_grip_w > usb_cut_w && usb_grip_h > usb_cut_h,
+       "Griffmass kleiner als der Durchbruch — dann braucht es keine Tasche");
+// Die beiden Mulden duerfen nicht zusammenlaufen.
+assert((psw_x_c - psw_recess_w/2) - (usb_x_c + usb_pocket_w/2) >= load_wall,
+       str("zu wenig Wand zwischen Steckertasche und Schaltermulde: ",
+           (psw_x_c - psw_recess_w/2) - (usb_x_c + usb_pocket_w/2)));
+assert(wall - psw_recess_d >= 1.2,
+       str("hinter der Schaltermulde bleibt zu wenig Wand: ", wall - psw_recess_d));
+assert(psw_tool_d + 0.4 <= psw_cut_w && psw_tool_d + 0.4 <= psw_cut_h,
+       "Schalteroeffnung zu klein fuer einen Stift");
 // Und der Taster muss auf seine Platine passen.
 assert(sw_size <= bo_w - 1.0,
        str("Taster ", sw_size, " passt nicht auf eine ", bo_w, " mm breite Platine"));
 
 // 6. Die Aufnahme steht auf freiem Boden, nicht auf Elektronik
-assert(ped_x0 >= pcb_x0 + pcb_w + pcb_clear + pcb_clip_t,
+assert(ped_x0 >= pcb_x0 + pcb_w + pcb_clear,
        "Aufnahme steht auf der Hauptplatine");
 assert(ped_x0 >= bat_x0 + bat_ex - bat_clear + bat_wall_t ||
        ped_y1 <= bat_y0 - bat_clear - bat_wall_t ||
@@ -496,10 +533,10 @@ assert(rect_dist(spk_cx, spk_cy, ped_x0, ped_y0, ped_x1, ped_y1)
        str("Aufnahme schneidet die Lautsprechertasche, Abstand ",
            rect_dist(spk_cx, spk_cy, ped_x0, ped_y0, ped_x1, ped_y1)));
 assert(rect_dist(spk_cx, spk_cy,
-                 pcb_x0 - pcb_clear - pcb_clip_t, pcb_y0 - pcb_clear - pcb_clip_t,
-                 pcb_x0 + pcb_w + pcb_clear + pcb_clip_t,
-                 pcb_y0 + pcb_h + pcb_clear + pcb_clip_t) >= spk_pocket_r + 0.1,
-       "Lautsprechertasche schneidet Platinenauflage oder Winkel");
+                 pcb_x0 - pcb_clear, pcb_y0 - pcb_clear,
+                 pcb_x0 + pcb_w + pcb_clear,
+                 pcb_y0 + pcb_h + pcb_clear) >= spk_pocket_r + 0.1,
+       "Lautsprechertasche schneidet die Platinenauflage");
 assert(rect_dist(spk_cx, spk_cy,
                  bat_x0 - bat_clear - bat_wall_t, bat_y0 - bat_clear - bat_wall_t,
                  bat_x0 + bat_ex - bat_clear + bat_wall_t,
@@ -507,10 +544,10 @@ assert(rect_dist(spk_cx, spk_cy,
        "Lautsprechertasche schneidet das Akkufach");
 // Die Tasterplatine laeuft ueber den Lautsprecher — aber ueber NICHTS
 // sonst. Genau darauf beruht ped_top = spk_top + 0.3.
-assert(bo_x0 + bo_w + 0.3 <= pcb_x0 - pcb_clear - pcb_clip_t ||
-       bo_x0 - 0.3 >= pcb_x0 + pcb_w + pcb_clear + pcb_clip_t ||
-       bo_y0 + bo_l + 0.3 <= pcb_y0 - pcb_clear - pcb_clip_t ||
-       bo_y0 - 0.3 >= pcb_y0 + pcb_h + pcb_clear + pcb_clip_t,
+assert(bo_x0 + bo_w + 0.3 <= pcb_x0 - pcb_clear ||
+       bo_x0 - 0.3 >= pcb_x0 + pcb_w + pcb_clear ||
+       bo_y0 + bo_l + 0.3 <= pcb_y0 - pcb_clear ||
+       bo_y0 - 0.3 >= pcb_y0 + pcb_h + pcb_clear,
        "Tasterplatine liegt ueber der Hauptplatine");
 assert(bo_x0 + bo_w + 0.3 <= bat_x0 - bat_clear - bat_wall_t ||
        bo_x0 - 0.3 >= bat_x0 + bat_ex - bat_clear + bat_wall_t ||
@@ -523,16 +560,14 @@ assert(cx - sw_size/2 > ped_x0 + 0.4 && cx + sw_size/2 < ped_x1 - 0.4 &&
        "der Taster steht nicht mit Rand ueber der Aufnahme");
 
 // 7. Durchbrueche liegen in der geraden Wand, nicht in der Eckrundung.
-//    USB-C in der Suedwand (x), Schieber in der Westwand (y).
-assert(usb_x_c - usb_funnel_w/2 > corner_r + 1.0, "USB-Oeffnung in der Eckrundung");
-assert(usb_x_c + usb_funnel_w/2 < cavity - corner_r - 1.0, "USB-Oeffnung in der Eckrundung");
-assert(psw_x_c - (psw_cut_w + 4)/2 > corner_r + 1.0, "Schalter in der Eckrundung");
-assert(psw_x_c + (psw_cut_w + 4)/2 < cavity - corner_r - 1.0, "Schalter in der Eckrundung");
+//    Beide in der Suedwand, Lage entlang x.
+assert(usb_x_c - usb_pocket_w/2 > corner_r + 1.0, "Steckertasche in der Eckrundung");
+assert(usb_x_c + usb_pocket_w/2 < cavity - corner_r - 1.0, "Steckertasche in der Eckrundung");
+assert(psw_x_c - psw_recess_w/2 > corner_r + 1.0, "Schaltermulde in der Eckrundung");
+assert(psw_x_c + psw_recess_w/2 < cavity - corner_r - 1.0, "Schaltermulde in der Eckrundung");
 // Die beiden Durchbrueche in einer Wand duerfen nicht zusammenlaufen:
 // dazwischen muss tragendes Wandmaterial stehen bleiben.
-assert(psw_x_c - psw_cut_w/2 - (usb_x_c + usb_funnel_w/2) >= load_wall,
-       str("zu wenig Wand zwischen USB-C und Schalter: ",
-           psw_x_c - psw_cut_w/2 - (usb_x_c + usb_funnel_w/2)));
+
 assert(usb_z_c + usb_cut_h/2 < stop_z - 1.0, "USB-Oeffnung reicht in den Ring");
 assert(psw_z_c + psw_cut_h/2 < stop_z - 1.0, "Schalteroeffnung reicht in den Ring");
 // Der Anschlagring steht 12,85 mm hoch unmittelbar hinter diesen

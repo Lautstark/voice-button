@@ -80,10 +80,6 @@ module probes_lid() {
     probe_at(cx, cavity - 0.15 - stop_band/2, bay_z + 1.0);   // Ring Nord
     probe_at(0.15 + stop_band/2, cy, bay_z + 1.0);            // Ring West
     probe_at(cavity - 0.15 - stop_band/2, cy, bay_z + 1.0);   // Ring Ost
-    // Haltenase am Lautsprecher: auf der ersten der vier Richtungen
-    probe_at(spk_cx + (spk_pocket_r + spk_tab_t/2)*cos(spk_tab_a[0]),
-             spk_cy + (spk_pocket_r + spk_tab_t/2)*sin(spk_tab_a[0]),
-             bay_z + (spk_top - bay_z)/2);
     // Material unter der Lautsprechertasche
     probe_at(spk_cx + spk_pocket_r - 1.0, spk_cy, spk_floor/2);
     probe_at(pcb_x0 + pcb_w/2, pcb_y0 + pcb_h/2, bay_z + pcb_standoff/2);
@@ -104,6 +100,17 @@ module probes_button() {
     probe_at(cx, cy - card_ch_l/2 + lip_bottom/2, plate_front_z - rail_lip_t/2);
     probe_at(cx, cy + card_ch_l/2 - lip_top/2, plate_front_z - rail_lip_t/2);
     probe_at(cx - prism_w/2 + rail_wall/2, cy, plate_front_z - 0.6);
+}
+
+// Obere bzw. untere Haelfte der sitzenden KARTE — begrenzt durch
+// card_w, nicht durch die Muldenlaenge. Genau daran ist der alte
+// Haltecheck gescheitert.
+module card_half(top) {
+    yc = card_y0() + card_w/2;
+    y0 = top ? yc : card_y0() - card_w;
+    y1 = top ? card_y0() + 2*card_w : yc;
+    translate([cx - card_w, y0, card_bed_z - 1])
+        cube([2*card_w, y1 - y0, card_t + card_ch_h + rail_lip_t + 2]);
 }
 
 // --- Auswahl ----------------------------------------------------------
@@ -157,7 +164,7 @@ else if (part == "check_screw_fits")
     // Der Schaft muss ganz im Kernloch liegen. Ist das Kernloch zu kurz,
     // steht hier Material im Weg und die Schraube klemmt nie.
     intersection() {
-        for (p = screw_pos) translate([p[0], p[1], screw_head_h])
+        for (p = screw_pos) translate([p[0], p[1], 0])
             cylinder(d = screw_pilot_d - 0.3, h = screw_len);
         union() { front_housing(); rear_lid(); }
     }
@@ -184,35 +191,16 @@ else if (part == "check_port_tunnel_open")
         }
         union() { rear_lid(); front_housing(); }
     }
-// Die oestlichen Nasen muessen den Korbrand wirklich uebergreifen:
-// angehoben muss er an sie stossen.
-else if (part == "check_speaker_retained")
+// Und der Ladestecker muss wirklich hineingehen.
+else if (part == "check_usb_plug_fits")
     intersection() {
-        rear_lid();
-        translate([0, 0, spk_tab_lip + 0.5]) mock_speaker();
+        mock_usb_plug();
+        union() { front_housing(); rear_lid(); }
     }
-// Und in den Richtungen OHNE Nase muss der Weg nach unten frei sein,
-// sonst kommt der starre Korb nicht hinein.
-//
-// Der Pruefkoerper laeuft ueber spk_free_a, NICHT ueber "spk_tab_a ohne
-// Lippe". Der Unterschied ist der ganze Punkt: leitet er seine Form aus
-// spk_lip_a ab, dann loescht die Mutation "Nase ringsum" den Pruefkoerper
-// gleich mit, der Check meldet leer und besteht aus dem falschen Grund.
-// Genau das hat der Negativtest gefunden.
-else if (part == "check_speaker_insert_free")
+else if (part == "check_switch_tool_fits")
     intersection() {
-        rear_lid();
-        for (a = spk_free_a)
-            translate([spk_cx, spk_cy, spk_lip_z + 0.05])
-                rotate([0, 0, a - spk_tab_arc/2])
-                    linear_extrude(spk_tab_lip - 0.1)
-                        difference() {
-                            circle(r = spk_d/2, $fn = 96);
-                            circle(r = spk_d/2 - 0.6, $fn = 96);
-                            translate([-spk_d, -spk_d]) square([2*spk_d, spk_d]);
-                            rotate([0, 0, spk_tab_arc])
-                                translate([-spk_d, 0]) square([2*spk_d, spk_d]);
-                        }
+        mock_switch_tool();
+        union() { front_housing(); rear_lid(); }
     }
 // Die Schallloecher muessen durch den 1,5 mm starken Taschenboden gehen.
 // Der Pruefkoerper ist bewusst NICHT lid_grille(): mit dem Fehler
@@ -274,13 +262,20 @@ else if (part == "check_card_window_open")
                   house_front_z + 6 - card_bed_z - card_t]);
         union() { button(); front_housing(); }
     }
-else if (part == "check_card_retained")
-    // die obere Lippe muss die sitzende Karte ueberdecken
-    intersection() {
-        button();
-        translate([cx - card_w/2, cy + card_ch_l/2 - lip_top, card_bed_z])
-            cube([card_w, lip_top, card_t + card_ch_h]);
-    }
+// Halt der Karte: die ECHTE Karte nach vorn gegen die Lippen druecken.
+//
+// Der alte Pruefkoerper war ein Quader, dessen Lage aus card_ch_l kam —
+// also aus der Mulde, die er pruefen sollte. Verlaengert man die Mulde
+// um 3 mm, wandert er mit, und der Check meldet unveraendert 115,2 mm3,
+// obwohl die obere Lippe die Karte dann gar nicht mehr ueberdeckt.
+// Dieselbe Fehlerklasse wie bei den Lautsprecher-Checks.
+//
+// Geprueft wird jetzt getrennt oben und unten, begrenzt durch die
+// Ausdehnung der KARTE (card_w), nicht der Mulde.
+else if (part == "check_card_retained_top")
+    intersection() { button(); mock_card(0, card_ch_h); card_half(true); }
+else if (part == "check_card_retained_bottom")
+    intersection() { button(); mock_card(0, card_ch_h); card_half(false); }
 
 // --- Gehaeuse: Material da, Bohrungen offen ----------------------------
 else if (part == "check_wall_solid")

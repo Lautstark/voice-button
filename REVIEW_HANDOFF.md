@@ -367,7 +367,7 @@ wird auch nicht gebraucht: Das nachgiebige Druckstück begrenzt, was beim
 ## Stand
 
 ```
-c1cb0c4  Gemessene Hardware: Kavitaet 84, Lautsprecher in den Deckel eingesenkt
+65e344f  Review von 5d55b20: fuenf Befunde behoben, Ladestecker erreicht die Buchse
 ```
 
 Prüfbar mit:

@@ -15,13 +15,13 @@ use <assembly.scad>
 part = "view_iso";
 
 // --- Hilfskoerper -----------------------------------------------------
-module everything_but_rim() {
+module everything_but_posts() {
     // alles, was die Taste beim Kippen NICHT beruehren darf
     front_housing();
     mock_electronics();
-    intersection() {
+    difference() {
         rear_lid();
-        translate([cx, cy, -1]) rbox_c(rim_in - 0.2, 60, 1.0);
+        post_columns();
     }
 }
 
@@ -34,8 +34,8 @@ module everything_but_rim() {
 
 module lid_sweep() {
     hull() {
-        union() { lid_rim(); lid_features(); }
-        translate([0, 0, -20]) union() { lid_rim(); lid_features(); }
+        union() { lid_posts(); lid_features(); }
+        translate([0, 0, -20]) union() { lid_posts(); lid_features(); }
     }
 }
 
@@ -73,20 +73,38 @@ module probe_at(x, y, z) translate([x - probe/2, y - probe/2, z - probe/2])
     cube([probe, probe, probe]);
 
 module probes_lid() {
-    probe_at((ped_x0 + ped_x1)/2, (ped_y0 + ped_y1)/2, bay_z + (ped_top - bay_z)/2);
-    // Suedsonde NICHT auf cx: dort liegt der Durchlass fuer den
-    // Schiebeschalter, die Sonde saesse im Hohlraum.
-    probe_at(cavity - 12.0, 0.15 + stop_band/2, bay_z + 1.0);  // Ring Sued
-    probe_at(cx, cavity - 0.15 - stop_band/2, bay_z + 1.0);   // Ring Nord
-    probe_at(0.15 + stop_band/2, cy, bay_z + 1.0);            // Ring West
-    probe_at(cavity - 0.15 - stop_band/2, cy, bay_z + 1.0);   // Ring Ost
+    // Je eine Sonde in der L-Flaeche jedes Pfostens, dicht unter der
+    // Anschlagflaeche. Dort entscheidet sich, ob der Pfosten die
+    // Handkraft traegt — nicht an seinem Fuss. Eine Sonde im Fuss hat
+    // beim Vorgaenger einen Pfosten durchgelassen, dem der Verschnitt
+    // mit der Kavitaet den Kopf abgeschnitten hatte.
+    // Je zwei Sonden pro Pfosten, eine auf jedem Bein der L-Flaeche,
+    // und beide auf halber Pfostenbreite statt in der Ecke. Die erste
+    // Fassung sass bei (1,25 / 1,25) — rechnerisch im Pfostenquadrat,
+    // aber ausserhalb der Kavitaetsrundung und damit in der WAND, wo
+    // der Deckel kein Material hat. check_features_lid hat das mit
+    // 0,28 mm3 gemeldet.
+    for (i = [0 : 3]) {
+        fx = post_pos[i][0] + (post_dir[i][0] > 0 ? post_face/2
+                                                  : post_w - post_face/2);
+        fy = post_pos[i][1] + (post_dir[i][1] > 0 ? post_face/2
+                                                  : post_w - post_face/2);
+        for (z = [stop_z - 0.8, bay_z + 1.0]) {
+            probe_at(fx, post_pos[i][1] + post_w/2, z);   // Bein in y
+            probe_at(post_pos[i][0] + post_w/2, fy, z);   // Bein in x
+        }
+    }
     // Material unter der Lautsprechertasche
     probe_at(spk_cx + spk_pocket_r - 1.0, spk_cy, spk_floor/2);
-    probe_at(cx, cy, lid_t/2 - 0.0);                          // Deckelboden
+    // Deckelboden. NICHT mehr in der Kavitaetsmitte: der Lautsprecher
+    // liegt jetzt fast mittig, und die Sonde sass in seiner Tasche —
+    // also im Hohlraum. Stattdessen unter der Platinenauflage, 39,6 mm
+    // von der Taschenmitte entfernt.
+    probe_at(pcb_x0 + pcb_w/2, pcb_y0 + pcb_h/2, lid_t/2);
     // Akkufachwaende — ohne diese Sonden koennen sie spurlos
     // verschwinden, ohne dass eine Pruefung anders ausgeht.
-    probe_at(bat_x0 - bat_clear - bat_wall_t/2,
-             bat_y0 + bat_ey/2 - bat_clear, bay_z + 1.0);
+    probe_at(bat_x0 + bat_ex/2 - bat_clear,
+             bat_y0 - bat_clear - bat_wall_t/2, bay_z + 1.0);
     probe_at(bat_x0 + bat_ex/2 - bat_clear,
              bat_y0 - bat_clear + bat_ey + bat_wall_t/2, bay_z + 1.0);
 }
@@ -131,11 +149,28 @@ else if (part == "view_exploded") assembly(1);
 else if (part == "view_front") assembly();
 else if (part == "view_section_y") section(0);
 else if (part == "view_section_x") section(1);
+// Zwei Montageansichten. Sie zeigen die beiden Stellen, die nicht mehr
+// mittig sind und die man beim Kleben treffen muss: das Druckstueck auf
+// der Tastenrueckseite und den Zwischenleger auf dem Lautsprecher.
+else if (part == "view_button_back") {
+    color([0.62, 0.50, 0.78]) button();
+    color([0.85, 0.30, 0.30]) mock_pad();
+}
+else if (part == "view_lid_top") {
+    // Eigene Farben statt mock_electronics(): auf diesem Bild soll man
+    // Leger und Tasterplatine FINDEN koennen, und in Einheitsgruen
+    // verschwinden beide auf dem Lautsprecher.
+    color([0.75, 0.75, 0.80]) rear_lid();
+    color([0.30, 0.45, 0.30]) { mock_speaker(); mock_battery(); mock_pcb(); }
+    color([0.95, 0.75, 0.25]) mock_shim();
+    color([0.85, 0.30, 0.30]) mock_breakout();
+}
 
 // Bauteile in Drucklage
 else if (part == "part_front_housing") translate([0, 0, -bay_z]) front_housing();
 else if (part == "part_button")        translate([0, 0, -plate_under_z]) button();
 else if (part == "part_rear_lid")      rear_lid();
+else if (part == "part_switch_shim")   switch_shim();
 
 // --- Selbsttests der Messwerkzeuge (muessen GREIFEN) -------------------
 else if (part == "selftest_wall_band")
@@ -185,9 +220,9 @@ else if (part == "check_lid_inner_pressed")
     // nichts im Deckel beruehren
     intersection() {
         button_pressed(travel_stop);
-        intersection() {
+        difference() {
             rear_lid();
-            translate([cx, cy, -1]) rbox_c(rim_in - 0.2, 60, 1.0);
+            post_columns();
         }
     }
 else if (part == "check_port_tunnel_open")
@@ -196,13 +231,22 @@ else if (part == "check_port_tunnel_open")
     // hier gerade am gesunden Modell am groessten.
     intersection() {
         union() {
-            // 0,2 mm schlanker als der Kanal: deckungsgleiche Flaechen
-            // ergeben sonst einen entarteten Koerper statt einer Pruefung.
-            translate([usb_x_c - usb_pocket_w/2 + 0.1, 0.1,
-                       usb_z_c - usb_pocket_h/2 + 0.1])
-                cube([usb_pocket_w - 0.2, stop_band, usb_pocket_h - 0.2]);
-            translate([psw_x_c - psw_cut_w/2, 0.1, psw_z_c - psw_cut_h/2])
-                cube([psw_cut_w, stop_band, psw_cut_h]);
+            // GERUNDET, nicht scharfkantig. Ein Quader im Querschnitt
+            // der Tasche stoesst mit seinen vier Ecken in deren
+            // Eckrundung und meldete 6,53 mm3, wo in Wirklichkeit nichts
+            // im Weg steht — dieselbe Falle wie beim Steckermodell.
+            //
+            // Das USB-Mass ist bewusst GENAU das Griffmass: geprueft
+            // wird damit nicht "irgendein Korridor", sondern dass der
+            // Griff des Kabels bis zur Buchse durchkommt.
+            translate([usb_x_c, -wall + 0.1, usb_z_c])
+                rotate([-90, 0, 0]) linear_extrude(wall + usb_grip_y - 0.2)
+                    translate([-usb_grip_w/2, -usb_grip_h/2])
+                        rrect(usb_grip_w, usb_grip_h, 1.0);
+            translate([psw_x_c, -wall + 0.1, psw_z_c])
+                rotate([-90, 0, 0]) linear_extrude(wall + pcb_y0 - 0.2)
+                    translate([-(psw_cut_w - 0.4)/2, -(psw_cut_h - 0.4)/2])
+                        rrect(psw_cut_w - 0.4, psw_cut_h - 0.4, 0.8);
         }
         union() { rear_lid(); front_housing(); }
     }
@@ -268,6 +312,28 @@ else if (part == "check_stop_face_height")
 // Zehntel betraegt oder null ist.
 else if (part == "selftest_tilt")
     difference() { button(); button_tilt(1, 0); }
+// Die Loetbeine muessen im Fenster des Legers stehen, nicht auf ihm.
+// Ohne diesen Check stuende die Tasterplatine 1,2 mm schief, und keine
+// andere Pruefung ginge anders aus — der Leger ist kein Druckteil des
+// Gehaeuses und beruehrt keinen der Gehaeusechecks.
+else if (part == "check_shim_pins_clear")
+    intersection() { mock_shim(); mock_switch_pins(); }
+// Und sie duerfen nicht bis auf den Lautsprecherruecken durchstossen.
+else if (part == "check_pins_speaker_clear")
+    intersection() { mock_speaker(); mock_switch_pins(); }
+// Der Leger muss die Platine wirklich tragen: Platine 0,1 mm abgesenkt
+// MUSS ihn treffen. Ein zu kleiner oder verschobener Leger faellt hier
+// auf, nicht erst beim Kleben.
+else if (part == "check_shim_carries")
+    intersection() { mock_shim(); translate([0, 0, -0.1]) mock_breakout(); }
+// Die Tasterplatine liegt vollstaendig auf dem Lautsprecher. Geprueft
+// wird mit einem Zylinder aus spk_d — NICHT mit mock_speaker(), denn
+// deren Lage und Mass sind dasselbe, was hier gelten soll.
+else if (part == "check_breakout_overhang")
+    difference() {
+        mock_breakout();
+        translate([spk_cx, spk_cy, -1]) cylinder(d = spk_d, h = 60);
+    }
 else if (part == "check_screws_clear")
     intersection() { mock_screws(); union() { button(); mock_electronics(); } }
 
@@ -283,14 +349,14 @@ else if (part == "check_foam_preloaded")
     intersection() { mock_foam(); button(); }
 
 // --- Kippen: acht Richtungen ------------------------------------------
-else if (part == "check_tilt_n")  intersection() { everything_but_rim(); button_tilt(0, 1); }
-else if (part == "check_tilt_s")  intersection() { everything_but_rim(); button_tilt(0, -1); }
-else if (part == "check_tilt_e")  intersection() { everything_but_rim(); button_tilt(1, 0); }
-else if (part == "check_tilt_w")  intersection() { everything_but_rim(); button_tilt(-1, 0); }
-else if (part == "check_tilt_ne") intersection() { everything_but_rim(); button_tilt(1, 1); }
-else if (part == "check_tilt_nw") intersection() { everything_but_rim(); button_tilt(-1, 1); }
-else if (part == "check_tilt_se") intersection() { everything_but_rim(); button_tilt(1, -1); }
-else if (part == "check_tilt_sw") intersection() { everything_but_rim(); button_tilt(-1, -1); }
+else if (part == "check_tilt_n")  intersection() { everything_but_posts(); button_tilt(0, 1); }
+else if (part == "check_tilt_s")  intersection() { everything_but_posts(); button_tilt(0, -1); }
+else if (part == "check_tilt_e")  intersection() { everything_but_posts(); button_tilt(1, 0); }
+else if (part == "check_tilt_w")  intersection() { everything_but_posts(); button_tilt(-1, 0); }
+else if (part == "check_tilt_ne") intersection() { everything_but_posts(); button_tilt(1, 1); }
+else if (part == "check_tilt_nw") intersection() { everything_but_posts(); button_tilt(-1, 1); }
+else if (part == "check_tilt_se") intersection() { everything_but_posts(); button_tilt(1, -1); }
+else if (part == "check_tilt_sw") intersection() { everything_but_posts(); button_tilt(-1, -1); }
 
 // --- Karte -------------------------------------------------------------
 else if (part == "check_card_seated")

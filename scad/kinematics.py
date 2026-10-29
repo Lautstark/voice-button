@@ -30,32 +30,49 @@ for name, expr in re.findall(r'^\s*([a-z_][\w]*)\s*=\s*([^;]+);', src, re.M):
     except Exception:
         pass
 
-need = ["cavity", "plate_under_z", "stop_z", "stop_band", "flange_w", "prism_w",
+need = ["cavity", "plate_under_z", "stop_z", "flange_w", "prism_w",
         "travel_stop", "act_gap", "pad_click", "sw_travel", "bat_env",
-        "pcb_comp_top", "bo_top", "spk_top", "ped_top", "bay_z"]
+        "pcb_comp_top", "bo_top", "spk_top", "bay_z",
+        "post_w", "post_face", "post_foam_w", "sw_x", "sw_y", "sw_off_plate"]
 missing = [n for n in need if n not in V]
 if missing:
     sys.exit("config.scad nicht lesbar, fehlt: %s" % missing)
 g = lambda n: V[n]
 C   = g("cavity"); PU = g("plate_under_z"); SZ = g("stop_z")
-BAND= g("stop_band"); FW = g("flange_w"); PW = g("prism_w")
+FW  = g("flange_w"); PW = g("prism_w")
+PW_ = g("post_w"); PF = g("post_face"); PK = g("post_foam_w")
+SWX = g("sw_x"); SWY = g("sw_y")
 cx = cy = C/2.0
+
+# Die vier Eckpfosten, hier aus cavity und post_w neu aufgebaut — nicht
+# aus post_pos gelesen. Eine Liste in config.scad kann der Parser oben
+# nicht auswerten, und eine abgeschriebene Liste waere genau die Art
+# stiller Abweichung, die diese Datei verhindern soll.
+POSTS = [((0.0, 0.0), (1, 1)), ((C - PW_, 0.0), (-1, 1)),
+         ((0.0, C - PW_), (1, -1)), ((C - PW_, C - PW_), (-1, -1))]
 
 # Feste Merkmale unter der Taste: (x, y, Oberkante)
 feat = []
-# Anschlagring: Raster ueber das ganze Band
-n = 160
-for i in range(n):
-    t = C*i/(n-1)
-    for u in (BAND/2.0, C-BAND/2.0):
-        feat.append((t, u, SZ)); feat.append((u, t, SZ))
-# Bauteile und Aufnahme (Punkt in ihrer Mitte genuegt fuer die Reihenfolge,
-# die Hoehen sind die Oberkanten aus dem Stapel)
-feat += [(g("bat_x0")+10, g("bat_y0")+15, g("bat_env")),
+# Anschlagflaeche: nur die L-Flaeche jedes Pfostens, die Kerbe NICHT.
+# Das ist der Unterschied zum umlaufenden Ring: zwischen den Pfosten
+# liegt nichts, und die Taste kann dort auf keinen Anschlag treffen.
+m = 24
+for (px, py), (dx, dy) in POSTS:
+    nx0 = px + (PF if dx > 0 else 0.0)
+    ny0 = py + (PF if dy > 0 else 0.0)
+    for a in range(m):
+        for b in range(m):
+            x = px + PW_*(a + 0.5)/m
+            y = py + PW_*(b + 0.5)/m
+            if nx0 <= x <= nx0 + PK and ny0 <= y <= ny0 + PK:
+                continue                       # in der Kerbe, kein Anschlag
+            feat.append((x, y, SZ))
+# Bauteile (Punkt in ihrer Mitte genuegt fuer die Reihenfolge, die
+# Hoehen sind die Oberkanten aus dem Stapel)
+feat += [(g("bat_x0")+g("bat_ex")/2, g("bat_y0")+g("bat_ey")/2, g("bat_env")),
          (g("pcb_x0")+14, g("pcb_y0")+13, g("pcb_comp_top")),
-         (cx, cy+5, g("bo_top")),
-         (g("spk_cx"), g("spk_cy"), g("spk_top")),
-         ((g("ped_x0")+g("ped_x1"))/2, (g("ped_y0")+g("ped_y1"))/2, g("ped_top"))]
+         (SWX, SWY, g("bo_top")),
+         (g("spk_cx"), g("spk_cy"), g("spk_top"))]
 # nur was wirklich unter dem Flansch liegt
 half = FW/2.0
 feat = [f for f in feat if abs(f[0]-cx) <= half+1e-9 and abs(f[1]-cy) <= half+1e-9]
@@ -85,13 +102,18 @@ def case(ux, uy, label):
             best = (tan, (x, y, h))
     tan, first = best
     press = s(cx + ux*PW/2.0, cy + uy*PW/2.0) * tan   # Weg am Druckpunkt
-    sw    = s(cx, cy) * tan - g("act_gap")            # Weg am Taster
+    # Der Taster sitzt NICHT in der Plattenmitte. Das ist der Kern der
+    # Bauform ohne Klotz, und genau hier hat sich das frueher gerechnet,
+    # als saesse er mittig.
+    sw    = s(SWX, SWY) * tan - g("act_gap")          # Weg am Taster
     return label, press, sw, first
 
 cases = [(0, 0, "gerade"), (0, 1, "Kante N"), (0, -1, "Kante S"),
          (1, 0, "Kante O"), (-1, 0, "Kante W"), (1, 1, "Ecke NO"),
          (-1, 1, "Ecke NW"), (1, -1, "Ecke SO"), (-1, -1, "Ecke SW")]
 
+print("Taster sitzt %.2f mm neben der Plattenmitte, bei (%.2f / %.2f)"
+      % (g("sw_off_plate"), SWX, SWY))
 print("Luft ueber dem Taster: %.2f mm (act_gap)" % g("act_gap"))
 print("Danach gebraucht:      %.3f mm (pad_click %.2f + sw_travel %.2f)"
       % (need_travel, g("pad_click"), g("sw_travel")))
@@ -119,9 +141,14 @@ print("  je Seite. Das gilt in jeder Stellung, gekippt wie in Ruhe — die")
 print("  Taste kann nach vorn gar nicht heraus.")
 print("  Gefuehrt wird sie in Ruhe vom umlaufenden Konus (zentriert sich")
 print("  selbst) und beim Druecken von der Konusseite am Drehpunkt plus")
-print("  %.2f mm Wandspiel. Die Drehung selbst ist durch den Anschlagring"
+print("  %.2f mm Wandspiel. Die Drehung selbst ist durch die Eckpfosten"
       % g("plate_clear"))
 print("  begrenzt: hoechstens %.3f Grad."
       % math.degrees(math.atan(g("travel_stop")/FW)))
+print("  Die Begrenzung sind VIER ECKPFOSTEN, kein umlaufender Ring.")
+print("  Zwischen ihnen liegt nichts: ein Druck auf eine Kantenmitte")
+print("  biegt die 2,4 mm starke Platte zusaetzlich durch. Gerechnet")
+print("  rund 1,2 mm bei 30 N, von der Pad-Stauchung aufgenommen und")
+print("  rund 10-fach unter der Bruchspannung — aber NICHT gemessen.")
 print("  Sichtbarer Spalt: %.2f mm in Ruhe, hoechstens %.2f mm beim Druecken."
       % (g("seat_clear"), g("seat_clear") + 2.0))

@@ -91,6 +91,13 @@ must_be_clear check_usb_plug_fits
 must_be_clear check_usb_insert_path
 must_be_clear check_switch_tool_fits
 
+echo "— Taster auf dem Lautsprecherruecken —"
+must_be_empty check_breakout_overhang
+must_be_clear check_shim_pins_clear
+must_be_clear check_pins_speaker_clear
+must_engage   check_shim_carries
+must_be_clear check_pins_clear
+
 echo "— Halten, Anschlag, Rueckstellung —"
 must_engage check_button_retained
 must_engage check_stop_engages

@@ -6,25 +6,27 @@ dahinter lässt sich ohne Werkzeug wechseln, am fertig montierten Gerät.
 
 Gebaut für ein dreieinhalbjähriges Kind, das nicht spricht.
 
-> **Hardware gemessen (2026-10-28).** Lautsprecher, Akku, Platinen und
-> Portlagen liegen als Messwerte vor; das Gerät ist dadurch von 76 auf
-> 93 mm gewachsen und von 22,4 auf 21,9 mm abgeflacht. Offen sind nur
-> noch die Kennlinien der beiden Schaumteile und der Schaltvorlauf —
-> alles, was das Druckstück beim Zusammenbau ausgleicht. Siehe
+> **Verkleinert (2026-10-29).** 93 → 85 mm Kantenmaß, durch zwei
+> Streichungen: der Sockel unter der Tasterplatine ist weg (sie klebt
+> jetzt auf dem Lautsprecherrücken), und der umlaufende Anschlagring ist
+> durch **vier Eckpfosten** ersetzt. Bezahlt wird das mit Reserve beim
+> Randdruck — 0,10 statt 0,25 mm — und mit 1,5 mm mehr Bauhöhe.
+> Drei Maße am Lautsprecherrücken sind noch Annahme; sie betreffen nur
+> den Zwischenleger, nicht die drei großen Druckteile. Siehe
 > [REVIEW_HANDOFF.md](REVIEW_HANDOFF.md).
 
 | | |
 |---|---|
-| Außenmaß | 93 × 93 × 21,9 mm |
-| Druckteile | drei, alle ohne Stützen |
+| Außenmaß | 85 × 85 × 23,4 mm |
+| Druckteile | vier, alle ohne Stützen |
 | Befestigung | vier M2 × 10, von hinten |
 | Karte | 40 × 40 mm, zulässig 39,3–40,7 mm |
-| Druckfläche | 79 × 79 mm |
-| Tastenweg | 2,0 mm bis zum Anschlag |
+| Druckfläche | 71 × 71 mm |
+| Tastenweg | 2,0 mm bis zu den Eckpfosten |
 
 ## Aufbau
 
-Drei Teile, und jedes hat genau eine Aufgabe.
+Vier Teile, und jedes hat genau eine Aufgabe.
 
 **Frontgehäuse** — die Außenhaut. Ein umlaufender 45-Grad-Konus hält die
 Taste nach vorn fest; die Wand nimmt die Anschlagkräfte auf und trägt
@@ -34,14 +36,21 @@ die vier Gewinde.
 Sie kann nach vorn nicht heraus, und **keine Schraube geht durch sie
 hindurch**.
 
-**Rückdeckel** — trägt Akku, Hauptplatine und die Aufnahme der
-Tasterplatine, dazu den umlaufenden Anschlagring. Der Lautsprecher liegt
-in einer **Tasche im Deckel**, nicht auf dem Boden: das hält ihn flach
-genug, dass die Tasterplatine über ihn hinweglaufen darf.
+**Rückdeckel** — trägt Akku und Hauptplatine und die **vier
+Eckpfosten**, die die Handkraft abfangen. Jeder Pfosten ist mit der
+Kavität verschnitten, liegt also an zwei Gehäusewänden an und kann nicht
+ausweichen. In seiner Innenecke sitzt eine Kerbe für ein
+Rückstellpad. Der Lautsprecher liegt in einer **Tasche im Deckel**,
+nicht auf dem Boden.
 
-Warum es so und nicht anders aussieht — besonders, warum das Gerät
-93 statt 61 mm breit ist und warum das Druckstück weich sein muss —
-steht in [docs/adr-002-architektur.md](docs/adr-002-architektur.md).
+**Zwischenleger** — ein Plättchen von 20 × 9 × 1,6 mm. Es klebt auf dem
+Lautsprecherrücken, die Tasterplatine klebt auf ihm. Es gibt den nach
+unten vorstehenden Lötbeinen des Tasters ein Fenster und der Platine
+eine steife, ebene Auflage.
+
+Warum es so und nicht anders aussieht — besonders, warum der Taster
+nicht mittig sitzt und was das kostet — steht in
+[docs/adr-002-architektur.md](docs/adr-002-architektur.md).
 
 ## Weiterlesen
 

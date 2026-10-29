@@ -77,17 +77,43 @@ run "Schalteroeffnung zu" parts.scad \
 run "Schallloecher zu" parts.scad \
     's|^module lid_grille() {|module lid_grille() { if (true) {} else|' \
     check_grille_open ueberschneidung
-# Anschlagring 1,3 mm zu hoch: stop_z und alle asserts bleiben heil, der
+# Pfosten 1,3 mm zu hoch: stop_z und alle asserts bleiben heil, der
 # Tastenweg schrumpft aber von 2,0 auf 0,7 mm und das Geraet loest nie
 # aus. Bis zu diesem Test hat das keine Pruefung gemerkt — alle fragten
-# nur, ob der Ring IRGENDWO greift, und ein zu hoher greift mehr.
-run "Anschlagring zu hoch" config.scad \
-    's|^rim_h          = stop_z - bay_z;|rim_h = stop_z - bay_z + 1.3;|' \
+# nur, ob der Anschlag IRGENDWO greift, und ein zu hoher greift mehr.
+run "Pfosten zu hoch" config.scad \
+    's|^post_h         = stop_z - bay_z;|post_h = stop_z - bay_z + 1.3;|' \
     check_stop_face_height ueberschneidung
-# Freistellung unter dem Taster zugebaut: seine Loetbeine stossen auf.
-run "Tasterbeine stossen auf" parts.scad \
-    's|ped_top - pin_relief\])|ped_top + 5])|' \
-    check_pins_clear ueberschneidung
+# Fenster im Zwischenleger vergessen: die Loetbeine des Tasters stossen
+# auf, die Platine steht schief und der Taster schaltet im Leeren.
+run "Legerfenster fehlt" parts.scad \
+    's|^        translate(\[-sw_off_l|        if (false) translate([-sw_off_l|' \
+    check_shim_pins_clear ueberschneidung
+# Leger nicht unter der Platine: sie haengt in der Luft statt auf ihm.
+# Mutation im Mock, damit sie an den asserts vorbeikommt.
+#
+# Erster Versuch war scale([0.25, 0.25, 1]) — und das war KEINE Mutation:
+# ein geschrumpfter Leger liegt immer noch unter der Platinenmitte und
+# traegt weiter. Der Negativtest meldete deshalb 'ueberschneidung' und
+# hat damit sich selbst entlarvt, nicht den Check.
+run "Leger traegt nicht" assembly.scad \
+    's|        rotate(\[0, 0, bo_ang\]) switch_shim();|        translate([30, 0, 0]) rotate([0, 0, bo_ang]) switch_shim();|' \
+    check_shim_carries leer
+# Tasterplatine zu lang: sie haengt ueber den Lautsprecherrand und hat
+# unter dem Taster keine steife Auflage mehr. Auch hier im Mock, denn
+# in config.scad faengt das ein assert vorher ab.
+run "Platine haengt ueber" assembly.scad \
+    's|            translate(\[-bo_l/2, -bo_w/2, 0\]) cube(\[bo_l, bo_w, bo_t\]);|            translate([-bo_l/2 - 6, -bo_w/2, 0]) cube([bo_l + 12, bo_w, bo_t]);|' \
+    check_breakout_overhang ueberschneidung
+# Taster wandert von Magneten auf die Membran: dort gibt er beim
+# Druecken nach, statt zu schalten. Hier greift der assert.
+run "Taster auf der Membran" config.scad \
+    's|^spk_sw_reach   = 6.0;|spk_sw_reach = 12.0;|' \
+    check_shim_carries renderfehler
+# Kerbe so gross, dass von der L-Flaeche nichts Tragendes bleibt.
+run "Kerbe frisst den Pfosten" config.scad \
+    's|^post_foam_w    = 4.5;|post_foam_w = 6.5;|' \
+    check_stop_engages renderfehler
 # Kippmodell bewegt die Taste nicht mehr: dann bestehen die acht
 # Kippruefungen auch an einem kaputten Modell.
 # Beide Terme muessen weg: mit ang = 0 allein schiebt das Modell die
@@ -95,9 +121,9 @@ run "Tasterbeine stossen auf" parts.scad \
 run "Kippmodell steht still" assembly.scad \
     's|ang   = atan2(travel_stop, span);|ang = 0;|; s|slide = (plate_front_z - plate_under_z) \* travel_stop/span;|slide = 0;|' \
     selftest_tilt leer
-# Anschlagring entfernt: die Taste faellt bis auf die Elektronik
-run "Anschlagring weg" parts.scad \
-    's|^module lid_rim() {|module lid_rim() { if (true) {} else|' \
+# Eckpfosten entfernt: die Taste faellt bis auf die Elektronik
+run "Eckpfosten weg" parts.scad \
+    's|^module lid_posts() {|module lid_posts() { if (true) {} else|' \
     check_stop_engages leer
 # Loch in die Aussenwand
 run "Loch in der Wand" parts.scad \
@@ -111,8 +137,9 @@ run "Durchlass fehlt" parts.scad \
 run "Kernloch fehlt" parts.scad \
     's|            translate(\[p\[0\], p\[1\], bay_z - 0.01\])|            if (false) translate([p[0], p[1], bay_z - 0.01])|' \
     check_screw_bores_open ueberschneidung
-# Aufnahme der Tasterplatine entfernt
-run "Aufnahme weg" parts.scad \
-    's|    translate(\[ped_x0, ped_y0, bay_z\])|    if (false) translate([ped_x0, ped_y0, bay_z])|' \
+# Akkufachwand entfernt: ohne Sonde dort verschwindet sie spurlos,
+# ohne dass eine andere Pruefung anders ausgeht.
+run "Akkufachwand weg" parts.scad \
+    's|    translate(\[bat_x0 - bat_clear, bat_y0 - bat_clear - bat_wall_t, bay_z\])|    if (false) translate([bat_x0 - bat_clear, bat_y0 - bat_clear - bat_wall_t, bay_z])|' \
     check_features_lid ueberschneidung
 exit $fail

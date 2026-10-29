@@ -123,26 +123,45 @@ module button() {
 }
 
 // ---------------------------------------------------------------------
-// RUECKDECKEL — traegt die Elektronik und den Anschlagring
+// RUECKDECKEL — traegt die Elektronik und die vier Eckpfosten
 // ---------------------------------------------------------------------
 module lid_plate() {
     translate([cx, cy, 0]) rbox_c(housing, lid_t, corner_r);
 }
 
-// Der Anschlagring. Er ist umlaufend und liegt mit seiner Aussenflaeche
-// an der Gehaeusewand an, kann also nicht ausweichen. Er faengt die
-// Handkraft ab, bevor sie Taster, Platine oder Akku erreicht.
-module lid_rim() {
-    difference() {
-        translate([cx, cy, bay_z]) rbox_c(rim_out, rim_h, corner_ri - 0.15);
-        translate([cx, cy, bay_z - 1])
-            rbox_c(rim_in, rim_h + 2, max(0.5, corner_ri - stop_band));
-        // Nut fuer den Rueckstellstreifen
-        // Stufe an der Innenseite, nach innen offen
-        translate([cx, cy, foam_groove_z])
-            rbox_c(foam_out, foam_groove_d + 1,
-                   max(0.5, corner_ri - 0.15 - stop_face));
-    }
+// DIE VIER ECKPFOSTEN. Sie ersetzen den umlaufenden Anschlagring und
+// fangen die Handkraft ab, bevor sie Taster, Platine oder Akku erreicht.
+//
+// Jeder Pfosten ist mit der KAVITAET VERSCHNITTEN. Das ist kein
+// Schoenheitsschnitt: dadurch folgt seine Aussenseite der Innenrundung
+// der Gehaeuseecke, er liegt an zwei Waenden an und kann nicht
+// ausweichen — genau die Eigenschaft, die vorher der umlaufende Ring
+// hatte. Ohne den Schnitt stuende ein Stueck des Quadrats im Bereich
+// der Wand und der Deckel liesse sich nicht mehr einlegen.
+//
+// In der Innenecke sitzt die Kerbe fuer das Rueckstellpad. Sie geht
+// nur von foam_groove_z bis oben; darunter ist der Pfosten voll.
+module lid_posts() {
+    for (i = [0 : 3])
+        difference() {
+            intersection() {
+                translate([post_pos[i][0], post_pos[i][1], bay_z])
+                    cube([post_w, post_w, post_h]);
+                translate([cx, cy, bay_z - 1]) rbox_c(cavity, post_h + 2, corner_ri);
+            }
+            translate([post_pos[i][0] + (post_dir[i][0] > 0 ? post_face : 0),
+                       post_pos[i][1] + (post_dir[i][1] > 0 ? post_face : 0),
+                       foam_groove_z])
+                cube([post_foam_w, post_foam_w, foam_groove_d + 1]);
+        }
+}
+
+// Nur die Saeulen, ohne Kerbe und ohne Verschnitt — als Hilfskoerper
+// fuer die Kippruefungen: "alles im Deckel AUSSER den Pfosten".
+module post_columns() {
+    for (i = [0 : 3])
+        translate([post_pos[i][0], post_pos[i][1], bay_z - 1])
+            cube([post_w, post_w, post_h + 20]);
 }
 
 // Der Lautsprecher liegt in einer TASCHE im Deckel. Gedruckt wird der
@@ -179,40 +198,65 @@ module lid_features() {
     translate([pcb_x0 + pcb_w + pcb_clear,
                pcb_y0 + pcb_h/2 - pcb_nose_l/2, bay_z])
         cube([pcb_nose_t, pcb_nose_l, pcb_nose_h]);
-    // Akkufach: West- und Nordwand. Nach Sueden begrenzt die Platinen-
-    // auflage, nach Osten der freie Boden — dort kommt man mit dem
-    // Finger an die Zelle, um sie beim Zusammenbau einzulegen.
-    translate([bat_x0 - bat_clear - bat_wall_t, bat_y0 - bat_clear - bat_wall_t, bay_z])
-        cube([bat_wall_t, bat_ey + 2*bat_wall_t, bat_t + bat_pad_t]);
-    translate([bat_x0 - bat_clear - bat_wall_t,
-               bat_y0 - bat_clear + bat_ey, bay_z])
-        cube([bat_ex + 2*bat_wall_t, bat_wall_t, bat_t + bat_pad_t]);
-    // Aufnahme der Tasterplatine: Block auf freiem Boden, oben mit einer
-    // Freistellung unter dem Taster — dessen Beine stehen nach unten
-    // heraus. Die Platine liegt ringsum auf dem stehengebliebenen Rand.
+    // Akkufach: SUED- und NORDwand, also an den kurzen Enden der
+    // hochkant liegenden Zelle. Die Zelle ist in y lang; zwei Waende an
+    // den Enden halten sie laengs, das ist die Richtung, in die sie
+    // rutschen koennte. Nach WESTEN begrenzt die Gehaeusewand selbst,
+    // nach OSTEN bleibt der Boden frei — dort kommt man mit dem Finger
+    // an die Zelle, um sie beim Zusammenbau einzulegen.
+    translate([bat_x0 - bat_clear, bat_y0 - bat_clear - bat_wall_t, bay_z])
+        cube([bat_ex, bat_wall_t, bat_t + bat_pad_t]);
+    translate([bat_x0 - bat_clear, bat_y0 - bat_clear + bat_ey, bay_z])
+        cube([bat_ex, bat_wall_t, bat_t + bat_pad_t]);
+    // Keine Aufnahme fuer die Tasterplatine mehr: sie klebt auf dem
+    // Lautsprecherruecken. Der Klotz, der hier stand, war der Grund
+    // fuer acht Millimeter Kantenmass.
+}
+
+// ---------------------------------------------------------------------
+// VIERTES DRUCKTEIL: Zwischenleger unter der Tasterplatine
+// ---------------------------------------------------------------------
+// Er klebt auf dem Lautsprecherruecken, die Tasterplatine klebt auf
+// ihm. Zwei Aufgaben: den nach unten vorstehenden Loetbeinen des
+// Tasters ein Fenster geben, und der Platine eine steife, ebene
+// Auflage. Weiches Schaumklebeband koennte beides nicht — es wuerde
+// den Schaltweg aufbrauchen, statt ihn weiterzugeben.
+//
+// Gedruckt flach liegend, ohne Stuetzen. Das Fenster ist ein
+// Durchbruch, keine Tasche — so ist die Tiefe egal, falls die Beine
+// laenger sind als angenommen.
+module switch_shim() {
     difference() {
-        translate([ped_x0, ped_y0, bay_z])
-            cube([ped_x1 - ped_x0, ped_y1 - ped_y0, ped_top - bay_z]);
-        translate([cx - (sw_size + 0.6)/2, cy - (sw_size + 0.6)/2,
-                   ped_top - pin_relief])
-            cube([sw_size + 0.6, sw_size + 0.6, pin_relief + 1]);
+        translate([-shim_l/2, -shim_w/2, 0])
+            rbox(shim_l, shim_w, shim_t, 1.0);
+        // Fenster unter dem Taster, am Ort des Tasters auf der Platine.
+        // MINUS sw_off_l, nicht plus: bo_cx/bo_cy legen die Platinenmitte
+        // um +sw_off_l vom Taster weg, der Taster liegt relativ zur Mitte
+        // also bei -sw_off_l. Mit + lag das Fenster auf der falschen
+        // Seite und die Loetbeine standen auf dem Leger —
+        // check_shim_pins_clear hat 2,96 mm3 gemeldet.
+        translate([-sw_off_l - (sw_size + 1.0)/2, -(sw_size + 1.0)/2, -0.5])
+            rbox(sw_size + 1.0, sw_size + 1.0, shim_t + 1, 0.8);
     }
 }
 
-// Durchlass im Anschlagring hinter den Durchbruechen. Er endet
-// unterhalb der Ringoberkante: oben bleibt die Anschlagflaeche
-// umlaufend geschlossen, gedruckt wird darueber eine Bruecke.
+// Durchlass hinter den Durchbruechen. Mit dem Ring ist das grosse
+// Hindernis weg; was bleibt, ist die SUEDKANTE DER PLATINENAUFLAGE.
+// Sie reicht bis 5,2 mm hoch, die Steckertasche beginnt bei 4,35 —
+// 0,85 mm Ueberschneidung auf 0,3 mm Tiefe. Klein, aber genau die Art
+// Rest, die man uebersieht, wenn man das grosse Hindernis entfernt hat.
 module lid_port_tunnels() {
     // Griffmass, bis zur Buchsenstirn
     translate([usb_x_c - usb_pocket_w/2, -1, usb_z_c - usb_pocket_h/2])
         cube([usb_pocket_w, usb_grip_y + 1, usb_pocket_h]);
-    translate([psw_x_c - psw_cut_w/2 - 0.5, -1, bay_z - 1])
-        cube([psw_cut_w + 1.0, stop_band + 2, port_tunnel_z - bay_z + 1]);
+    translate([psw_x_c - psw_cut_w/2 - 0.5, -1, psw_z_c - psw_recess_h/2])
+        cube([psw_cut_w + 1.0, pcb_y0 + 1, port_tunnel_z - psw_z_c
+              + psw_recess_h/2]);
 }
 
 module rear_lid() {
     difference() {
-        union() { lid_plate(); lid_rim(); lid_features(); }
+        union() { lid_plate(); lid_posts(); lid_features(); }
         lid_speaker_pocket();
         lid_port_tunnels();
         lid_grille();

@@ -131,3 +131,106 @@ Schraube durch ein bewegliches Teil.
 Siehe [REVIEW_HANDOFF.md](../REVIEW_HANDOFF.md). Kurz: die Kennlinien der
 beiden Schaumteile und der Schaltvorlauf des Tasters. Alles davon
 gleicht das Druckstück beim Zusammenbau aus; dafür ist es da.
+
+---
+
+## Nachtrag 2026-10-29, zweiter: 93 → 85 mm
+
+Die Nutzerin wollte das Gerät kleiner und hat dafür eine Bedingung
+gelockert: *„der button muss nicht aus jeder position 100% funktionieren,
+hier gilt best effort, natürlich muss der button funktionieren auch wenn
+man nicht genau die mitte trifft, aber eben kein over engineering"*.
+
+Das ist die Lockerung, die die acht Millimeter freigibt — denn die 84 mm
+oben hingen an **einem** Satz: *„Soll der Lastpfad nicht über die
+Elektronik laufen, muss die Tastermitte frei bleiben."* Die Tastermitte
+frei zu halten heißt, zwischen Hauptplatine und Lautsprecher einen
+8 mm breiten Sockel zu stellen und den Lautsprecher dann noch 18,4 mm
+von dessen Ecken weg. Das waren die 84.
+
+### Die zwei Streichungen
+
+**Der Sockel ist weg.** Die Tasterplatine klebt jetzt auf dem **Rücken
+des Lautsprechers**, über dem Magneten. Das ist das einzige steife,
+flache Teil im Gehäuse, das keinen eigenen Fußabdruck auf dem Boden
+braucht — es liegt ohnehin da. Zwischen Platine und Korb kommt ein
+gedruckter Zwischenleger von 1,6 mm: er gibt den Lötbeinen des Tasters
+ein Fenster und macht die Auflage steif. Weiches Schaumklebeband wäre
+hier falsch, es würde den Schaltweg aufbrauchen statt ihn
+weiterzugeben.
+
+Vorher war eine Variante geprüft und **verworfen**: den Taster auf den
+Akku zu kleben. Eine LiPo-Pouchzelle darf keine wiederholte Punktlast
+auf 6 × 6 mm bekommen — Separatorschaden, innerer Kurzschluss —, und das
+mehrmals täglich neben dem Gesicht eines Kindes. Der Lautsprecherkorb
+ist derselbe Gedanke mit einem Teil, das Last tragen darf.
+
+**Der Anschlagring ist weg.** Statt eines umlaufenden Rings von 4,6 mm
+Breite, der an allen vier Seiten Bauraum fraß, tragen **vier
+Eckpfosten** von 7 × 7 mm die Handkraft. Jeder ist mit der Kavität
+verschnitten, liegt also an zwei Wänden an und kann nicht ausweichen —
+die Eigenschaft, auf die es beim Ring ankam. Die Ecken sind ohnehin der
+Platz, den rechteckige Bauteile nicht nutzen können.
+
+### Was es kostet, in Zahlen
+
+Der Taster sitzt jetzt **6,76 mm neben der Plattenmitte**, weil der
+Lautsprecher nicht in die Mitte kann. Damit gilt die Hälfte-Regel aus
+dem Abschnitt oben nicht mehr: beim Druck auf die Seite, auf der der
+Taster *nicht* liegt, bekommt er weniger.
+
+| | Vorgänger (84) | jetzt (76) |
+|---|---|---|
+| Außenmaß | 93 × 93 × 21,9 | **85 × 85 × 23,4** |
+| Druckfläche | 79 × 79 | 71 × 71 |
+| Druckteile | 3 | 4 |
+| Taster | mittig | 6,76 mm daneben |
+| Reserve, schlechtester Randdruck | 0,25 mm | **0,10 mm** |
+| Stütze der Taste | umlaufend | vier Ecken |
+| Spalt gegen Krumen | abgedichtet | offen |
+| Steckertiefe bis zur Buchse | 9,7 mm | 5,3 mm |
+
+Die letzte Zeile ist der unerwartete Gewinn: ohne Ring liegt die
+USB-C-Buchse fast direkt hinter der Wand, und der Ladestecker war
+vorher der Punkt, an dem dieser Entwurf einmal funktionsuntüchtig war.
+
+### Warum 76 und nicht weniger
+
+Durchgerechnet, nicht geschätzt. Die Packungssuche findet bei **74 keine
+Lösung mehr**, in der der Taster noch nah genug an der Plattenmitte
+liegt. Bei 76 ist zusätzlich das 20-mm-Lautsprecherkabel bindend: die
+erste gefundene Lage brauchte 14,10 mm nutzbare Länge und hatte 14,00.
+Der Lautsprecher ist deshalb um 0,9 mm nach Südwesten gerückt.
+
+Mit der ursprünglichen Reserve von 0,15 mm wären es **82** gewesen, also
+91 mm außen — vier Millimeter für eine Reserve, die niemand merkt, bis
+sie fehlt. Die Entscheidung für 0,05 mm als Untergrenze ist die
+Umsetzung des „best effort" oben, und sie steht als Assert in
+`config.scad`, damit sie nicht aus Versehen weiter rutscht.
+
+Der nächste echte Sprung wäre **nicht** ein kleineres Gehäuse dieser
+Bauform, sondern ein zweistöckiger Deckel: Lautsprecher in einer Kammer
+innerhalb der Deckeldicke, Platine darüber. Von Hand gerechnet landet
+das bei etwa 81 × 81 × 28 — bei gleichem Bauvolumen und einer
+Druckfläche von nur noch 67 mm. Für einen Sprachtaster ist die
+Druckfläche das Produkt; sie zu verkleinern, damit die Schachtel
+kleiner wird, ist verkehrt herum. Deshalb nicht gebaut.
+
+### Was damit zusätzlich offen ist
+
+Zwei Dinge, die der Ring vorher erledigt hat:
+
+1. **Zwischen den Pfosten stützt nichts.** Ein Druck auf eine
+   Kantenmitte biegt die 2,4 mm starke Platte zusätzlich durch —
+   gerechnet rund 1,2 mm bei 30 N, bei rund einem Zehntel der
+   Bruchspannung, und die Durchbiegung geht in die Stauchung des Pads.
+   **Gerechnet, nicht gemessen.**
+2. **Drei Maße am Lautsprecherrücken sind Annahme.** Wie weit der
+   steife Teil reicht (`spk_magnet_r = 9,0`), ob die Lötbeine vorstehen
+   (`pin_relief = 1,2`) und ob der Rücken eben ist. Die Rückseite dieses
+   Lautsprechers ist auf keinem der vorliegenden Fotos zu sehen. Das
+   erste Maß ist das kritische: reicht der steife Teil nicht 9 mm weit,
+   steht der Taster über der Membran und gibt beim Drücken nach. Dann
+   muss der Lautsprecher näher zur Mitte und das Gerät wieder größer.
+   Siehe [build.md](build.md), Abschnitt „Vor dem Kleben am
+   Lautsprecher prüfen".

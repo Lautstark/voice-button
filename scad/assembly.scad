@@ -15,9 +15,11 @@ module mock_speaker()
     translate([spk_cx, spk_cy, spk_z0 + tape_t + seat_eps])
         cylinder(d = spk_d, h = spk_depth);
 
-// 28 mm in x, 20 mm in y — die Buchse zeigt nach Norden zur Platine.
+// HOCHKANT: 20 mm in x, 28 mm in y — die Buchse zeigt nach Sueden zur
+// Platine. Vorher lag die Zelle quer; gedreht passt sie westlich des
+// Lautsprechers, ohne das 20-mm-Kabel zu ueberdehnen.
 module mock_battery()
-    translate([bat_x0, bat_y0, bat_z + seat_eps]) cube([bat_l, bat_w, bat_t]);
+    translate([bat_x0, bat_y0, bat_z + seat_eps]) cube([bat_w, bat_l, bat_t]);
 
 module mock_pcb() {
     translate([pcb_x0, pcb_y0, pcb_z + seat_eps]) cube([pcb_w, pcb_h, pcb_t]);
@@ -25,28 +27,52 @@ module mock_pcb() {
         cube([pcb_w - 4, pcb_h - 4, pcb_comp_h]);
 }
 
+// Der Zwischenleger, am Einbauort: auf dem Lautsprecherruecken,
+// mitgedreht mit der Platine.
+module mock_shim()
+    translate([bo_cx, bo_cy, spk_top + tape_t + seat_eps])
+        rotate([0, 0, bo_ang]) switch_shim();
+
+// Die Tasterplatine liegt GEDREHT auf dem Lautsprecherruecken: ihre
+// Laengsachse tangential, der Taster bei (sw_x / sw_y). Alles hier
+// kommt aus bo_cx/bo_cy/bo_ang und sw_x/sw_y — keine eigene Rechnung,
+// sonst prueften die Checks eine andere Lage als die Asserts.
+// Nur die vier Loetbeine. Als eigener Koerper, damit sich pruefen
+// laesst, ob sie im Fenster des Legers stehen — mit mock_breakout()
+// ginge das nicht, dort steckt die Platine mit drin.
+module mock_switch_pins()
+    for (dx = [-1, 1]) for (dy = [-1, 1])
+        translate([sw_x + dx*sw_size/3, sw_y + dy*sw_size/3, bo_z - pin_relief])
+            cylinder(d = pin_d, h = pin_relief);
+
 module mock_breakout() {
-    translate([bo_x0, bo_y0, bo_z + seat_eps]) cube([bo_w, bo_l, bo_t]);
-    translate([cx - sw_size/2, cy - sw_size/2, bo_top + seat_eps]) cube([sw_size, sw_size, sw_h]);
+    translate([bo_cx, bo_cy, bo_z + seat_eps])
+        rotate([0, 0, bo_ang])
+            translate([-bo_l/2, -bo_w/2, 0]) cube([bo_l, bo_w, bo_t]);
+    translate([sw_x - sw_size/2, sw_y - sw_size/2, bo_top + seat_eps])
+        cube([sw_size, sw_size, sw_h]);
     // Die vier Loetbeine des Tasters, nach unten durch die Platine.
     for (dx = [-1, 1]) for (dy = [-1, 1])
-        translate([cx + dx*sw_size/3, cy + dy*sw_size/3, bo_z - pin_relief])
+        translate([sw_x + dx*sw_size/3, sw_y + dy*sw_size/3, bo_z - pin_relief])
             cylinder(d = pin_d, h = pin_relief + bo_t);
 }
 
 
-// Das Pad klebt auf der ebenen Rueckseite, nicht mehr in einer Tasche.
+// Das Pad klebt auf der ebenen Rueckseite, nicht mehr in einer Tasche —
+// und nicht mehr mittig, sondern ueber dem Taster.
 module mock_pad()
-    translate([cx - pad_w/2, cy - pad_w/2, plate_under_z - pad_t])
+    translate([sw_x - pad_w/2, sw_y - pad_w/2, plate_under_z - pad_t])
         cube([pad_w, pad_w, pad_t]);
 
+// VIER Rueckstellpads statt eines umlaufenden Streifens, je eines in
+// der Kerbe eines Pfostens. 0,2 mm schlanker als die Kerbe, damit
+// deckungsgleiche Flaechen die Pruefung nicht entarten lassen.
 module mock_foam() {
-    difference() {
-        translate([cx, cy, foam_groove_z])
-            rbox_c(foam_out - 0.2, foam_t, max(0.5, corner_ri - 0.15 - stop_face));
-        translate([cx, cy, foam_groove_z - 1])
-            rbox_c(foam_in + 0.2, foam_t + 2, 0.5);
-    }
+    for (i = [0 : 3])
+        translate([post_pos[i][0] + (post_dir[i][0] > 0 ? post_face : 0) + 0.1,
+                   post_pos[i][1] + (post_dir[i][1] > 0 ? post_face : 0) + 0.1,
+                   foam_groove_z])
+            cube([post_foam_w - 0.2, post_foam_w - 0.2, foam_t]);
 }
 
 // Die Karte LIEGT auf der unteren Lippe — daher der Bezug auf den
@@ -101,7 +127,7 @@ module mock_screws()
     }
 
 module mock_electronics() {
-    mock_speaker(); mock_battery(); mock_pcb(); mock_breakout();
+    mock_speaker(); mock_battery(); mock_pcb(); mock_shim(); mock_breakout();
 }
 
 // --- Bewegungen der Taste ---------------------------------------------

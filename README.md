@@ -1,6 +1,10 @@
 # Kompakte Variante: 72 × 72 mm
 
-Der neue Entwurf auf diesem Branch liegt in **[compact72/](compact72/README.md)**: 72 × 72 × 25 mm Gehäuse, 60 × 60 mm Symbolkarte. Eine integrierte Ecköse mit 4-mm-Schnurloch ist ergänzt (nur die Ecke steht 8 mm über). Dort liegen die vier druckfertigen STLs, OpenSCAD-Quelle, Vorschauen, Montageanleitung und Prüfergebnisse. 33 Geometrieprüfungen bestanden; noch nicht physisch gedruckt und getestet.
+Der kompakte Entwurf liegt in **[compact72/](compact72/README.md)**: Gehäuse 72 × 72 × 25 mm, Symbolkarte 60 × 60 mm, vier Druckteile. Der Taster sitzt dort mittig auf einer Brücke über der Elektronik, statt seitlich auf dem Lautsprecher — dadurch bekommt er bei jedem Kippen die volle Hälfte des Tastenwegs.
+
+An der Südostecke ist eine **Schnurlobe mit dem Körper verschmolzen**: die Kante verlässt die Gerade 9 mm vor der Ecke und läuft tangential in eine Lobe mit 2,5-mm-Bohrung. Das Grundquadrat bleibt exakt 72 × 72, nur die Lobe steht 3,5 mm je Seite darüber hinaus (umschreibend 75,5 × 75,5). Die Form ist durchgehend konvex, hat also keine Einschnürung, an der sie brechen könnte.
+
+Dort liegen die vier druckfertigen STLs, OpenSCAD-Quelle, Vorschauen, Montageanleitung und Prüfergebnisse. 33 Geometrieprüfungen bestanden; **noch nicht physisch gedruckt und getestet**.
 
 Die folgende Dokumentation beschreibt weiterhin den bisherigen Entwurf. Für die kompakte Variante bitte die Anleitung in `compact72/` verwenden.
 

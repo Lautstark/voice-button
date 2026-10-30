@@ -86,7 +86,7 @@ def main():
     ap.add_argument('--only',help='Comma-separated case names; replace those results in existing report')
     args=ap.parse_args()
     cases=[(n,n,'part',[]) for n in ['base','frame','button','bridge']]
-    clears=['eye_hole','electronics','frame_base','bridge_frame','bridge_base','button_rest',
+    clears=['cord_wall','electronics','frame_base','bridge_frame','bridge_base','button_rest',
             'button_pressed','card_seated','card_lifted','usb','screws']
     cases += [(f'check_{n}',f'check_{n}','clear',[]) for n in clears]
     for x,y in [(1,0),(-1,0),(0,1),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:

@@ -16,9 +16,28 @@ case_w = 72;
 wall = 2.4;
 base_t = 2.4;
 corner_r = 5;
-// Integral flat cord eye at the +X/+Y corner; printed on the bed.
-eye_h = 3.2; eye_r = 6; eye_hole_d = 4;
-eye_c = case_w+2; eye_clear = 0.2;
+// SCHNURLOBE an der SUEDOST-Ecke, mit dem Koerper verschmolzen.
+//
+// Statt einer angesetzten Lasche waechst die Ecke selbst in die Lobe:
+// die Kante verlaesst die Gerade lobe_blend vor der Ecke und laeuft
+// tangential hinein. Die Form entsteht als hull() zweier Kreise und ist
+// damit DURCHGEHEND KONVEX — es kann dort keine Kehle und keine
+// Einschnuerung entstehen, auch wenn jemand spaeter an den Zahlen dreht.
+// Eine Kehle waere eine Kerbe, und Kerben reissen.
+//
+// Warum Suedost und nicht Nordost: der Uebergang beginnt 9 mm vor der
+// Ecke, und genau dort sitzt an jeder anderen Ecke ein Schraubenkopf in
+// der Aussenflaeche. Nur im Suedosten liegt genug freier Boden, damit
+// der Schraubdom nach innen ausweichen kann, ohne an Platine,
+// Lautsprecher oder Brueckenfuss zu stossen.
+//
+// Das GRUNDQUADRAT bleibt exakt 72 x 72; nur die Lobe steht darueber
+// hinaus, und zwar 3,5 mm in +x und 3,5 mm in -y.
+lobe_blend = 9.0;    // Uebergangsradius; je groesser, desto fliessender
+lobe_r     = 4.0;    // Radius der Lobe
+lobe_x     = case_w-0.5;
+lobe_y     = 0.5;
+cord_d     = 2.5;    // fuer eine 2-mm-Schnur
 card_w = 60;
 c = case_w/2;
 cavity = case_w - 2*wall;
@@ -106,12 +125,23 @@ switch_recess_w = 9; switch_recess_h = 7.4;
 switch_recess_depth = 1.2;           // leaves 1.2 mm behind shallow recess
 
 boss_w = 7.5;
+// Die Dome, je Ecke einzeln. Der SUEDOST-Dom ist 18 statt 7,5 mm breit:
+// er traegt weiterhin den Anschlag in der Ecke UND nimmt die nach innen
+// gerueckte Schraube auf. Frueher war das eine Schleife ueber vier
+// gleiche Quadrate; mit der Lobe geht das nicht mehr auf.
+boss_se_w = 18.0;
+bosses = [[0, 0, boss_w, boss_w],
+          [case_w-boss_se_w, 0, boss_se_w, boss_w],
+          [case_w-boss_w, case_w-boss_w, boss_w, boss_w],
+          [0, case_w-boss_w, boss_w, boss_w]];
 screw_d = 1.7; screw_free_d = 2.4;
 screw_head_d = 3.8; screw_head_h = 1.4;
 screw_len = 10;
 // Three front/rear screws and one west-side screw; every protruding tip
 // points into free space, never into the battery. M2x10, recessed 1.4 mm.
-screw_origins = [[4.5,0,6],[case_w-4.5,0,6],[case_w-4.5,case_w,6],[0,case_w-4.5,6]];
+// Die SUEDOST-Schraube sitzt bei x = 59 statt 67,5: ihr Kopf braucht
+// eine ebene Flaeche, und ab x = 63 beginnt der Uebergang in die Lobe.
+screw_origins = [[4.5,0,6],[59,0,6],[case_w-4.5,case_w,6],[0,case_w-4.5,6]];
 screw_rotations = [[-90,0,0],[-90,0,0],[90,0,0],[0,90,0]];
 
 function point_rect_dist(x,y,rx,ry,w,h) =
@@ -137,8 +167,27 @@ assert(switch_x-switch_recess_w/2-(usb_x+usb_w/2) >= 1.6);
 assert(screw_origins[0][2]+screw_d/2 < foam_bottom-1, "Screw bore reaches foam pockets");
 assert(wall-screw_head_h >= 1-eps, "Insufficient material behind screw head");
 
-assert(eye_r-eye_hole_d/2 >= 4, "Insufficient material around cord hole");
-assert(eye_h+eye_clear < screw_origins[2][2]-(screw_head_d+0.4)/2, "Eye reaches screw head");
+// Material nach AUSSEN um die Bohrung.
+assert(lobe_r-cord_d/2 >= 2.4,
+       str("Zu wenig Material aussen um die Schnurbohrung: ", lobe_r-cord_d/2));
+// Material von der Bohrung zur KAVITAET. Die Kavitaetsecke ist die Rundung
+// corner_ri um (case_w-corner_r, corner_r); naeher darf die Bohrung nicht.
+assert(sqrt(pow(lobe_x-(case_w-corner_r),2)+pow(lobe_y-corner_r,2))
+       - corner_ri - cord_d/2 >= 2.0,
+       str("Schnurbohrung zu nah an der Kavitaet: ",
+           sqrt(pow(lobe_x-(case_w-corner_r),2)+pow(lobe_y-corner_r,2))
+           - corner_ri - cord_d/2));
+// Der Uebergang beginnt bei case_w-lobe_blend; der Schraubenkopf braucht
+// davor eine ebene Flaeche.
+assert(screw_origins[1][0]+(screw_head_d+0.4)/2 <= case_w-lobe_blend-0.5,
+       "Suedost-Schraubenkopf liegt im Uebergang zur Lobe");
+// und die Schraube muss mit Rand in ihrem Dom bleiben
+assert(screw_origins[1][0]-screw_d/2 >= case_w-boss_se_w+1.0 &&
+       screw_origins[1][0]+screw_d/2 <= case_w-1.0,
+       "Suedost-Schraube steht aus ihrem Dom heraus");
+// Bohrung und Schraube duerfen sich nicht kreuzen
+assert(lobe_x-cord_d/2 > screw_origins[1][0]+screw_d/2+1.0,
+       "Schnurbohrung kreuzt die Suedost-Schraube");
 
 module rr(w,h,r) {
     assert(w>2*r && h>2*r && r>0);
@@ -153,25 +202,25 @@ module cone(w0,w1,r0,z) {
         centred_box(w1,eps,r0-h,z+h);
     }
 }
-module body_outline(z,h) { translate([0,0,z]) rb(case_w,case_w,h,corner_r); }
-
-module eye_plan() {
-    hull() {
-        translate([case_w-5,case_w-5]) circle(r=5);
-        translate([eye_c,eye_c]) circle(r=eye_r);
+// Aussenkontur: Grundquadrat UND die verschmolzene Ecklobe. Weil beide
+// Teile — Unterteil und Rahmen — dieses Modul benutzen, bekommen sie die
+// Lobe zwangslaeufig deckungsgleich. Haette ich sie in jedes Teil
+// einzeln gezeichnet, koennten sie auseinanderlaufen.
+module body_plan() {
+    union() {
+        rr(case_w,case_w,corner_r);
+        hull() {
+            translate([case_w-lobe_blend, lobe_blend]) circle(r=lobe_blend);
+            translate([lobe_x, lobe_y]) circle(r=lobe_r);
+        }
     }
 }
-module eye_blank() {
-    difference() {
-        linear_extrude(eye_h) eye_plan();
-        // Keep the thickened portion outside the frame: no notch or new
-        // unsupported bridge in its first print layers. Root joins the floor.
-        translate([0,0,base_t]) linear_extrude(eye_h-base_t+eps)
-            offset(delta=eye_clear) rr(case_w,case_w,corner_r);
-    }
-}
-module eye_bore() {
-    translate([eye_c,eye_c,-eps]) cylinder(d=eye_hole_d,h=eye_h+2*eps);
+module body_outline(z,h) { translate([0,0,z]) linear_extrude(h) body_plan(); }
+// Die Schnurbohrung geht durch BEIDE Teile, von vorn nach hinten. Dass
+// die Schnur durch Unterteil und Rahmen laeuft, haelt die beiden
+// zusaetzlich zusammen.
+module cord_bore() {
+    translate([lobe_x,lobe_y,-1]) cylinder(d=cord_d, h=frame_top+2);
 }
 
 module at_screw(i) {
@@ -196,8 +245,8 @@ module ports() {
 module raw_bosses() {
     intersection() {
         centred_box(cavity-0.4,stop_z-base_t,corner_ri-0.2,base_t);
-        union() for(x=[0,case_w-boss_w],y=[0,case_w-boss_w])
-            translate([x,y,base_t]) cube([boss_w,boss_w,stop_z-base_t]);
+        union() for(b=bosses)
+            translate([b[0],b[1],base_t]) cube([b[2],b[3],stop_z-base_t]);
     }
 }
 module frame() {
@@ -213,6 +262,7 @@ module frame() {
 
         }
         ports();
+        cord_bore();
         for(i=[0:3]) at_screw(i) {
             translate([0,0,-eps]) cylinder(d=screw_free_d,h=wall+1);
             translate([0,0,-eps]) cylinder(d=screw_head_d+0.4,h=screw_head_h+eps);
@@ -272,7 +322,6 @@ module base() {
     difference() {
         union() {
             body_outline(0,base_t);
-            eye_blank();
             raw_bosses();
             translate([pcb_x-0.3,pcb_y-0.3,base_t-eps])
                 cube([pcb_w+0.6,pcb_h+0.6,pcb_standoff+eps]);
@@ -290,7 +339,7 @@ module base() {
         }
         translate([spk_x,spk_y,spk_floor]) cylinder(d=spk_d+2*spk_clear,h=base_t-spk_floor+eps);
         speaker_holes();
-        eye_bore();
+        cord_bore();
         // Open inner-corner pockets avoid thin ligaments around round foam holes.
         for(x=[0,1],y=[0,1]) translate([
             x==0 ? boss_w-foam_d : case_w-boss_w-eps,
@@ -357,7 +406,24 @@ else if(part=="layout") {
     translate([88,88+case_w,bridge_top]) rotate([180,0,0]) bridge();
 }
 else if(part=="inside") { color("#bd9ed5") base(); color("#7d9473") electronics(); color("#829cb5") bridge(); }
-else if(part=="check_eye_hole") intersection(){base();eye_bore();}
+// Die Bohrung gegen das Teil zu schneiden, aus dem sie herausgeschnitten
+// wurde, ist IMMER leer — so eine Pruefung kann nicht scheitern. Geprueft
+// werden muss, dass rund um die Bohrung MATERIAL steht: ein Ring knapp
+// ausserhalb der Bohrung muss vollstaendig im Teil liegen.
+else if(part=="check_cord_wall")
+    difference() {
+        difference() {
+            // bis frame_top, NICHT bis plate_top: oberhalb der
+            // Rahmenvorderseite steht die Taste, dort hat die Lobe
+            // kein Material — mein erster Ring reichte 1,5 mm zu hoch
+            // und meldete das als fehlende Wand.
+            translate([lobe_x,lobe_y,1.0])
+                cylinder(d=cord_d+2.8, h=frame_top-2.0);
+            translate([lobe_x,lobe_y,0])
+                cylinder(d=cord_d+0.4, h=plate_top+2);
+        }
+        union() { base(); frame(); }
+    }
 else if(part=="check_electronics") intersection() { electronics(); union(){base(); frame(); bridge();} }
 else if(part=="check_frame_base") intersection(){base();frame();}
 else if(part=="check_bridge_frame") intersection(){bridge();frame();}

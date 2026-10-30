@@ -5,20 +5,20 @@
     "returncode": 0,
     "empty": false,
     "warnings": [],
-    "volume_mm3": 14172.870403,
+    "volume_mm3": 14769.615408,
     "bounds_min": [
       0.0,
-      0.0,
+      -3.5,
       0.0
     ],
     "bounds_max": [
-      80.0,
-      80.0,
+      75.5,
+      72.0,
       18.6
     ],
     "size": [
-      80.0,
-      80.0,
+      75.5,
+      75.5,
       18.6
     ],
     "components": 1,
@@ -31,20 +31,20 @@
     "returncode": 0,
     "empty": false,
     "warnings": [],
-    "volume_mm3": 14165.971532,
+    "volume_mm3": 15232.484486,
     "bounds_min": [
       0.0,
-      0.0,
+      -3.5,
       -3.8147e-07
     ],
     "bounds_max": [
-      72.0,
+      75.5,
       72.0,
       21.1
     ],
     "size": [
-      72.0,
-      72.0,
+      75.5,
+      75.5,
       21.1
     ],
     "components": 1,
@@ -56,6 +56,7 @@
     "expected": "part",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 10884.680487,
     "bounds_min": [
       2.7,
@@ -81,6 +82,7 @@
     "expected": "part",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 2696.667958,
     "bounds_min": [
       25.0,
@@ -102,7 +104,7 @@
     "pass": true
   },
   {
-    "name": "check_eye_hole",
+    "name": "check_cord_wall",
     "expected": "clear",
     "returncode": 1,
     "empty": true,
@@ -129,21 +131,21 @@
     "volume_mm3": 0.0,
     "bounds_min": [
       0.0,
-      0.0,
+      -3.5,
       2.4
     ],
     "bounds_max": [
-      72.0,
+      75.5,
       72.0,
       2.4
     ],
     "size": [
-      72.0,
-      72.0,
+      75.5,
+      75.5,
       0.0
     ],
     "components": 1,
-    "nonmanifold_edges": 102,
+    "nonmanifold_edges": 92,
     "pass": true
   },
   {
@@ -167,6 +169,7 @@
     "expected": "clear",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 1.6e-05,
     "bounds_min": [
       2.7,
@@ -213,7 +216,7 @@
       0.0
     ],
     "components": 4,
-    "nonmanifold_edges": 60,
+    "nonmanifold_edges": 62,
     "pass": true
   },
   {
@@ -221,6 +224,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -228,6 +232,7 @@
     "expected": "clear",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 0.0,
     "bounds_min": [
       6.49981,
@@ -253,6 +258,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -260,6 +266,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -267,6 +274,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -274,6 +282,7 @@
     "expected": "clear",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 0.0,
     "bounds_min": [
       2.73004,
@@ -299,6 +308,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -306,6 +316,7 @@
     "expected": "clear",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 0.0,
     "bounds_min": [
       4.99998,
@@ -331,6 +342,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -338,6 +350,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -345,6 +358,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -352,6 +366,7 @@
     "expected": "clear",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 0.0,
     "bounds_min": [
       3.38884,
@@ -377,6 +392,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -384,6 +400,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -391,6 +408,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -422,6 +440,7 @@
     "expected": "engage",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 4.778601,
     "bounds_min": [
       6.00932,
@@ -447,6 +466,7 @@
     "expected": "engage",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 20.678478,
     "bounds_min": [
       6.0,
@@ -472,7 +492,8 @@
     "expected": "engage",
     "returncode": 0,
     "empty": false,
-    "volume_mm3": 8.708382,
+    "warnings": [],
+    "volume_mm3": 18.592457,
     "bounds_min": [
       2.7,
       2.7,
@@ -497,6 +518,7 @@
     "expected": "engage",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 66.774366,
     "bounds_min": [
       2.7,

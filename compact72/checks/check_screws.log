@@ -1,7 +1,7 @@
 ECHO: "COMPACT72: case 72 x 72 x 25; card 60 x 60; button face 64; bridge underside 8.5"
 Geometries in cache: 114
 Geometry cache size in bytes: 554512
-CGAL Polyhedrons in cache: 19
-CGAL cache size in bytes: 9701368
-Total rendering time: 0:00:23.621
+CGAL Polyhedrons in cache: 21
+CGAL cache size in bytes: 9886840
+Total rendering time: 0:00:18.981
 Current top level object is empty.

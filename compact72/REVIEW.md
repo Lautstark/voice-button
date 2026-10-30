@@ -20,3 +20,29 @@ Die Oberkante der Öse liegt bei Z=3,2 mm, die Unterkante der benachbarten Schra
 Kein weiterer zwingender CAD-Umbau aus dieser Prüfung. Ich würde die tatsächlichen vier Teile drucken. Die neue Öse verändert nur das Unterteil; Rahmen, Drückerplatte und Brücke bleiben geometrisch unverändert.
 
 Nicht durch die Geometrieprüfung nachgewiesen: Zugfestigkeit bzw. Verschleiß der Öse, reale Betätigungskraft und Rückstellung mit den gewählten Polstern, tatsächlicher Durchhang der Kartenlippe sowie vollständige Kabelführung. Nach dem Zusammenbau müssen insbesondere Mitte und Ecken auslösen und selbstständig wieder freigeben. Das ist keine Aussage über eine bereits physisch geprüfte oder zertifizierte Kindersicherheit.
+
+
+---
+
+## Nachtrag: Lobe statt Lasche (Review des vorigen Stands)
+
+Die flache Ecklasche des vorigen Commits war handwerklich in Ordnung —
+richtige Druckorientierung, 4 mm Material ums Loch, breite Anbindung,
+und die umschreibende Fläche von 80 × 80 mm war offen dokumentiert.
+Zwei Dinge haben trotzdem dagegen gesprochen:
+
+1. Die Vorgabe war ausdrücklich, dass das **Grundquadrat 72 × 72 bleibt**
+   und möglichst wenig darüber hinausragt. 8 mm je Seite an einer Ecke
+   sind das Gegenteil davon.
+2. Eine angesetzte Lasche sitzt an einer Einschnürung, und die ist bei
+   einem Gerät am Schlüsselbund genau die Stelle, die bricht.
+
+Jetzt wächst die Ecke selbst in die Lobe: die Kante verlässt die Gerade
+9 mm vor der Ecke und läuft tangential hinein. Als `hull()` zweier
+Kreise ist die Form durchgehend konvex — dort kann keine Kerbe
+entstehen. Überstand 3,5 statt 8 mm je Seite.
+
+Ebenfalls korrigiert: `check_eye_hole` verschnitt die Bohrung mit dem
+Teil, aus dem sie herausgeschnitten wurde. Das ist bauartbedingt leer
+und konnte nie scheitern. Ersetzt durch `check_cord_wall`, und der ist
+gegen einen eingebauten Fehler verifiziert.

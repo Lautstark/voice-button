@@ -54,12 +54,22 @@ def run_case(case):
     name, mode, expected, defs = case
     with tempfile.TemporaryDirectory(prefix='compact72-') as tmp:
         output = ROOT/'stl'/f'{name}.stl' if expected=='part' else pathlib.Path(tmp)/'test.stl'
+        # Fester $fn fuer die Druckteile: ohne das exportiert die Pruefung
+        # groebere STL, als im Repo liegen, und ueberschreibt sie bei jedem
+        # Lauf. Dann weiss niemand mehr, welche Datei gedruckt wird.
         command = ['openscad','-D',f'part="{mode}"','-o',str(output)]
+        if expected == 'part': command += ['-D','$fn=72']
         for definition in defs: command += ['-D',definition]
         command += [str(SOURCE)]
         p = subprocess.run(command,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         log = p.stdout
-        (ROOT/'checks'/f'{name}.log').write_text(log)
+        # Die Renderzeit aendert sich bei jedem Lauf. Stuende sie im
+        # Protokoll, waere das Arbeitsverzeichnis nach jeder Pruefung
+        # schmutzig und man koennte nicht mehr sehen, ob sich wirklich
+        # etwas an der Geometrie geaendert hat.
+        stable = '\n'.join(l for l in log.splitlines()
+                            if not l.startswith('Total rendering time'))
+        (ROOT/'checks'/f'{name}.log').write_text(stable + '\n')
         empty = 'top level object is empty' in log
         result = dict(name=name,expected=expected,returncode=p.returncode,empty=empty)
         warnings = [line for line in log.splitlines() if 'WARNING:' in line or 'EXPORT-WARNING:' in line]

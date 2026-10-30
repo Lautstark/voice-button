@@ -5,15 +5,21 @@ Stützen**. Alle vier Teile sind in `stl/` schon in Drucklage gedreht.
 
 ## Reihenfolge
 
-Die Portlagen sind gemessen, deshalb gibt es keine Reihenfolge mehr, die
-sich aus offenen Maßen ergibt. Zwei Platten sind trotzdem besser als
-eine: das Gehäuse braucht einen Brim und wird mit ihm 109 × 116 mm groß.
+**Alle vier auf eine Platte**, in zwei Reihen, Brim auf alle vier:
 
-1. **Frontgehäuse** allein, mit 8 mm Brim.
-2. **Rückdeckel, Taste und Zwischenleger** zusammen — 85 + 75,4 + 20
-   plus Abstände sind rund 190 mm, das passt nebeneinander. Den Leger
-   mit auf diese Platte: er dauert zwei Minuten, und man will ihn nicht
-   als einzelnes Teil noch einmal aufspannen.
+```
+  oben:   Frontgehäuse  |  Rückdeckel
+  unten:  Taste         |  Zwischenleger
+```
+
+196 × 194 mm bei 220 × 220 Bett. Brim auf alle vier statt nur aufs
+Gehäuse: bei den anderen dreien schadet er nicht, und man spart sich
+die Objekteinstellungen im Slicer.
+
+Zwei Platten (Gehäuse allein, Rest zusammen) sind die vorsichtigere
+Variante — dann kostet ein misslungener Druck nur ein Teil statt vier.
+Bis 2026-10-29 stand hier zwei Platten als Empfehlung; das kam aus dem
+alten 93-mm-Maß, bei dem es nicht anders ging.
 
 Es gibt keine Testteile und keine Coupons: gedruckt wird nur, was ins
 fertige Gerät geht.
@@ -39,11 +45,8 @@ fertige Gerät geht.
 | Zwischenleger | 20 × 9 mm | volle Fläche, 180 mm² |
 
 In **einer Reihe** gehen alle vier nicht: 85 + 85 + 75,4 + 20 plus
-Abstände sind über 290 mm. In **zwei Reihen** passen sie auf eine
-Platte — 196 × 194 mm bei 220 × 220 Bett, mit Brim am Gehäuse
-gerechnet. Das sind 12 mm Rand je Seite; machbar, aber eng, und ein
-misslungener Druck kostet dann alle vier Teile. Deshalb oben trotzdem
-zwei Platten.
+Abstände sind über 290 mm. In **zwei Reihen** ja: 196 × 194 mm. Das
+sind 12 mm Rand je Seite — auf die Bettklammern in den Ecken achten.
 
 ## Die kritischen Stellen
 

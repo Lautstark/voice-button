@@ -3,6 +3,7 @@
 Run from anywhere: python3 checks/validate.py [--jobs 4]
 Requires OpenSCAD CLI. Results are geometry checks, not a force certification.
 """
+import re
 import argparse
 import concurrent.futures
 import json
@@ -50,6 +51,26 @@ def mesh_info(path):
                 components=components,
                 nonmanifold_edges=sum(len(ids)!=2 for ids in edges.values()))
 
+def canonicalise_stl(path):
+    """Facetten in eine feste Reihenfolge bringen.
+
+    OpenSCAD gibt dieselbe Geometrie bei jedem Lauf in anderer
+    Facettenreihenfolge aus. Ohne das hier sind nach jeder Pruefung vier
+    STL "geaendert", obwohl sich nichts geaendert hat — und dann sieht
+    niemand mehr, wenn sich wirklich etwas aendert.
+
+    Nur die REIHENFOLGE wird angefasst, kein Zahlenwert. Nachgewiesen:
+    Dreiecksmenge und Volumen bleiben identisch.
+    """
+    text = path.read_text()
+    head, _, rest = text.partition('\n')
+    blocks = re.findall(r'  facet normal .*?\n  endfacet\n', rest, re.S)
+    if not blocks:
+        return
+    tail = rest[rest.rindex('  endfacet\n') + len('  endfacet\n'):]
+    path.write_text(head + '\n' + ''.join(sorted(blocks)) + tail)
+
+
 def run_case(case):
     name, mode, expected, defs = case
     with tempfile.TemporaryDirectory(prefix='compact72-') as tmp:
@@ -79,6 +100,8 @@ def run_case(case):
         bad_warning = any(not (expected=='clear' and 'may not be a valid 2-manifold' in w) for w in warnings)
         bad = 'ERROR:' in log or bad_warning or (p.returncode!=0 and not empty)
         result['warnings'] = warnings
+        if expected=='part' and not bad and output.exists():
+            canonicalise_stl(output)
         if not empty and not bad:
             try: result.update(mesh_info(output))
             except Exception as e: result['error']=str(e); bad=True

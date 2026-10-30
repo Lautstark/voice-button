@@ -16,6 +16,9 @@ case_w = 72;
 wall = 2.4;
 base_t = 2.4;
 corner_r = 5;
+// Integral flat cord eye at the +X/+Y corner; printed on the bed.
+eye_h = 3.2; eye_r = 6; eye_hole_d = 4;
+eye_c = case_w+2; eye_clear = 0.2;
 card_w = 60;
 c = case_w/2;
 cavity = case_w - 2*wall;
@@ -134,6 +137,9 @@ assert(switch_x-switch_recess_w/2-(usb_x+usb_w/2) >= 1.6);
 assert(screw_origins[0][2]+screw_d/2 < foam_bottom-1, "Screw bore reaches foam pockets");
 assert(wall-screw_head_h >= 1-eps, "Insufficient material behind screw head");
 
+assert(eye_r-eye_hole_d/2 >= 4, "Insufficient material around cord hole");
+assert(eye_h+eye_clear < screw_origins[2][2]-(screw_head_d+0.4)/2, "Eye reaches screw head");
+
 module rr(w,h,r) {
     assert(w>2*r && h>2*r && r>0);
     hull() for(x=[r,w-r],y=[r,h-r]) translate([x,y]) circle(r=r);
@@ -148,6 +154,25 @@ module cone(w0,w1,r0,z) {
     }
 }
 module body_outline(z,h) { translate([0,0,z]) rb(case_w,case_w,h,corner_r); }
+
+module eye_plan() {
+    hull() {
+        translate([case_w-5,case_w-5]) circle(r=5);
+        translate([eye_c,eye_c]) circle(r=eye_r);
+    }
+}
+module eye_blank() {
+    difference() {
+        linear_extrude(eye_h) eye_plan();
+        // Keep the thickened portion outside the frame: no notch or new
+        // unsupported bridge in its first print layers. Root joins the floor.
+        translate([0,0,base_t]) linear_extrude(eye_h-base_t+eps)
+            offset(delta=eye_clear) rr(case_w,case_w,corner_r);
+    }
+}
+module eye_bore() {
+    translate([eye_c,eye_c,-eps]) cylinder(d=eye_hole_d,h=eye_h+2*eps);
+}
 
 module at_screw(i) {
     translate(screw_origins[i]) rotate(screw_rotations[i]) children();
@@ -247,6 +272,7 @@ module base() {
     difference() {
         union() {
             body_outline(0,base_t);
+            eye_blank();
             raw_bosses();
             translate([pcb_x-0.3,pcb_y-0.3,base_t-eps])
                 cube([pcb_w+0.6,pcb_h+0.6,pcb_standoff+eps]);
@@ -264,6 +290,7 @@ module base() {
         }
         translate([spk_x,spk_y,spk_floor]) cylinder(d=spk_d+2*spk_clear,h=base_t-spk_floor+eps);
         speaker_holes();
+        eye_bore();
         // Open inner-corner pockets avoid thin ligaments around round foam holes.
         for(x=[0,1],y=[0,1]) translate([
             x==0 ? boss_w-foam_d : case_w-boss_w-eps,
@@ -325,11 +352,12 @@ else if(part=="frame") translate([0,0,-base_t]) frame();
 else if(part=="button") translate([0,0,-plate_z]) button();
 else if(part=="bridge") translate([0,case_w,bridge_top]) rotate([180,0,0]) bridge();
 else if(part=="layout") {
-    base(); translate([80,0,-base_t]) frame();
-    translate([0,80,-plate_z]) button();
-    translate([80,80+case_w,bridge_top]) rotate([180,0,0]) bridge();
+    base(); translate([88,0,-base_t]) frame();
+    translate([0,88,-plate_z]) button();
+    translate([88,88+case_w,bridge_top]) rotate([180,0,0]) bridge();
 }
 else if(part=="inside") { color("#bd9ed5") base(); color("#7d9473") electronics(); color("#829cb5") bridge(); }
+else if(part=="check_eye_hole") intersection(){base();eye_bore();}
 else if(part=="check_electronics") intersection() { electronics(); union(){base(); frame(); bridge();} }
 else if(part=="check_frame_base") intersection(){base();frame();}
 else if(part=="check_bridge_frame") intersection(){bridge();frame();}

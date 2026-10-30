@@ -4,20 +4,21 @@
     "expected": "part",
     "returncode": 0,
     "empty": false,
-    "volume_mm3": 13814.986341,
+    "warnings": [],
+    "volume_mm3": 14172.870403,
     "bounds_min": [
       0.0,
       0.0,
       0.0
     ],
     "bounds_max": [
-      72.0,
-      72.0,
+      80.0,
+      80.0,
       18.6
     ],
     "size": [
-      72.0,
-      72.0,
+      80.0,
+      80.0,
       18.6
     ],
     "components": 1,
@@ -29,6 +30,7 @@
     "expected": "part",
     "returncode": 0,
     "empty": false,
+    "warnings": [],
     "volume_mm3": 14165.971532,
     "bounds_min": [
       0.0,
@@ -100,10 +102,19 @@
     "pass": true
   },
   {
+    "name": "check_eye_hole",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "warnings": [],
+    "pass": true
+  },
+  {
     "name": "check_electronics",
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -140,6 +151,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -147,6 +159,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -385,6 +398,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -392,6 +406,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {
@@ -399,6 +414,7 @@
     "expected": "clear",
     "returncode": 1,
     "empty": true,
+    "warnings": [],
     "pass": true
   },
   {

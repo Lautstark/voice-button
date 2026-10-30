@@ -2,7 +2,7 @@
 
 Independent compact design, 30 October 2026. Built from the measured hardware dimensions and the card-holder geometry in Lautstark/voice-button, commit `0425524b22bb1f8d9373a8dc9a905e820a851844`. This variant lives in `compact72/`; the previous design remains available elsewhere in the repository.
 
-**Body: 72 × 72 × 25 mm. Card: 60 × 60 mm.** The four screw heads are recessed into the sides; they do not add a rear protrusion. Compared with the latest repository's 85 × 85 × 23.4 mm body, the footprint is 28.2% smaller and the body is 1.6 mm thicker. Compared with the earlier 93 mm case, the footprint is 40.1% smaller. Dimensions exclude any optional stick-on feet; none are needed to clear the screw heads.
+**Body: 72 × 72 × 25 mm. Card: 60 × 60 mm.** The four screw heads are recessed into the sides; they do not add a rear protrusion. Compared with the latest repository's 85 × 85 × 23.4 mm body, the footprint is 28.2% smaller and the body is 1.6 mm thicker. Compared with the earlier 93 mm case, the footprint is 40.1% smaller. The integrated cord eye extends 8 mm beyond each of the two adjacent sides at one corner (overall XY bounding box 80 × 80 mm); the body and card remain unchanged. Dimensions exclude any optional stick-on feet; none are needed to clear the screw heads.
 
 This is a new, CAD-checked design, not a physically printed and tested product. It uses the existing electronics. It does not require separate test coupons: the four supplied parts are the actual enclosure parts.
 
@@ -21,7 +21,7 @@ This is a new, CAD-checked design, not a physically printed and tested product. 
 - A separately printed bridge carries the switch above the electronics. A third foot immediately beside the switch supports the central area; it stands in the gap between the battery and speaker, not on the battery.
 - The screws enter horizontally: two through the USB/switch face, one through the opposite face at the speaker corner, and one through the left side at the battery corner. This keeps the frame open at the back so the button can be inserted without bending it. The screw tips are checked against the electronics and bridge.
 - The central button pad is now at the centre of the plate. Four small foam return pads sit in open pockets at the corners.
-- There is no external lanyard loop in this version. The body itself stays within 72 × 72 mm.
+- An integral rounded cord eye at the +X/+Y corner belongs to the base: 4 mm through-hole, at least 4 mm radial material, 3.2 mm outer thickness. Its broad root joins the 2.4 mm floor. The thickened portion stays outside the frame with 0.2 mm clearance, so the frame needs no notch and no new print bridge. Thread a thin cord through it to attach the case to a bag or jacket. This is not a measured load rating.
 
 ## Files to print
 
@@ -34,7 +34,7 @@ This is a new, CAD-checked design, not a physically printed and tested product. 
 
 Use the supplied orientations. The bridge must **not** be flipped to stand on its feet for printing.
 
-Starting settings for the existing Ender 3 V2 / 0.4 mm nozzle / PLA setup: 0.2 mm layers, three walls, four top and bottom layers, 25–30% infill, supports off. Use about 5 mm brim on the frame. The four footprints fit in two rows within roughly 152 × 152 mm before brim, leaving ample room on a 220 mm bed. `part="layout"` in OpenSCAD shows that arrangement.
+Starting settings for the existing Ender 3 V2 / 0.4 mm nozzle / PLA setup: 0.2 mm layers, three walls, four top and bottom layers, 25–30% infill, supports off. Use about 5 mm brim on the frame. The four footprints fit in two rows within roughly 160 × 160 mm before brim, leaving ample room on a 220 mm bed. `part="layout"` in OpenSCAD shows that arrangement.
 
 The card holder is intentionally unchanged in construction. Its 3 mm upper overhang is now 60.8 mm wide, rather than 40.8 mm. Check the slicer's lip paths and the finished card fit; the relief underneath gives room for some sag, but the digital model cannot predict that sag. The bridge platform itself prints flat; its feet grow upwards, with no unsupported roof between them.
 
@@ -53,7 +53,7 @@ The card holder is intentionally unchanged in construction. Its 3 mm upper overh
 
 ## Verification and practical limits
 
-The validation script exports the four printable parts and checks that each has one connected, closed mesh and starts at Z=0. It also tests the electronics, screw paths, bridge, frame, moving plate, eight tilted positions, card seating/retention, positive stop/retainer engagement, USB grip clearance, and discrete assembly insertion positions. **All 32 export/geometry checks passed.** Machine-readable results are in `checks/results.json`. Intended touching faces can produce a zero-thickness, non-manifold intersection; those two cases were rerun with the checker accepting that specific warning only when the intersection volume is below 0.02 mm³. The four printable meshes themselves must be closed, single-component solids without warnings.
+The validation script exports the four printable parts and checks that each has one connected, closed mesh and starts at Z=0. It also tests the electronics, screw paths, bridge, frame, moving plate, eight tilted positions, card seating/retention, positive stop/retainer engagement, USB grip clearance, and discrete assembly insertion positions. **All 33 export/geometry checks passed (including the cord-hole clearance check). After adding the eye, the base/frame exports and affected electronics, assembly and part-clearance checks were rerun; unchanged mechanism/card results were retained.** Machine-readable results are in `checks/results.json`. Intended touching faces can produce a zero-thickness, non-manifold intersection; those two cases were rerun with the checker accepting that specific warning only when the intersection volume is below 0.02 mm³. The four printable meshes themselves must be closed, single-component solids without warnings.
 
 Measured hardware sizes were retained. Upstream assumptions remain assumptions: PCB thickness/component envelopes, the 6 mm switch body, switch travel, tape thickness, laminate thickness, foam properties and the complete cable/connector envelopes. The base and frame use 0.2 mm nominal assembly clearance at the corner posts; the button uses 0.3 mm side clearance. These are CAD clearances, not a promise of the exact fit from every printer.
 
@@ -66,3 +66,7 @@ python3 checks/validate.py --jobs 4
 ```
 
 Open `scad/compact72.scad` to edit the parameters or inspect the assembly. Select `part="inside"` for the internal arrangement, or set `exploded=12` for the exploded view. The four STL exports already have their print orientations applied.
+
+## Corner-eye revision review
+
+The eye prints directly on the bed, with its hole vertical. Its upper thickening is supported by its own lower layers. The frame remains geometrically unchanged. The corner screw counterbore starts at Z=3.9 mm; the eye ends at Z=3.2 mm, leaving 0.7 mm vertical separation. The new base is checked as one closed mesh, and the hole, electronics and assembly paths remain clear. The print layout spacing is increased from 80 to 88 mm to accommodate the extension. Base and frame STLs were regenerated; button and bridge are unchanged. Actual pull strength and cord wear have not been tested.

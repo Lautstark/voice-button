@@ -1,6 +1,6 @@
 # Kompakte Variante: 72 × 72 mm
 
-Der neue Entwurf auf diesem Branch liegt in **[compact72/](compact72/README.md)**: 72 × 72 × 25 mm Gehäuse, 60 × 60 mm Symbolkarte. Dort liegen die vier druckfertigen STLs, OpenSCAD-Quelle, Vorschauen, Montageanleitung und Prüfergebnisse. 32 Geometrieprüfungen bestanden; noch nicht physisch gedruckt und getestet.
+Der neue Entwurf auf diesem Branch liegt in **[compact72/](compact72/README.md)**: 72 × 72 × 25 mm Gehäuse, 60 × 60 mm Symbolkarte. Eine integrierte Ecköse mit 4-mm-Schnurloch ist ergänzt (nur die Ecke steht 8 mm über). Dort liegen die vier druckfertigen STLs, OpenSCAD-Quelle, Vorschauen, Montageanleitung und Prüfergebnisse. 33 Geometrieprüfungen bestanden; noch nicht physisch gedruckt und getestet.
 
 Die folgende Dokumentation beschreibt weiterhin den bisherigen Entwurf. Für die kompakte Variante bitte die Anleitung in `compact72/` verwenden.
 

@@ -1,14 +1,14 @@
 ECHO: "COMPACT72: case 72 x 72 x 25; card 60 x 60; button face 64; bridge underside 8.5"
-Geometries in cache: 103
-Geometry cache size in bytes: 491400
-CGAL Polyhedrons in cache: 12
-CGAL cache size in bytes: 17913952
-Total rendering time: 0:01:17.850
+Geometries in cache: 112
+Geometry cache size in bytes: 552960
+CGAL Polyhedrons in cache: 13
+CGAL cache size in bytes: 18411040
+Total rendering time: 0:01:36.632
    Top level object is a 3D object:
    Simple:        yes
-   Vertices:     4722
-   Halfedges:   14176
-   Edges:        7088
-   Halffacets:   4750
-   Facets:       2375
+   Vertices:     4893
+   Halfedges:   14678
+   Edges:        7339
+   Halffacets:   4910
+   Facets:       2455
    Volumes:         2

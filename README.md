@@ -1,112 +1,77 @@
-# Kompakte Variante: 72 × 72 mm
-
-Der kompakte Entwurf liegt in **[compact72/](compact72/README.md)**: Gehäuse 72 × 72 × 25 mm, Symbolkarte 60 × 60 mm, vier Druckteile. Der Taster sitzt dort mittig auf einer Brücke über der Elektronik, statt seitlich auf dem Lautsprecher — dadurch bekommt er bei jedem Kippen die volle Hälfte des Tastenwegs.
-
-An der Südostecke ist eine **Schnurlobe mit dem Körper verschmolzen**: die Kante verlässt die Gerade 9 mm vor der Ecke und läuft tangential in eine Lobe mit 2,5-mm-Bohrung. Das Grundquadrat bleibt exakt 72 × 72, nur die Lobe steht 3,5 mm je Seite darüber hinaus (umschreibend 75,5 × 75,5). Die Form ist durchgehend konvex, hat also keine Einschnürung, an der sie brechen könnte.
-
-Dort liegen die vier druckfertigen STLs, OpenSCAD-Quelle, Vorschauen, Montageanleitung und Prüfergebnisse. 33 Geometrieprüfungen bestanden; **noch nicht physisch gedruckt und getestet**.
-
-## Für einen Review: zwei Entwürfe liegen hier nebeneinander
-
-| | wo | Stand |
-|---|---|---|
-| **Aktuell: 72 × 72 × 25** | `compact72/` | vier Druckteile, Taster mittig auf einer Brücke, Schnurlobe. 33 Prüfungen grün. **Dies ist der zu prüfende Stand.** |
-| Abgelöst: 85 × 85 × 23,4 | `scad/`, `stl/`, `docs/`, `render/` | vier Druckteile, Taster seitlich auf dem Lautsprecher, vier Eckpfosten. 57 Prüfungen und 19 Negativtests grün. Bleibt als geprüfter Rückfall liegen, falls sich die 72er beim Drucken als Fehlgriff erweist. |
-
-Beide benutzen dieselbe gemessene Hardware. Sie teilen **keinen** Code: `compact72/scad/compact72.scad` steht für sich, `scad/config.scad` gilt nur für den abgelösten Entwurf.
-
-Prüfungen reproduzieren:
-
-```bash
-python3 compact72/checks/validate.py --jobs 4    # aktueller Entwurf, 33 Pruefungen
-scad/check_fit.sh && scad/check_negative.sh      # abgeloester Entwurf
-```
-
-Wo die offenen Punkte stehen: [`compact72/README.md`](compact72/README.md) und
-[`compact72/REVIEW.md`](compact72/REVIEW.md) für den aktuellen Entwurf,
-[`REVIEW_HANDOFF.md`](REVIEW_HANDOFF.md) für den abgelösten.
-
-**Keiner der beiden ist physisch gedruckt und erprobt.** Kräfte, Schaumkennlinien,
-Auszugsfestigkeit der Schnurlobe und die Kabelführung sind in keinem von beiden
-nachgewiesen.
-
----
-
 # Lautstark Mini Voice Button
 
-Ein kleiner Sprachtaster zum Selberdrucken. Die ganze Symbolfläche ist
-die Taste; ein Druck spielt eine Aufnahme ab. Die laminierte Karte
-dahinter lässt sich ohne Werkzeug wechseln, am fertig montierten Gerät.
+Ein kleiner Sprachtaster zum Selberdrucken. Die ganze Symbolfläche ist die
+Taste; ein Druck spielt eine Aufnahme ab. Die laminierte Karte dahinter lässt
+sich ohne Werkzeug wechseln, am fertig montierten Gerät.
 
 Gebaut für ein dreieinhalbjähriges Kind, das nicht spricht.
 
-> **Verkleinert (2026-10-29).** 93 → 85 mm Kantenmaß, durch zwei
-> Streichungen: der Sockel unter der Tasterplatine ist weg (sie klebt
-> jetzt auf dem Lautsprecherrücken), und der umlaufende Anschlagring ist
-> durch **vier Eckpfosten** ersetzt. Bezahlt wird das mit Reserve beim
-> Randdruck — 0,10 statt 0,25 mm — und mit 1,5 mm mehr Bauhöhe.
-> Drei Maße am Lautsprecherrücken sind noch Annahme; sie betreffen nur
-> den Zwischenleger, nicht die drei großen Druckteile. Siehe
-> [REVIEW_HANDOFF.md](REVIEW_HANDOFF.md).
+> **Dieser Stand ist konstruiert und rechnerisch geprüft, aber noch nie
+> gedruckt worden.** Kräfte, Schaumkennlinien, die Auszugsfestigkeit der
+> Schnurlobe und die Kabelführung sind nicht nachgewiesen.
 
 | | |
 |---|---|
-| Außenmaß | 85 × 85 × 23,4 mm |
+| Außenmaß | 72 × 72 × 25 mm (Grundquadrat; mit Schnurlobe umschreibend 75,5 × 75,5) |
 | Druckteile | vier, alle ohne Stützen |
-| Befestigung | vier M2 × 10, von hinten |
-| Karte | 40 × 40 mm, zulässig 39,3–40,7 mm |
-| Druckfläche | 71 × 71 mm |
-| Tastenweg | 2,0 mm bis zu den Eckpfosten |
+| Befestigung | vier M2 × 10, waagerecht durch die Seitenwände |
+| Karte | 60 × 60 mm |
+| Druckfläche | 64 × 64 mm |
+| Tastenweg | 2,0 mm bis zu den Eckanschlägen |
+
+Alles liegt in **[compact72/](compact72/README.md)** — vier druckfertige STLs,
+OpenSCAD-Quelle, Montageanleitung, Prüfskript und Prüfergebnisse.
 
 ## Aufbau
 
-Vier Teile, und jedes hat genau eine Aufgabe.
+**Unterteil** — trägt Akku, Hauptplatine und Lautsprecher, dazu die vier
+Eckanschläge, in denen auch die Schrauben sitzen.
 
-**Frontgehäuse** — die Außenhaut. Ein umlaufender 45-Grad-Konus hält die
-Taste nach vorn fest; die Wand nimmt die Anschlagkräfte auf und trägt
-die vier Gewinde.
+**Brücke** — ein eigenes Druckteil auf drei Füßen, das die Tasterplatine
+**mittig über** der Elektronik hält. Dadurch sitzt der 6 × 6-Taster genau in
+der Plattenmitte und bekommt bei jedem Kippen die volle Hälfte des Tastenwegs,
+egal wo man drückt.
 
-**Taste** — Platte mit Flansch und Kartenmulde, von hinten eingelegt.
-Sie kann nach vorn nicht heraus, und **keine Schraube geht durch sie
-hindurch**.
+**Rahmen** — die Außenwand mit dem umlaufenden Haltekonus, der die Taste nach
+vorn festhält. Keine Schraube geht durch ein bewegliches Teil.
 
-**Rückdeckel** — trägt Akku und Hauptplatine und die **vier
-Eckpfosten**, die die Handkraft abfangen. Jeder Pfosten ist mit der
-Kavität verschnitten, liegt also an zwei Gehäusewänden an und kann nicht
-ausweichen. In seiner Innenecke sitzt eine Kerbe für ein
-Rückstellpad. Der Lautsprecher liegt in einer **Tasche im Deckel**,
-nicht auf dem Boden.
+**Taste** — Platte mit Flansch und Kartenmulde, von hinten eingelegt. Karte
+schräg unter die obere Lippe schieben, loslassen, sie fällt auf die untere.
 
-**Zwischenleger** — ein Plättchen von 20 × 9 × 1,6 mm. Es klebt auf dem
-Lautsprecherrücken, die Tasterplatine klebt auf ihm. Es gibt den nach
-unten vorstehenden Lötbeinen des Tasters ein Fenster und der Platine
-eine steife, ebene Auflage.
+### Schnurlobe
 
-Warum es so und nicht anders aussieht — besonders, warum der Taster
-nicht mittig sitzt und was das kostet — steht in
-[docs/adr-002-architektur.md](docs/adr-002-architektur.md).
+An der Südostecke ist eine Schnurlobe **mit dem Körper verschmolzen**: die
+Kante verlässt die Gerade 9 mm vor der Ecke und läuft tangential in eine Lobe
+mit 2,5-mm-Bohrung. Das Grundquadrat bleibt exakt 72 × 72, nur die Lobe steht
+3,5 mm je Seite darüber hinaus.
 
-## Weiterlesen
+Die Form entsteht als `hull()` zweier Kreise und ist damit **durchgehend
+konvex** — dort kann keine Kehle entstehen, auch wenn jemand später an den
+Zahlen dreht. Eine Kehle wäre eine Kerbe, und Kerben reißen. Die Bohrung geht
+durch Unterteil *und* Rahmen; dass die Schnur durch beide Teile läuft, hält sie
+zusätzlich zusammen.
 
-| | |
-|---|---|
-| [docs/mechanism.md](docs/mechanism.md) | wie die Betätigung rechnet, alle neun Druckfälle |
-| [docs/build.md](docs/build.md) | Stückliste und Montagefolge |
-| [docs/print.md](docs/print.md) | Drucken, kritische Stellen |
-| [REVIEW_HANDOFF.md](REVIEW_HANDOFF.md) | offene Messungen, Annahmen, Grenzen |
-| [docs/adr-001-architecture.md](docs/adr-001-architecture.md) | der abgelöste Vorgänger, als Protokoll |
-
-## Selber bauen
+## Prüfen
 
 ```bash
-scad/render_all.sh     # STLs nach stl/, Ansichten nach render/
-scad/check_fit.sh      # Geometrieprüfungen
-scad/check_negative.sh # baut absichtlich Fehler ein und verlangt ein FAIL
-python3 scad/kinematics.py   # Betätigung unabhängig nachgerechnet
+python3 compact72/checks/validate.py --jobs 4
 ```
 
-Gebraucht wird OpenSCAD 2021.01 oder neuer und Python 3.
+33 Geometrieprüfungen: geschlossene Einzelkörper je Druckteil, Elektronik,
+Schraubenwege, acht Kipplagen, Kartensitz und -halt, Anschlag, Haltekonus,
+Steckerfreigang, Einsetzwege und die Wandstärke um die Schnurbohrung.
 
-Alle Maße stehen in `scad/config.scad`, getrennt nach `[GEMESSEN]`,
-`[ANNAHME]` und abgeleitet. Nichts anderes von Hand ändern — der Rest
-rechnet sich daraus.
+Gebraucht wird OpenSCAD 2021.01 oder neuer und Python 3. Alle Maße stehen in
+`compact72/scad/compact72.scad`.
+
+## Was offen ist
+
+Steht ausführlich in [compact72/README.md](compact72/README.md) und
+[compact72/REVIEW.md](compact72/REVIEW.md). Kurz: Betätigungs- und
+Rückstellkräfte, Durchhang der Kartenlippe, Verschleiß der Schnur in einer
+ungefasten PLA-Bohrung, vollständige Kabelführung — und die Annahmen über
+Platinendicke, Schaltvorlauf, Klebebandstärke und Laminatdicke.
+
+Ein früherer Entwurf (85 × 85 mm, Taster seitlich auf dem Lautsprecher, vier
+Eckpfosten, mit eigener Prüfsuite und Negativtests) ist bis Commit `abfec20` in
+der Historie zu finden.

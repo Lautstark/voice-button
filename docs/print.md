@@ -38,8 +38,12 @@ fertige Gerät geht.
 | Rückdeckel | 85 × 85 mm | volle Fläche, ca. 7200 mm² |
 | Zwischenleger | 20 × 9 mm | volle Fläche, 180 mm² |
 
-Alle vier nebeneinander gehen **nicht**: 85 + 75,4 + 85 plus Abstände
-sind über 260 mm. Zwei Platten, siehe oben.
+In **einer Reihe** gehen alle vier nicht: 85 + 85 + 75,4 + 20 plus
+Abstände sind über 290 mm. In **zwei Reihen** passen sie auf eine
+Platte — 196 × 194 mm bei 220 × 220 Bett, mit Brim am Gehäuse
+gerechnet. Das sind 12 mm Rand je Seite; machbar, aber eng, und ein
+misslungener Druck kostet dann alle vier Teile. Deshalb oben trotzdem
+zwei Platten.
 
 ## Die kritischen Stellen
 

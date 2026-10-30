@@ -6,7 +6,29 @@ An der Südostecke ist eine **Schnurlobe mit dem Körper verschmolzen**: die Kan
 
 Dort liegen die vier druckfertigen STLs, OpenSCAD-Quelle, Vorschauen, Montageanleitung und Prüfergebnisse. 33 Geometrieprüfungen bestanden; **noch nicht physisch gedruckt und getestet**.
 
-Die folgende Dokumentation beschreibt weiterhin den bisherigen Entwurf. Für die kompakte Variante bitte die Anleitung in `compact72/` verwenden.
+## Für einen Review: zwei Entwürfe liegen hier nebeneinander
+
+| | wo | Stand |
+|---|---|---|
+| **Aktuell: 72 × 72 × 25** | `compact72/` | vier Druckteile, Taster mittig auf einer Brücke, Schnurlobe. 33 Prüfungen grün. **Dies ist der zu prüfende Stand.** |
+| Abgelöst: 85 × 85 × 23,4 | `scad/`, `stl/`, `docs/`, `render/` | vier Druckteile, Taster seitlich auf dem Lautsprecher, vier Eckpfosten. 57 Prüfungen und 19 Negativtests grün. Bleibt als geprüfter Rückfall liegen, falls sich die 72er beim Drucken als Fehlgriff erweist. |
+
+Beide benutzen dieselbe gemessene Hardware. Sie teilen **keinen** Code: `compact72/scad/compact72.scad` steht für sich, `scad/config.scad` gilt nur für den abgelösten Entwurf.
+
+Prüfungen reproduzieren:
+
+```bash
+python3 compact72/checks/validate.py --jobs 4    # aktueller Entwurf, 33 Pruefungen
+scad/check_fit.sh && scad/check_negative.sh      # abgeloester Entwurf
+```
+
+Wo die offenen Punkte stehen: [`compact72/README.md`](compact72/README.md) und
+[`compact72/REVIEW.md`](compact72/REVIEW.md) für den aktuellen Entwurf,
+[`REVIEW_HANDOFF.md`](REVIEW_HANDOFF.md) für den abgelösten.
+
+**Keiner der beiden ist physisch gedruckt und erprobt.** Kräfte, Schaumkennlinien,
+Auszugsfestigkeit der Schnurlobe und die Kabelführung sind in keinem von beiden
+nachgewiesen.
 
 ---
 

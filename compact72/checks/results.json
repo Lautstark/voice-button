@@ -1,0 +1,504 @@
+[
+  {
+    "name": "base",
+    "expected": "part",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 13814.986341,
+    "bounds_min": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "bounds_max": [
+      72.0,
+      72.0,
+      18.6
+    ],
+    "size": [
+      72.0,
+      72.0,
+      18.6
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "frame",
+    "expected": "part",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 14165.971532,
+    "bounds_min": [
+      0.0,
+      0.0,
+      -3.8147e-07
+    ],
+    "bounds_max": [
+      72.0,
+      72.0,
+      21.1
+    ],
+    "size": [
+      72.0,
+      72.0,
+      21.1
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "button",
+    "expected": "part",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 10884.680487,
+    "bounds_min": [
+      2.7,
+      2.7,
+      -5.72205e-07
+    ],
+    "bounds_max": [
+      69.3,
+      69.3,
+      4.4
+    ],
+    "size": [
+      66.6,
+      66.6,
+      4.4
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "bridge",
+    "expected": "part",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 2696.667958,
+    "bounds_min": [
+      25.0,
+      2.80001,
+      3.8147e-07
+    ],
+    "bounds_max": [
+      51.0,
+      67.5,
+      8.3
+    ],
+    "size": [
+      26.0,
+      64.7,
+      8.3
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "check_electronics",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "check_frame_base",
+    "expected": "clear",
+    "returncode": 0,
+    "empty": false,
+    "warnings": [
+      "WARNING: Object may not be a valid 2-manifold and may need repair!",
+      "EXPORT-WARNING: Exported object may not be a valid 2-manifold and may need repair"
+    ],
+    "volume_mm3": 0.0,
+    "bounds_min": [
+      0.0,
+      0.0,
+      2.4
+    ],
+    "bounds_max": [
+      72.0,
+      72.0,
+      2.4
+    ],
+    "size": [
+      72.0,
+      72.0,
+      0.0
+    ],
+    "components": 1,
+    "nonmanifold_edges": 102,
+    "pass": true
+  },
+  {
+    "name": "check_bridge_frame",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "check_bridge_base",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "check_button_rest",
+    "expected": "clear",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 1.6e-05,
+    "bounds_min": [
+      2.7,
+      2.7,
+      20.61
+    ],
+    "bounds_max": [
+      69.2924,
+      69.2924,
+      21.61
+    ],
+    "size": [
+      66.5924,
+      66.5924,
+      1.0
+    ],
+    "components": 17,
+    "nonmanifold_edges": 60,
+    "pass": true
+  },
+  {
+    "name": "check_button_pressed",
+    "expected": "clear",
+    "returncode": 0,
+    "empty": false,
+    "warnings": [
+      "WARNING: Object may not be a valid 2-manifold and may need repair!",
+      "EXPORT-WARNING: Exported object may not be a valid 2-manifold and may need repair"
+    ],
+    "volume_mm3": 0.0,
+    "bounds_min": [
+      2.7,
+      2.7,
+      18.6
+    ],
+    "bounds_max": [
+      69.3,
+      69.3,
+      18.6
+    ],
+    "size": [
+      66.6,
+      66.6,
+      0.0
+    ],
+    "components": 4,
+    "nonmanifold_edges": 60,
+    "pass": true
+  },
+  {
+    "name": "check_card_seated",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "check_card_lifted",
+    "expected": "clear",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 0.0,
+    "bounds_min": [
+      6.49981,
+      66.8375,
+      23.01
+    ],
+    "bounds_max": [
+      65.5002,
+      66.8375,
+      23.6
+    ],
+    "size": [
+      59.0004,
+      0.0,
+      0.59
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "check_usb",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "check_screws",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "tilt_1_0",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "tilt_-1_0",
+    "expected": "clear",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 0.0,
+    "bounds_min": [
+      2.73004,
+      4.99998,
+      18.6
+    ],
+    "bounds_max": [
+      2.73004,
+      7.5,
+      18.6
+    ],
+    "size": [
+      0.0,
+      2.5,
+      0.0
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "tilt_0_1",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "tilt_0_-1",
+    "expected": "clear",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 0.0,
+    "bounds_min": [
+      4.99998,
+      2.73004,
+      18.6
+    ],
+    "bounds_max": [
+      7.5,
+      2.73004,
+      18.6
+    ],
+    "size": [
+      2.5,
+      0.0,
+      0.0
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "tilt_1_1",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "tilt_1_-1",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "tilt_-1_1",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "tilt_-1_-1",
+    "expected": "clear",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 0.0,
+    "bounds_min": [
+      3.38884,
+      3.38884,
+      18.6
+    ],
+    "bounds_max": [
+      3.38913,
+      3.38913,
+      18.6
+    ],
+    "size": [
+      0.0003,
+      0.0003,
+      0.0
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "button_insert_12",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "button_insert_4",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "button_insert_1",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "base_insert_12",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "base_insert_4",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "base_insert_1",
+    "expected": "clear",
+    "returncode": 1,
+    "empty": true,
+    "pass": true
+  },
+  {
+    "name": "check_card_retained_bottom",
+    "expected": "engage",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 4.778601,
+    "bounds_min": [
+      6.00932,
+      5.5625,
+      23.9
+    ],
+    "bounds_max": [
+      65.9907,
+      5.97183,
+      24.1
+    ],
+    "size": [
+      59.9814,
+      0.4093,
+      0.2
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "check_card_retained_top",
+    "expected": "engage",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 20.678478,
+    "bounds_min": [
+      6.0,
+      63.8263,
+      23.9
+    ],
+    "bounds_max": [
+      66.0,
+      65.5625,
+      24.1
+    ],
+    "size": [
+      60.0,
+      1.7362,
+      0.2
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "check_stop",
+    "expected": "engage",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 8.708382,
+    "bounds_min": [
+      2.7,
+      2.7,
+      18.4
+    ],
+    "bounds_max": [
+      69.3,
+      69.3,
+      18.6
+    ],
+    "size": [
+      66.6,
+      66.6,
+      0.2
+    ],
+    "components": 4,
+    "nonmanifold_edges": 0,
+    "pass": true
+  },
+  {
+    "name": "check_retained",
+    "expected": "engage",
+    "returncode": 0,
+    "empty": false,
+    "volume_mm3": 66.774366,
+    "bounds_min": [
+      2.7,
+      2.7,
+      20.9
+    ],
+    "bounds_max": [
+      69.3,
+      69.3,
+      21.91
+    ],
+    "size": [
+      66.6,
+      66.6,
+      1.01
+    ],
+    "components": 1,
+    "nonmanifold_edges": 0,
+    "pass": true
+  }
+]

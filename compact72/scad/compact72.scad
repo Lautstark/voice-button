@@ -38,6 +38,19 @@ lobe_r     = 4.0;    // Radius der Lobe
 lobe_x     = case_w-0.5;
 lobe_y     = 0.5;
 cord_d     = 2.5;    // fuer eine 2-mm-Schnur
+// Fase an beiden Enden der Bohrung. Eine gedruckte Lochkante ist scharf,
+// und eine Schnur saegt daran. Das gehoert ins Modell und nicht in die
+// Nacharbeit mit dem Messer — eine Handarbeit, die man vergessen kann,
+// ist keine Loesung.
+//
+// Beide Fasen sind druckbar, in beiden Drucklagen:
+//   unten  (Rueckseite des Unterteils, z = 0, liegt auf dem Bett):
+//          das Loch verengt sich nach oben, das Material waechst mit
+//          45 Grad nach innen — selbsttragend.
+//   oben   (Vorderseite des Rahmens, z = frame_top, letzte Schicht):
+//          das Loch oeffnet sich nach oben, Material weicht zurueck —
+//          gar kein Ueberhang.
+cord_cham  = 0.6;
 card_w = 60;
 c = case_w/2;
 cavity = case_w - 2*wall;
@@ -170,6 +183,14 @@ assert(wall-screw_head_h >= 1-eps, "Insufficient material behind screw head");
 // Material nach AUSSEN um die Bohrung.
 assert(lobe_r-cord_d/2 >= 2.4,
        str("Zu wenig Material aussen um die Schnurbohrung: ", lobe_r-cord_d/2));
+// Dasselbe AN DER FASE, wo die Wand am duennsten ist. Ohne diese Zeile
+// koennte eine groessere Fase die Lobe an der Oberflaeche aufzehren,
+// ohne dass irgendein Assert anschlaegt.
+assert(lobe_r-cord_d/2-cord_cham >= 1.8,
+       str("Fase frisst die Lobe an der Oberflaeche auf: ",
+           lobe_r-cord_d/2-cord_cham));
+assert(cord_cham > 0 && cord_cham <= base_t/2,
+       "Fase unbrauchbar oder tiefer als der halbe Boden");
 // Material von der Bohrung zur KAVITAET. Die Kavitaetsecke ist die Rundung
 // corner_ri um (case_w-corner_r, corner_r); naeher darf die Bohrung nicht.
 assert(sqrt(pow(lobe_x-(case_w-corner_r),2)+pow(lobe_y-corner_r,2))
@@ -221,6 +242,13 @@ module body_outline(z,h) { translate([0,0,z]) linear_extrude(h) body_plan(); }
 // zusaetzlich zusammen.
 module cord_bore() {
     translate([lobe_x,lobe_y,-1]) cylinder(d=cord_d, h=frame_top+2);
+    // Die untere Fase liegt ganz im Unterteil (0..18,6), die obere ganz
+    // im Rahmen (2,4..23,5). Beide Teile ziehen dasselbe Modul ab; jede
+    // Fase trifft nur das Teil, zu dem sie gehoert.
+    translate([lobe_x,lobe_y,-eps])
+        cylinder(d1=cord_d+2*cord_cham, d2=cord_d, h=cord_cham+eps);
+    translate([lobe_x,lobe_y,frame_top-cord_cham])
+        cylinder(d1=cord_d, d2=cord_d+2*cord_cham, h=cord_cham+eps);
 }
 
 module at_screw(i) {

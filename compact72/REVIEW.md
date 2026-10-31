@@ -46,3 +46,22 @@ Ebenfalls korrigiert: `check_eye_hole` verschnitt die Bohrung mit dem
 Teil, aus dem sie herausgeschnitten wurde. Das ist bauartbedingt leer
 und konnte nie scheitern. Ersetzt durch `check_cord_wall`, und der ist
 gegen einen eingebauten Fehler verifiziert.
+
+
+## Nachtrag: Fase am Schnurloch
+
+Die Lochkanten waren scharf, und in der Druckanleitung stand als Abhilfe
+"einmal mit dem Messer brechen". Eine Nacharbeit, die man vergessen kann,
+ist keine Lösung — das gehört ins Modell. Beide Enden der Bohrung haben
+jetzt 0,6 mm Fase.
+
+Druckbar in beiden Lagen: unten, auf der Rückseite des Unterteils,
+verengt sich das Loch nach oben, das Material wächst mit 45 Grad nach
+innen und trägt sich selbst. Oben, auf der Stirnfläche des Rahmens,
+öffnet es sich nach oben — gar kein Überhang.
+
+Am exportierten STL nachgemessen: Lochradius an beiden Oberflächen
+1,840 mm, 0,6 mm tiefer exakt 1,250 mm. Ein zusätzlicher Assert deckt
+die Stelle ab, an der die Lobe durch die Fase am dünnsten wird; ohne ihn
+könnte eine größere Fase sie an der Oberfläche aufzehren, ohne dass
+etwas anschlägt.
